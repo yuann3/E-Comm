@@ -3,43 +3,407 @@
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>@ViewData["Title"] - E_Comm</title>
+    <title>@ViewData["Title"] - 3B1G</title>
     <script type="importmap"></script>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" 
+          integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" 
+          crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true"/>
     <link rel="stylesheet" href="~/E_Comm.styles.css" asp-append-version="true"/>
+    <style>
+        /* Custom Modern Styling - Performance Optimized */
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --shadow: 0 2px 4px rgba(0, 0, 0, 0.075);
+            --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.175);
+            --border-radius: 15px;
+            --border-radius-sm: 10px;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            -webkit-overflow-scrolling: touch;
+            scroll-behavior: smooth;
+        }
+
+        /* Performance optimizations */
+        * {
+            box-sizing: border-box;
+        }
+        
+        img {
+            transform: translateZ(0);
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+
+        .navbar {
+            box-shadow: var(--shadow);
+        }
+
+        .hover-shadow {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            will-change: transform;
+        }
+
+        .hover-shadow:hover {
+            transform: translate3d(0, -5px, 0);
+            box-shadow: var(--shadow-lg) !important;
+        }
+
+        .product-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border-radius: var(--border-radius);
+            will-change: transform;
+        }
+
+        .product-card:hover {
+            transform: translate3d(0, -8px, 0);
+            box-shadow: var(--shadow-lg) !important;
+        }
+
+        .btn {
+            border-radius: var(--border-radius-sm);
+            font-weight: 500;
+            padding: 0.5rem 1.5rem;
+            transition: transform 0.15s ease;
+        }
+
+        .btn:hover {
+            transform: translate3d(0, -2px, 0);
+        }
+
+        .card {
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            contain: layout style paint;
+        }
+
+        .badge {
+            border-radius: var(--border-radius-sm);
+            font-weight: 500;
+        }
+
+        .feature-icon {
+            transition: transform 0.2s ease;
+            will-change: transform;
+        }
+
+        .feature-icon:hover {
+            transform: scale3d(1.1, 1.1, 1);
+        }
+
+        /* Modern Animated Hero Section */
+        .hero-section-animated {
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(-45deg, #667eea, #764ba2, #f093fb, #f5576c, #4facfe, #00f2fe);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            min-height: 500px;
+            display: flex;
+            align-items: center;
+            border-radius: var(--border-radius);
+            margin: 0 15px;
+        }
+
+        .hero-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 1;
+        }
+
+        .hero-title {
+            font-size: 4rem;
+            background: linear-gradient(45deg, #ffffff, #f8f9fa, #ffffff);
+            background-size: 200% 200%;
+            animation: textShimmer 3s ease-in-out infinite;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.3));
+        }
+
+        .hero-subtitle {
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
+            font-weight: 300;
+            opacity: 0.95;
+        }
+
+        @@keyframes gradientShift {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        @@keyframes textShimmer {
+            0%, 100% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+
+        .hero-icons i {
+            opacity: 0.8;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            will-change: transform;
+        }
+
+        .hero-icons i:hover {
+            opacity: 1;
+            transform: scale3d(1.2, 1.2, 1);
+        }
+
+        /* Hero Section Buttons */
+        .btn-hero-primary {
+            background: rgba(255, 255, 255, 0.95);
+            color: #333;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+            font-weight: 600;
+            text-shadow: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-hero-primary:hover {
+            background: rgba(255, 255, 255, 1);
+            color: #222;
+            transform: translate3d(0, -3px, 0);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-hero-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(10px);
+            font-weight: 600;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .btn-hero-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border-color: rgba(255, 255, 255, 0.8);
+            transform: translate3d(0, -3px, 0);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .alert-hero {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            backdrop-filter: blur(10px);
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .footer {
+            background: var(--primary-gradient);
+            color: white;
+        }
+
+        .toast-container {
+            z-index: 1055;
+        }
+
+        /* Loading animation - optimized for performance */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s linear infinite;
+            will-change: transform;
+        }
+
+        @@keyframes spin {
+            to { transform: rotate3d(0, 0, 1, 360deg); }
+        }
+
+        /* Responsive improvements */
+        @@media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem !important;
+            }
+            
+            .display-4 {
+                font-size: 2rem;
+            }
+
+            .hero-section-animated {
+                min-height: 400px;
+            }
+
+            .hero-subtitle {
+                font-size: 1rem;
+            }
+        }
+    </style>
 </head>
 <body>
 <header>
-    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-        <div class="container-fluid">
-            <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">E_Comm</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                    aria-expanded="false" aria-label="Toggle navigation">
+    <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom mb-3">
+        <div class="container">
+            <!-- Brand -->
+            <a class="navbar-brand d-flex align-items-center" asp-area="" asp-controller="Home" asp-action="Index">
+                <i class="fas fa-crown text-primary me-2"></i>
+                <strong>3B1G</strong>
+            </a>
+            
+            <!-- Mobile Toggle -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                <ul class="navbar-nav flex-grow-1">
+            
+            <!-- Navigation -->
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                        <a class="nav-link" asp-controller="Home" asp-action="Index">
+                            <i class="fas fa-home me-1"></i>Home
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                        <a class="nav-link" asp-controller="Home" asp-action="Catalog">
+                            <i class="fas fa-th-large me-1"></i>Browse Products
+                        </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Home" asp-action="About">
+                            <i class="fas fa-info-circle me-1"></i>About
+                        </a>
+                    </li>
+                </ul>
+                
+                <!-- User Menu -->
+                <ul class="navbar-nav">
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" 
+                               role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-user-circle me-2"></i>
+                                <span class="d-none d-md-inline">@User.Identity.Name</span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end shadow">
+                                @if (User.IsInRole("Admin"))
+                                {
+                                    <li><h6 class="dropdown-header"><i class="fas fa-crown me-2"></i>Administrator</h6></li>
+                                    <li><a class="dropdown-item" asp-controller="Admin" asp-action="Index">
+                                        <i class="fas fa-tachometer-alt me-2"></i>Dashboard</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Admin" asp-action="ManageItems">
+                                        <i class="fas fa-boxes me-2"></i>Manage Items</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Admin" asp-action="ManageUsers">
+                                        <i class="fas fa-users-cog me-2"></i>Manage Users</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                }
+                                @if (User.IsInRole("Employee"))
+                                {
+                                    <li><h6 class="dropdown-header"><i class="fas fa-id-badge me-2"></i>Employee</h6></li>
+                                    <li><a class="dropdown-item" asp-controller="Employee" asp-action="Index">
+                                        <i class="fas fa-tachometer-alt me-2"></i>Dashboard</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Employee" asp-action="ViewItems">
+                                        <i class="fas fa-boxes me-2"></i>View Items</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Employee" asp-action="ViewAccounts">
+                                        <i class="fas fa-users me-2"></i>View Accounts</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                }
+                                @if (User.IsInRole("Customer"))
+                                {
+                                    <li><h6 class="dropdown-header"><i class="fas fa-user me-2"></i>Customer</h6></li>
+                                    <li><a class="dropdown-item" asp-controller="Customer" asp-action="Index">
+                                        <i class="fas fa-tachometer-alt me-2"></i>My Dashboard</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Customer" asp-action="MyAccount">
+                                        <i class="fas fa-user-edit me-2"></i>My Account</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Customer" asp-action="OrderHistory">
+                                        <i class="fas fa-history me-2"></i>Order History</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                }
+                                <li>
+                                    <form asp-controller="Auth" asp-action="Logout" method="post" class="d-inline">
+                                        <button type="submit" class="dropdown-item text-danger">
+                                            <i class="fas fa-sign-out-alt me-2"></i>Logout
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item me-2">
+                            <a class="nav-link" asp-controller="Auth" asp-action="Login">
+                                <i class="fas fa-sign-in-alt me-1"></i>Login
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="btn btn-primary btn-sm" asp-controller="Customer" asp-action="CreateAccount">
+                                <i class="fas fa-user-plus me-1"></i>Sign Up
+                            </a>
+                        </li>
+                    }
                 </ul>
             </div>
         </div>
     </nav>
 </header>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show mx-3" role="alert">
+        <i class="fas fa-check-circle me-2"></i>@TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show mx-3" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i>@TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
 <div class="container">
     <main role="main" class="pb-3">
         @RenderBody()
     </main>
 </div>
 
-<footer class="border-top footer text-muted">
-    <div class="container">
-        &copy; 2025 - E_Comm - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+<footer class="footer text-white mt-5">
+    <div class="container py-4">
+        <div class="row">
+            <div class="col-md-6">
+                <h5><i class="fas fa-crown me-2"></i>3B1G</h5>
+                <p class="mb-0 opacity-75">Your gateway to books, movies, and games.</p>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <p class="mb-0 opacity-75">
+                    &copy; 2025 3B1G - 
+                    <a asp-controller="Home" asp-action="Privacy" class="text-white text-decoration-none">Privacy Policy</a>
+                </p>
+            </div>
+        </div>
     </div>
 </footer>
 <script src="~/lib/jquery/dist/jquery.min.js"></script>

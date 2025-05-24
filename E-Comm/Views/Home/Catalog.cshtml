@@ -1,0 +1,247 @@
+@model List<E_Comm.Models.Product>
+@{
+    ViewData["Title"] = "Product Catalog - 3B1G";
+}
+
+<!-- Page Header -->
+<div class="bg-light py-4 mb-4">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <h1 class="h2 mb-0">Product Catalog</h1>
+                <p class="text-muted mb-0">Discover our amazing collection of books, movies, and games</p>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <span class="badge bg-primary fs-6">@Model.Count items found</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Search and Filter Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <form method="get" asp-action="Catalog">
+                        <div class="row g-3 align-items-end">
+                            <div class="col-md-5">
+                                <label for="searchTerm" class="form-label">Search Products</label>
+                                <input type="text" class="form-control" id="searchTerm" name="searchTerm" 
+                                       value="@ViewBag.SearchTerm" placeholder="Search by title, author, or description...">
+                            </div>
+                            <div class="col-md-3">
+                                <label for="genreId" class="form-label">Filter by Genre</label>
+                                <select class="form-select" id="genreId" name="genreId">
+                                    <option value="">All Genres</option>
+                                    @if (ViewBag.Genres != null)
+                                    {
+                                        @foreach (var genre in (List<E_Comm.Models.Genre>)ViewBag.Genres)
+                                        {
+                                            <option value="@genre.GenreID" selected="@(ViewBag.SelectedGenre == genre.GenreID)">
+                                                @genre.Name
+                                            </option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-search me-1"></i>Search
+                                </button>
+                            </div>
+                            <div class="col-md-2">
+                                <a asp-action="Catalog" class="btn btn-outline-secondary w-100">
+                                    <i class="fas fa-undo me-1"></i>Clear
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Products Grid -->
+    @if (Model.Any())
+    {
+        <div class="row">
+            @foreach (var product in Model)
+            {
+                <div class="col-xl-3 col-lg-4 col-md-6 mb-4">
+                    <div class="card h-100 border-0 shadow-sm hover-shadow product-card">
+                        <div class="card-body p-3">
+                            <!-- Product Header -->
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                @if (product.Genre != null)
+                                {
+                                    <span class="badge bg-primary">@product.Genre.Name</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Entertainment</span>
+                                }
+                                
+                                @if (product.Stocktakes?.Any() == true)
+                                {
+                                    var stocktake = product.Stocktakes.First();
+                                    <div class="text-end">
+                                        <div class="fw-bold text-success fs-6">$@(stocktake.Price?.ToString("F2") ?? "0.00")</div>
+                                        @if (stocktake.Quantity <= 5)
+                                        {
+                                            <small class="text-danger">Only @stocktake.Quantity left!</small>
+                                        }
+                                        else
+                                        {
+                                            <small class="text-success">In Stock</small>
+                                        }
+                                    </div>
+                                }
+                            </div>
+
+                            <!-- Product Info -->
+                            <h5 class="card-title mb-2">@product.Name</h5>
+                            
+                            @if (!string.IsNullOrEmpty(product.Author))
+                            {
+                                <p class="text-muted small mb-2">
+                                    <i class="fas fa-user me-1"></i>by @product.Author
+                                </p>
+                            }
+                            
+                            @if (product.Published.HasValue)
+                            {
+                                <p class="text-muted small mb-2">
+                                    <i class="fas fa-calendar me-1"></i>@product.Published.Value.ToString("yyyy")
+                                </p>
+                            }
+
+                            @if (!string.IsNullOrEmpty(product.Description))
+                            {
+                                <p class="card-text text-muted small mb-3">
+                                    @(product.Description.Length > 80 ? product.Description.Substring(0, 80) + "..." : product.Description)
+                                </p>
+                            }
+
+                            <!-- Action Buttons -->
+                            <div class="mt-auto">
+                                <div class="d-grid gap-2">
+                                    <a asp-controller="Home" asp-action="ProductDetails" asp-route-id="@product.ID" 
+                                       class="btn btn-outline-primary btn-sm">
+                                        <i class="fas fa-eye me-1"></i>View Details
+                                    </a>
+                                    @if (User.Identity?.IsAuthenticated == true && User.IsInRole("Customer"))
+                                    {
+                                        <button type="button" class="btn btn-success btn-sm" onclick="addToCart(@product.ID)">
+                                            <i class="fas fa-shopping-cart me-1"></i>Add to Cart
+                                        </button>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Pagination -->
+        @if (ViewBag.TotalPages > 1)
+        {
+            <div class="row mt-4">
+                <div class="col-12">
+                    <nav aria-label="Product pagination">
+                        <ul class="pagination justify-content-center">
+                            @if (ViewBag.CurrentPage > 1)
+                            {
+                                <li class="page-item">
+                                    <a class="page-link" asp-action="Catalog" 
+                                       asp-route-searchTerm="@ViewBag.SearchTerm" 
+                                       asp-route-genreId="@ViewBag.SelectedGenre"
+                                       asp-route-page="@(ViewBag.CurrentPage - 1)">Previous</a>
+                                </li>
+                            }
+
+                            @for (int i = Math.Max(1, ViewBag.CurrentPage - 2); i <= Math.Min(ViewBag.TotalPages, ViewBag.CurrentPage + 2); i++)
+                            {
+                                <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                                    <a class="page-link" asp-action="Catalog" 
+                                       asp-route-searchTerm="@ViewBag.SearchTerm" 
+                                       asp-route-genreId="@ViewBag.SelectedGenre"
+                                       asp-route-page="@i">@i</a>
+                                </li>
+                            }
+
+                            @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                            {
+                                <li class="page-item">
+                                    <a class="page-link" asp-action="Catalog" 
+                                       asp-route-searchTerm="@ViewBag.SearchTerm" 
+                                       asp-route-genreId="@ViewBag.SelectedGenre"
+                                       asp-route-page="@(ViewBag.CurrentPage + 1)">Next</a>
+                                </li>
+                            }
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <!-- No Products Found -->
+        <div class="row">
+            <div class="col-12">
+                <div class="text-center py-5">
+                    <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                    <h3>No products found</h3>
+                    <p class="text-muted">Try adjusting your search terms or filters to find what you're looking for.</p>
+                    <a asp-action="Catalog" class="btn btn-primary">Browse All Products</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        function addToCart(productId) {
+            // Simple add to cart functionality
+            fetch('/Customer/AddToCart', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `productId=${productId}&quantity=1`
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Show success message
+                    const toast = document.createElement('div');
+                    toast.className = 'toast-container position-fixed top-0 end-0 p-3';
+                    toast.innerHTML = `
+                        <div class="toast show" role="alert">
+                            <div class="toast-header">
+                                <i class="fas fa-check-circle text-success me-2"></i>
+                                <strong class="me-auto">Success</strong>
+                                <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+                            </div>
+                            <div class="toast-body">
+                                Item added to cart successfully!
+                            </div>
+                        </div>
+                    `;
+                    document.body.appendChild(toast);
+                    
+                    // Remove toast after 3 seconds
+                    setTimeout(() => {
+                        toast.remove();
+                    }, 3000);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    </script>
+} 
