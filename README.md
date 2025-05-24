@@ -2,7 +2,7 @@
 
 ### Technology Stack
 - **Framework**: ASP.NET Core 9.0 MVC
-- **Database**: SQLite (development), SQL Server (production)
+- **Database**: SQLite
 - **ORM**: Entity Framework Core 9.0
 - **Authentication**: ASP.NET Core Identity with Cookie Authentication
 - **Frontend**: Bootstrap 5, FontAwesome 6.4.0, jQuery
