@@ -6,8 +6,7 @@
 - **ORM**: Entity Framework Core 9.0
 - **Authentication**: ASP.NET Core Identity with Cookie Authentication
 - **Frontend**: Bootstrap 5, FontAwesome 6.4.0, jQuery
-- **Language**: C# 12
-
+  
 ### Project Structure
 ```
 E-Comm/
@@ -64,7 +63,7 @@ The database follows the provided SQL schema with the following core entities:
 - ProductsInOrder links Order to Stocktake (Many-to-Many)
 
 ### Database Configuration
-The application uses SQLite for development and can be configured for SQL Server in production. Connection string is defined in `appsettings.json`:
+The application uses SQLite, Connection string is defined in `appsettings.json`:
 
 ```json
 {
@@ -120,9 +119,6 @@ services.AddAuthorization(options =>
 ## Development Setup
 
 ### Prerequisites
-- .NET 9.0 SDK
-- Visual Studio 2022 or VS Code
-- Git
 
 ### Installation Steps
 1. Clone the repository
@@ -270,20 +266,6 @@ The application is mobile-first with breakpoints:
 - Authentication flow
 - API endpoints
 - View rendering
-
-## Deployment Considerations
-
-### Environment Configuration
-- Development: SQLite database
-- Production: SQL Server with connection pooling
-- Staging: Mimics production configuration
-
-### Security Measures
-- Password hashing with salt
-- CSRF protection
-- SQL injection prevention through EF Core
-- Role-based access control
-- Secure cookie configuration
 
 ## Contributing Guidelines
 
