@@ -32,6 +32,7 @@ namespace E_Comm.Models
         
         // Navigation properties
         public virtual Genre? Genre { get; set; }
+        public virtual User? LastUpdatedByUser { get; set; }
         public virtual ICollection<Stocktake> Stocktakes { get; set; } = new List<Stocktake>();
     }
 } 
