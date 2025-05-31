@@ -7,9 +7,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-// Add Entity Framework with SQLite
+// Add Entity Framework with SQL Server
 builder.Services.AddDbContext<EntertainmentGuildContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Add Authentication
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -35,12 +35,18 @@ builder.Services.AddScoped<AuthService>();
 
 var app = builder.Build();
 
+// Note: Database seeding is disabled because the database is already populated 
+// from the SQL script (scripted_db.sql)
+// If you need to run the DataSeeder, uncomment the block below:
+
+/*
 // Seed database with sample data
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<EntertainmentGuildContext>();
     await DataSeeder.SeedDataAsync(context);
 }
+*/
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

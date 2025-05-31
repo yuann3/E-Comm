@@ -10,8 +10,12 @@ namespace E_Comm.Models
 
         // DbSets for all entities
         public DbSet<Genre> Genres { get; set; }
+        public DbSet<BookGenre> BookGenres { get; set; }
+        public DbSet<MovieGenre> MovieGenres { get; set; }
+        public DbSet<GameGenre> GameGenres { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<Patron> Patrons { get; set; }
         public DbSet<Source> Sources { get; set; }
         public DbSet<Stocktake> Stocktakes { get; set; }
         public DbSet<Order> Orders { get; set; }
@@ -30,6 +34,28 @@ namespace E_Comm.Models
                 entity.Property(e => e.GenreID).HasColumnName("genreID");
             });
 
+            // Configure sub-genre tables
+            modelBuilder.Entity<BookGenre>(entity =>
+            {
+                entity.ToTable("Book_genre");
+                entity.HasKey(e => e.SubGenreID);
+                entity.Property(e => e.SubGenreID).HasColumnName("subGenreID").ValueGeneratedOnAdd();
+            });
+
+            modelBuilder.Entity<MovieGenre>(entity =>
+            {
+                entity.ToTable("Movie_genre");
+                entity.HasKey(e => e.SubGenreID);
+                entity.Property(e => e.SubGenreID).HasColumnName("subGenreID").ValueGeneratedOnAdd();
+            });
+
+            modelBuilder.Entity<GameGenre>(entity =>
+            {
+                entity.ToTable("Game_genre");
+                entity.HasKey(e => e.SubGenreID);
+                entity.Property(e => e.SubGenreID).HasColumnName("subGenreID").ValueGeneratedOnAdd();
+            });
+
             modelBuilder.Entity<Product>(entity =>
             {
                 entity.ToTable("Product");
@@ -38,6 +64,10 @@ namespace E_Comm.Models
                 entity.HasOne(p => p.Genre)
                       .WithMany(g => g.Products)
                       .HasForeignKey(p => p.GenreID);
+                entity.HasOne(p => p.LastUpdatedByUser)
+                      .WithMany()
+                      .HasForeignKey(p => p.LastUpdatedBy)
+                      .HasPrincipalKey(u => u.UserName);
             });
 
             modelBuilder.Entity<User>(entity =>
@@ -47,11 +77,18 @@ namespace E_Comm.Models
                 entity.Property(e => e.IsAdmin).HasColumnName("isAdmin");
             });
 
+            modelBuilder.Entity<Patron>(entity =>
+            {
+                entity.ToTable("Patrons");
+                entity.HasKey(e => e.UserID);
+                entity.Property(e => e.UserID).ValueGeneratedOnAdd();
+            });
+
             modelBuilder.Entity<Source>(entity =>
             {
                 entity.ToTable("Source");
                 entity.HasKey(e => e.SourceId);
-                entity.Property(e => e.SourceId).HasColumnName("sourceid");
+                entity.Property(e => e.SourceId).HasColumnName("sourceid").ValueGeneratedOnAdd();
                 entity.Property(e => e.GenreID).HasColumnName("Genre");
                 entity.HasOne(s => s.Genre)
                       .WithMany(g => g.Sources)
@@ -62,6 +99,7 @@ namespace E_Comm.Models
             {
                 entity.ToTable("Stocktake");
                 entity.HasKey(e => e.ItemId);
+                entity.Property(e => e.ItemId).ValueGeneratedOnAdd();
                 entity.HasOne(s => s.Source)
                       .WithMany(so => so.Stocktakes)
                       .HasForeignKey(s => s.SourceId);
@@ -74,6 +112,7 @@ namespace E_Comm.Models
             {
                 entity.ToTable("Orders");
                 entity.HasKey(e => e.OrderID);
+                entity.Property(e => e.OrderID).ValueGeneratedOnAdd();
                 entity.Property(e => e.CustomerId).HasColumnName("customer");
                 entity.HasOne(o => o.Customer)
                       .WithMany(c => c.Orders)
@@ -84,7 +123,10 @@ namespace E_Comm.Models
             {
                 entity.ToTable("TO");
                 entity.HasKey(e => e.CustomerID);
-                entity.Property(e => e.CustomerID).HasColumnName("customerID");
+                entity.Property(e => e.CustomerID).HasColumnName("customerID").ValueGeneratedOnAdd();
+                entity.HasOne(c => c.Patron)
+                      .WithMany(p => p.Customers)
+                      .HasForeignKey(c => c.PatronId);
             });
 
             modelBuilder.Entity<ProductsInOrder>(entity =>
