@@ -26,7 +26,7 @@ namespace E_Comm.Models
         [StringLength(64)]
         public string? HashPW { get; set; }
         
-        // Helper properties for role checking
+
         public bool IsEmployee => !IsAdmin && !string.IsNullOrEmpty(UserName);
         public bool IsCustomer => !IsAdmin && !IsEmployee;
     }
