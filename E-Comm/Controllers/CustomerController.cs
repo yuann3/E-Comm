@@ -15,7 +15,7 @@ namespace E_Comm.Controllers
             _context = context;
         }
 
-        // Customer Dashboard - Entry Point for Customers
+        // Customer Dashboard - Entry Point for Customers.
         public async Task<IActionResult> Index()
         {
             ViewBag.UserName = User.Identity?.Name ?? "Customer";
