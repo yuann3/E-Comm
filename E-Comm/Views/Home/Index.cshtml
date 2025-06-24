@@ -2,25 +2,26 @@
     ViewData["Title"] = "3B1G - Your Gateway to Books, Movies & Games";
 }
 
-<!-- Modern Hero Section with Video Background -->
-<div class="hero-section-video text-white py-5 mb-5">
+<!-- Full Screen Video Background -->
+<div class="hero-section-video-fullscreen text-white py-5 mb-5">
     <!-- Video Background -->
-    <div class="video-background">
-        <iframe src="https://www.youtube.com/embed/D_-sYUHyhAw?autoplay=1&mute=1&loop=1&playlist=D_-sYUHyhAw&controls=0&showinfo=0&rel=0&modestbranding=1&iv_load_policy=3&fs=0&disablekb=1&start=0&end=0"
+    <div class="video-background-fullscreen">
+        <iframe src="https://www.youtube.com/embed/D_-sYUHyhAw?autoplay=1&mute=1&loop=1&playlist=D_-sYUHyhAw&controls=0&showinfo=0&rel=0&modestbranding=1&iv_load_policy=3&fs=0&disablekb=1&start=43&end=93"
                 frameborder="0" 
                 allow="autoplay; encrypted-media" 
                 allowfullscreen
                 title="Background video">
         </iframe>
-        <div class="video-overlay"></div>
+        <div class="video-overlay-fullscreen"></div>
+        <div class="video-fade-bottom"></div>
     </div>
     
     <!-- Content -->
     <div class="container position-relative">
-        <div class="row align-items-center min-vh-50">
+        <div class="row align-items-center min-vh-75">
             <div class="col-lg-6">
                 <div class="hero-content">
-                    <h1 class="display-3 fw-bold mb-4" style="color: white; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);">
+                    <h1 class="display-3 fw-bold mb-4 brand-font" style="color: white; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);">
                         3B1G
                     </h1>
                     <p class="lead mb-4 fs-4" style="color: white; text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);">
@@ -57,19 +58,6 @@
                     }
                 </div>
             </div>
-            <div class="col-lg-6 text-center">
-                <div class="hero-icons d-flex justify-content-center gap-4 fs-1 mb-4">
-                    <div class="feature-icon" style="width: 100px; height: 100px; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px);">
-                        <i class="fas fa-book text-white"></i>
-                    </div>
-                    <div class="feature-icon" style="width: 100px; height: 100px; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px);">
-                        <i class="fas fa-film text-white"></i>
-                    </div>
-                    <div class="feature-icon" style="width: 100px; height: 100px; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px);">
-                        <i class="fas fa-gamepad text-white"></i>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 </div>
@@ -84,7 +72,7 @@
         
         <div class="col-lg-4 mb-4">
             <div class="feature-card h-100">
-                <div class="feature-icon bg-primary">
+                <div class="feature-icon">
                     <i class="fas fa-book fa-2x text-white"></i>
                 </div>
                 <h4 class="fw-bold mb-3">Books</h4>
@@ -97,7 +85,7 @@
         
         <div class="col-lg-4 mb-4">
             <div class="feature-card h-100">
-                <div class="feature-icon bg-success">
+                <div class="feature-icon">
                     <i class="fas fa-film fa-2x text-white"></i>
                 </div>
                 <h4 class="fw-bold mb-3">Movies</h4>
@@ -110,7 +98,7 @@
         
         <div class="col-lg-4 mb-4">
             <div class="feature-card h-100">
-                <div class="feature-icon bg-warning">
+                <div class="feature-icon">
                     <i class="fas fa-gamepad fa-2x text-white"></i>
                 </div>
                 <h4 class="fw-bold mb-3">Games</h4>
@@ -186,64 +174,72 @@
         </div>
     }
 
-    <!-- Statistics Section -->
-    <div class="row mb-5 py-5" style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); border-radius: 1rem;">
-        <div class="col-12 text-center mb-4">
-            <h3 class="fw-bold">Why Choose 3B1G?</h3>
+    <!-- Combined Why Choose Us & Call to Action Section -->
+    <div class="row mb-5 py-5 combined-section">
+        <!-- Why Choose Us -->
+        <div class="col-12 text-center mb-5">
+            <h2 class="display-5 fw-bold mb-3">Why Choose <span class="brand-font">3B1G</span>?</h2>
+            <p class="lead text-muted mb-5">Your trusted partner for premium entertainment content</p>
         </div>
-        <div class="col-md-3 text-center mb-3">
-            <div class="display-6 fw-bold text-primary mb-2">
-                <i class="fas fa-star"></i>
+        
+        <!-- Features Grid -->
+        <div class="col-md-3 text-center mb-4">
+            <div class="feature-stat">
+                <div class="feature-stat-icon mb-3">
+                    <i class="fas fa-star"></i>
+                </div>
+                <h5 class="fw-bold mb-2">Premium Quality</h5>
+                <p class="text-muted small">Curated selection of the finest entertainment</p>
             </div>
-            <h5 class="fw-bold">Premium Quality</h5>
-            <p class="text-muted">Curated selection of the finest entertainment</p>
         </div>
-        <div class="col-md-3 text-center mb-3">
-            <div class="display-6 fw-bold text-success mb-2">
-                <i class="fas fa-shipping-fast"></i>
+        <div class="col-md-3 text-center mb-4">
+            <div class="feature-stat">
+                <div class="feature-stat-icon mb-3">
+                    <i class="fas fa-shipping-fast"></i>
+                </div>
+                <h5 class="fw-bold mb-2">Fast Delivery</h5>
+                <p class="text-muted small">Quick and reliable shipping worldwide</p>
             </div>
-            <h5 class="fw-bold">Fast Delivery</h5>
-            <p class="text-muted">Quick and reliable shipping worldwide</p>
         </div>
-        <div class="col-md-3 text-center mb-3">
-            <div class="display-6 fw-bold text-warning mb-2">
-                <i class="fas fa-shield-alt"></i>
+        <div class="col-md-3 text-center mb-4">
+            <div class="feature-stat">
+                <div class="feature-stat-icon mb-3">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h5 class="fw-bold mb-2">Secure Shopping</h5>
+                <p class="text-muted small">Safe and protected transactions</p>
             </div>
-            <h5 class="fw-bold">Secure Shopping</h5>
-            <p class="text-muted">Safe and protected transactions</p>
         </div>
-        <div class="col-md-3 text-center mb-3">
-            <div class="display-6 fw-bold text-info mb-2">
-                <i class="fas fa-headset"></i>
+        <div class="col-md-3 text-center mb-4">
+            <div class="feature-stat">
+                <div class="feature-stat-icon mb-3">
+                    <i class="fas fa-headset"></i>
+                </div>
+                <h5 class="fw-bold mb-2">24/7 Support</h5>
+                <p class="text-muted small">Always here to help you</p>
             </div>
-            <h5 class="fw-bold">24/7 Support</h5>
-            <p class="text-muted">Always here to help you</p>
         </div>
-    </div>
-</div>
 
-<!-- Call to Action -->
-@if (User.Identity?.IsAuthenticated != true)
-{
-    <div class="py-5" style="background: linear-gradient(135deg, var(--gray-900) 0%, var(--gray-800) 100%);">
-        <div class="container text-center text-white">
-            <div class="row justify-content-center">
-                <div class="col-lg-8">
-                    <h2 class="display-5 fw-bold mb-4">Ready to Start Your Entertainment Journey?</h2>
-                    <p class="lead mb-5 opacity-75">Join thousands of satisfied customers who trust 3B1G for their entertainment needs. Create your account today and unlock exclusive deals.</p>
+        @if (User.Identity?.IsAuthenticated != true)
+        {
+            <!-- Call to Action -->
+            <div class="col-12 text-center mt-5">
+                <div class="cta-content">
+                    <h3 class="display-6 fw-bold mb-3">Ready to Start Your Entertainment Journey?</h3>
+                    <p class="lead text-muted mb-4">Join thousands of satisfied customers who trust <span class="brand-font">3B1G</span> for their entertainment needs.</p>
                     <div class="d-flex gap-3 justify-content-center flex-wrap">
-                        <a asp-controller="Customer" asp-action="CreateAccount" class="btn btn-light btn-lg px-5 py-3 fw-bold">
+                        <a asp-controller="Customer" asp-action="CreateAccount" class="btn btn-primary btn-lg px-5 py-3 fw-bold">
                             <i class="fas fa-user-plus me-2"></i>Create Account
                         </a>
-                        <a asp-controller="Auth" asp-action="Login" class="btn btn-outline-light btn-lg px-5 py-3 fw-bold">
+                        <a asp-controller="Auth" asp-action="Login" class="btn btn-outline-primary btn-lg px-5 py-3 fw-bold">
                             <i class="fas fa-sign-in-alt me-2"></i>Sign In
                         </a>
                     </div>
                 </div>
             </div>
-        </div>
+        }
     </div>
-}
+</div>
 
 @section Scripts {
     <script>
