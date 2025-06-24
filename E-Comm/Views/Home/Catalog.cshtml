@@ -3,21 +3,39 @@
     ViewData["Title"] = "Product Catalog - 3B1G";
 }
 
-<!-- Modern Page Header -->
-<div class="hero-section text-white py-4 mb-5" style="min-height: 300px;">
-    <div class="container">
-        <div class="row align-items-center h-100">
+<!-- Full Screen Video Background for Product Catalog -->
+<div class="hero-section-video-fullscreen text-white py-5 mb-5">
+    <!-- Video Background -->
+    <div class="video-background-fullscreen">
+        <iframe src="https://www.youtube.com/embed/eT_A2gPhTIw?autoplay=1&mute=1&loop=1&playlist=eT_A2gPhTIw&controls=0&showinfo=0&rel=0&modestbranding=1&iv_load_policy=3&fs=0&disablekb=1&start=186&end=390"
+                frameborder="0" 
+                allow="autoplay; encrypted-media" 
+                allowfullscreen
+                title="Product catalog background video">
+        </iframe>
+        <div class="video-overlay-fullscreen"></div>
+        <div class="video-fade-bottom"></div>
+    </div>
+    
+    <!-- Content -->
+    <div class="container position-relative">
+        <div class="row align-items-center min-vh-50">
             <div class="col-lg-8">
-                <h1 class="display-4 fw-bold mb-3" style="background: linear-gradient(45deg, #ffffff, #f8f9fa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
-                    Product Catalog
-                </h1>
-                <p class="lead mb-4" style="text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);">
-                    Discover our amazing collection of books, movies, and games
-                </p>
-            </div>
-            <div class="col-lg-4 text-center">
-                <div class="feature-icon mx-auto" style="width: 120px; height: 120px; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px);">
-                    <i class="fas fa-th-large fa-3x text-white"></i>
+                <div class="hero-content">
+                    <h1 class="display-3 fw-bold mb-4 brand-font" style="color: white; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);">
+                        Product Catalog
+                    </h1>
+                    <p class="lead mb-4 fs-4" style="color: white; text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);">
+                        Discover our amazing collection of books, movies, and games
+                    </p>
+                    <div class="d-flex gap-3 flex-wrap mb-4">
+                        <a href="#products" class="btn btn-light btn-lg px-4 py-3 fw-bold">
+                            <i class="fas fa-search me-2"></i>Start Browsing
+                        </a>
+                        <a href="#search" class="btn btn-outline-light btn-lg px-4 py-3 fw-bold">
+                            <i class="fas fa-filter me-2"></i>Find Specific Items
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -26,7 +44,7 @@
 
 <div class="container">
     <!-- Search and Filter Section -->
-    <div class="row mb-5">
+    <div class="row mb-5" id="search">
         <div class="col-12">
             <div class="search-section p-4">
                 <form method="get" asp-action="Catalog">
@@ -107,7 +125,7 @@
     <!-- Products Grid -->
     @if (Model.Any())
     {
-        <div class="row g-4 mb-5">
+        <div class="row g-4 mb-5" id="products">
             @foreach (var product in Model)
             {
                 <div class="col-xl-3 col-lg-4 col-md-6">
