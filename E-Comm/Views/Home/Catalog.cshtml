@@ -3,16 +3,22 @@
     ViewData["Title"] = "Product Catalog - 3B1G";
 }
 
-<!-- Page Header -->
-<div class="bg-light py-4 mb-4">
+<!-- Modern Page Header -->
+<div class="hero-section text-white py-4 mb-5" style="min-height: 300px;">
     <div class="container">
-        <div class="row align-items-center">
-            <div class="col-md-6">
-                <h1 class="h2 mb-0">Product Catalog</h1>
-                <p class="text-muted mb-0">Discover our amazing collection of books, movies, and games</p>
+        <div class="row align-items-center h-100">
+            <div class="col-lg-8">
+                <h1 class="display-4 fw-bold mb-3" style="background: linear-gradient(45deg, #ffffff, #f8f9fa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                    Product Catalog
+                </h1>
+                <p class="lead mb-4" style="text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);">
+                    Discover our amazing collection of books, movies, and games
+                </p>
             </div>
-            <div class="col-md-6 text-md-end">
-                <span class="badge bg-primary fs-6">@Model.Count items found</span>
+            <div class="col-lg-4 text-center">
+                <div class="feature-icon mx-auto" style="width: 120px; height: 120px; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px);">
+                    <i class="fas fa-th-large fa-3x text-white"></i>
+                </div>
             </div>
         </div>
     </div>
@@ -20,44 +26,79 @@
 
 <div class="container">
     <!-- Search and Filter Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="search-section p-4">
+                <form method="get" asp-action="Catalog">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-lg-5 col-md-6">
+                            <label for="searchTerm" class="form-label fw-semibold">
+                                <i class="fas fa-search me-2"></i>Search Products
+                            </label>
+                            <input type="text" class="form-control form-control-lg" id="searchTerm" name="searchTerm" 
+                                   value="@ViewBag.SearchTerm" placeholder="Search by title, author, or description...">
+                        </div>
+                        <div class="col-lg-3 col-md-4">
+                            <label for="genreId" class="form-label fw-semibold">
+                                <i class="fas fa-filter me-2"></i>Filter by Genre
+                            </label>
+                            <select class="form-select form-select-lg" id="genreId" name="genreId">
+                                <option value="">All Genres</option>
+                                @if (ViewBag.Genres != null)
+                                {
+                                    @foreach (var genre in (List<E_Comm.Models.Genre>)ViewBag.Genres)
+                                    {
+                                        <option value="@genre.GenreID" selected="@(ViewBag.SelectedGenre == genre.GenreID)">
+                                            @genre.Name
+                                        </option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                        <div class="col-lg-2 col-md-6">
+                            <button type="submit" class="btn btn-primary btn-lg w-100 fw-bold">
+                                <i class="fas fa-search me-2"></i>Search
+                            </button>
+                        </div>
+                        <div class="col-lg-2 col-md-6">
+                            <a asp-action="Catalog" class="btn btn-outline-secondary btn-lg w-100 fw-bold">
+                                <i class="fas fa-undo me-2"></i>Clear
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Results Header -->
     <div class="row mb-4">
         <div class="col-12">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <form method="get" asp-action="Catalog">
-                        <div class="row g-3 align-items-end">
-                            <div class="col-md-5">
-                                <label for="searchTerm" class="form-label">Search Products</label>
-                                <input type="text" class="form-control" id="searchTerm" name="searchTerm" 
-                                       value="@ViewBag.SearchTerm" placeholder="Search by title, author, or description...">
-                            </div>
-                            <div class="col-md-3">
-                                <label for="genreId" class="form-label">Filter by Genre</label>
-                                <select class="form-select" id="genreId" name="genreId">
-                                    <option value="">All Genres</option>
-                                    @if (ViewBag.Genres != null)
-                                    {
-                                        @foreach (var genre in (List<E_Comm.Models.Genre>)ViewBag.Genres)
-                                        {
-                                            <option value="@genre.GenreID" selected="@(ViewBag.SelectedGenre == genre.GenreID)">
-                                                @genre.Name
-                                            </option>
-                                        }
-                                    }
-                                </select>
-                            </div>
-                            <div class="col-md-2">
-                                <button type="submit" class="btn btn-primary w-100">
-                                    <i class="fas fa-search me-1"></i>Search
-                                </button>
-                            </div>
-                            <div class="col-md-2">
-                                <a asp-action="Catalog" class="btn btn-outline-secondary w-100">
-                                    <i class="fas fa-undo me-1"></i>Clear
-                                </a>
-                            </div>
-                        </div>
-                    </form>
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h3 class="fw-bold mb-2">
+                        @if (!string.IsNullOrEmpty((string)ViewBag.SearchTerm))
+                        {
+                            <span>Search Results</span>
+                        }
+                        else if (ViewBag.SelectedGenre != null)
+                        {
+                            <span>Filtered Products</span>
+                        }
+                        else
+                        {
+                            <span>All Products</span>
+                        }
+                    </h3>
+                    @if (!string.IsNullOrEmpty((string)ViewBag.SearchTerm))
+                    {
+                        <p class="text-muted mb-0">Results for "<em>@ViewBag.SearchTerm</em>"</p>
+                    }
+                </div>
+                <div>
+                    <span class="badge bg-primary fs-6 px-3 py-2">
+                        <i class="fas fa-box me-2"></i>@Model.Count items found
+                    </span>
                 </div>
             </div>
         </div>
@@ -66,12 +107,12 @@
     <!-- Products Grid -->
     @if (Model.Any())
     {
-        <div class="row">
+        <div class="row g-4 mb-5">
             @foreach (var product in Model)
             {
-                <div class="col-xl-3 col-lg-4 col-md-6 mb-4">
-                    <div class="card h-100 border-0 shadow-sm hover-shadow product-card">
-                        <div class="card-body p-3">
+                <div class="col-xl-3 col-lg-4 col-md-6">
+                    <div class="product-card h-100">
+                        <div class="card-body d-flex flex-column">
                             <!-- Product Header -->
                             <div class="d-flex justify-content-between align-items-start mb-3">
                                 @if (product.Genre != null)
@@ -87,39 +128,49 @@
                                 {
                                     var stocktake = product.Stocktakes.First();
                                     <div class="text-end">
-                                        <div class="fw-bold text-success fs-6">$@(stocktake.Price?.ToString("F2") ?? "0.00")</div>
+                                        <div class="price-display">$@(stocktake.Price?.ToString("F2") ?? "0.00")</div>
                                         @if (stocktake.Quantity <= 5)
                                         {
-                                            <small class="text-danger">Only @stocktake.Quantity left!</small>
+                                            <small class="stock-status stock-low">
+                                                <i class="fas fa-exclamation-triangle me-1"></i>Only @stocktake.Quantity left!
+                                            </small>
+                                        }
+                                        else if (stocktake.Quantity == 0)
+                                        {
+                                            <small class="stock-status stock-out">
+                                                <i class="fas fa-times-circle me-1"></i>Out of Stock
+                                            </small>
                                         }
                                         else
                                         {
-                                            <small class="text-success">In Stock</small>
+                                            <small class="stock-status stock-available">
+                                                <i class="fas fa-check-circle me-1"></i>In Stock
+                                            </small>
                                         }
                                     </div>
                                 }
                             </div>
 
                             <!-- Product Info -->
-                            <h5 class="card-title mb-2">@product.Name</h5>
+                            <h5 class="card-title fw-bold mb-2">@product.Name</h5>
                             
                             @if (!string.IsNullOrEmpty(product.Author))
                             {
                                 <p class="text-muted small mb-2">
-                                    <i class="fas fa-user me-1"></i>by @product.Author
+                                    <i class="fas fa-user me-2"></i>by @product.Author
                                 </p>
                             }
                             
                             @if (product.Published.HasValue)
                             {
                                 <p class="text-muted small mb-2">
-                                    <i class="fas fa-calendar me-1"></i>@product.Published.Value.ToString("yyyy")
+                                    <i class="fas fa-calendar me-2"></i>@product.Published.Value.ToString("yyyy")
                                 </p>
                             }
 
                             @if (!string.IsNullOrEmpty(product.Description))
                             {
-                                <p class="card-text text-muted small mb-3">
+                                <p class="card-text text-muted small mb-3 flex-grow-1">
                                     @(product.Description.Length > 80 ? product.Description.Substring(0, 80) + "..." : product.Description)
                                 </p>
                             }
@@ -128,14 +179,29 @@
                             <div class="mt-auto">
                                 <div class="d-grid gap-2">
                                     <a asp-controller="Home" asp-action="ProductDetails" asp-route-id="@product.ID" 
-                                       class="btn btn-outline-primary btn-sm">
-                                        <i class="fas fa-eye me-1"></i>View Details
+                                       class="btn btn-outline-primary">
+                                        <i class="fas fa-eye me-2"></i>View Details
                                     </a>
                                     @if (User.Identity?.IsAuthenticated == true && User.IsInRole("Customer"))
                                     {
-                                        <button type="button" class="btn btn-success btn-sm" onclick="addToCart(@product.ID)">
-                                            <i class="fas fa-shopping-cart me-1"></i>Add to Cart
-                                        </button>
+                                        @if (product.Stocktakes?.Any() == true && product.Stocktakes.First().Quantity > 0)
+                                        {
+                                            <button type="button" class="btn btn-success" onclick="addToCart(@product.ID)">
+                                                <i class="fas fa-shopping-cart me-2"></i>Add to Cart
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <button type="button" class="btn btn-secondary" disabled>
+                                                <i class="fas fa-times me-2"></i>Out of Stock
+                                            </button>
+                                        }
+                                    }
+                                    else if (User.Identity?.IsAuthenticated != true)
+                                    {
+                                        <a asp-controller="Auth" asp-action="Login" class="btn btn-outline-success">
+                                            <i class="fas fa-sign-in-alt me-2"></i>Login to Purchase
+                                        </a>
                                     }
                                 </div>
                             </div>
@@ -148,17 +214,19 @@
         <!-- Pagination -->
         @if (ViewBag.TotalPages > 1)
         {
-            <div class="row mt-4">
+            <div class="row mt-5">
                 <div class="col-12">
-                    <nav aria-label="Product pagination">
-                        <ul class="pagination justify-content-center">
+                    <nav aria-label="Product pagination" class="d-flex justify-content-center">
+                        <ul class="pagination pagination-lg">
                             @if (ViewBag.CurrentPage > 1)
                             {
                                 <li class="page-item">
                                     <a class="page-link" asp-action="Catalog" 
                                        asp-route-searchTerm="@ViewBag.SearchTerm" 
                                        asp-route-genreId="@ViewBag.SelectedGenre"
-                                       asp-route-page="@(ViewBag.CurrentPage - 1)">Previous</a>
+                                       asp-route-page="@(ViewBag.CurrentPage - 1)">
+                                        <i class="fas fa-chevron-left me-1"></i>Previous
+                                    </a>
                                 </li>
                             }
 
@@ -178,11 +246,20 @@
                                     <a class="page-link" asp-action="Catalog" 
                                        asp-route-searchTerm="@ViewBag.SearchTerm" 
                                        asp-route-genreId="@ViewBag.SelectedGenre"
-                                       asp-route-page="@(ViewBag.CurrentPage + 1)">Next</a>
+                                       asp-route-page="@(ViewBag.CurrentPage + 1)">
+                                        Next<i class="fas fa-chevron-right ms-1"></i>
+                                    </a>
                                 </li>
                             }
                         </ul>
                     </nav>
+                    
+                    <!-- Pagination Info -->
+                    <div class="text-center mt-3">
+                        <small class="text-muted">
+                            Showing page @ViewBag.CurrentPage of @ViewBag.TotalPages
+                        </small>
+                    </div>
                 </div>
             </div>
         }
@@ -193,10 +270,22 @@
         <div class="row">
             <div class="col-12">
                 <div class="text-center py-5">
-                    <i class="fas fa-search fa-3x text-muted mb-3"></i>
-                    <h3>No products found</h3>
-                    <p class="text-muted">Try adjusting your search terms or filters to find what you're looking for.</p>
-                    <a asp-action="Catalog" class="btn btn-primary">Browse All Products</a>
+                    <div class="feature-icon mx-auto mb-4" style="width: 150px; height: 150px; background: var(--gray-100);">
+                        <i class="fas fa-search fa-3x text-muted"></i>
+                    </div>
+                    <h3 class="fw-bold mb-3">No products found</h3>
+                    <p class="text-muted mb-4 lead">Try adjusting your search terms or filters to find what you're looking for.</p>
+                    <div class="d-flex gap-3 justify-content-center flex-wrap">
+                        <a asp-action="Catalog" class="btn btn-primary btn-lg px-4">
+                            <i class="fas fa-th-large me-2"></i>Browse All Products
+                        </a>
+                        @if (!string.IsNullOrEmpty((string)ViewBag.SearchTerm))
+                        {
+                            <a asp-action="Catalog" class="btn btn-outline-secondary btn-lg px-4">
+                                <i class="fas fa-times me-2"></i>Clear Search
+                            </a>
+                        }
+                    </div>
                 </div>
             </div>
         </div>
@@ -206,7 +295,13 @@
 @section Scripts {
     <script>
         function addToCart(productId) {
-            // Simple add to cart functionality
+            // Show loading state
+            const button = event.target.closest('button');
+            const originalContent = button.innerHTML;
+            button.innerHTML = '<span class="loading me-2"></span>Adding...';
+            button.disabled = true;
+
+            // Add to cart functionality with modern toast notification
             fetch('/Customer/AddToCart', {
                 method: 'POST',
                 headers: {
@@ -217,31 +312,94 @@
             .then(response => {
                 if (response.ok) {
                     // Show success message
-                    const toast = document.createElement('div');
-                    toast.className = 'toast-container position-fixed top-0 end-0 p-3';
-                    toast.innerHTML = `
-                        <div class="toast show" role="alert">
-                            <div class="toast-header">
-                                <i class="fas fa-check-circle text-success me-2"></i>
-                                <strong class="me-auto">Success</strong>
-                                <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
-                            </div>
-                            <div class="toast-body">
-                                Item added to cart successfully!
-                            </div>
-                        </div>
-                    `;
-                    document.body.appendChild(toast);
+                    showToast('success', 'Item added to cart successfully!', 'fas fa-check-circle');
                     
-                    // Remove toast after 3 seconds
+                    // Update button to show success temporarily
+                    button.innerHTML = '<i class="fas fa-check me-2"></i>Added!';
+                    button.classList.remove('btn-success');
+                    button.classList.add('btn-outline-success');
+                    
+                    // Restore button after 2 seconds
                     setTimeout(() => {
-                        toast.remove();
-                    }, 3000);
+                        button.innerHTML = originalContent;
+                        button.classList.remove('btn-outline-success');
+                        button.classList.add('btn-success');
+                        button.disabled = false;
+                    }, 2000);
+                } else {
+                    showToast('error', 'Failed to add item to cart. Please try again.', 'fas fa-exclamation-circle');
+                    // Restore button
+                    button.innerHTML = originalContent;
+                    button.disabled = false;
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
+                showToast('error', 'An error occurred. Please try again.', 'fas fa-exclamation-triangle');
+                // Restore button
+                button.innerHTML = originalContent;
+                button.disabled = false;
             });
         }
+
+        function showToast(type, message, icon) {
+            const toastId = 'toast-' + Date.now();
+            const bgColor = type === 'success' ? 'bg-success' : 'bg-danger';
+            
+            const toastHtml = `
+                <div class="toast show ${bgColor} text-white" role="alert" id="${toastId}" style="min-width: 300px;">
+                    <div class="toast-header ${bgColor} text-white border-0">
+                        <i class="${icon} me-2"></i>
+                        <strong class="me-auto">${type === 'success' ? 'Success' : 'Error'}</strong>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+                    </div>
+                    <div class="toast-body">
+                        ${message}
+                    </div>
+                </div>
+            `;
+            
+            // Create toast container if it doesn't exist
+            let container = document.getElementById('toast-container');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'toast-container';
+                container.className = 'toast-container position-fixed top-0 end-0 p-3';
+                container.style.zIndex = '1055';
+                document.body.appendChild(container);
+            }
+            
+            container.insertAdjacentHTML('beforeend', toastHtml);
+            
+            // Auto remove after 4 seconds
+            setTimeout(() => {
+                const toastElement = document.getElementById(toastId);
+                if (toastElement) {
+                    toastElement.remove();
+                }
+            }, 4000);
+        }
+
+        // Search form enhancements
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchTerm');
+            const searchForm = searchInput.closest('form');
+            
+            // Add search on Enter key
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    searchForm.submit();
+                }
+            });
+            
+            // Add real-time search feedback (optional)
+            searchInput.addEventListener('input', function() {
+                if (this.value.length > 0) {
+                    this.classList.add('border-primary');
+                } else {
+                    this.classList.remove('border-primary');
+                }
+            });
+        });
     </script>
 } 
