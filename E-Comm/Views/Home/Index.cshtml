@@ -228,7 +228,8 @@
                     <h3 class="display-6 fw-bold mb-3">Ready to Start Your Entertainment Journey?</h3>
                     <p class="lead text-muted mb-4">Join thousands of satisfied customers who trust <span class="brand-font">3B1G</span> for their entertainment needs.</p>
                     <div class="d-flex gap-3 justify-content-center flex-wrap">
-                        <a asp-controller="Customer" asp-action="CreateAccount" class="btn btn-primary btn-lg px-5 py-3 fw-bold">
+                        <!-- Changed -->
+                        <a asp-controller="Auth" asp-action="Signup" class="btn btn-primary btn-lg px-5 py-3 fw-bold">
                             <i class="fas fa-user-plus me-2"></i>Create Account
                         </a>
                         <a asp-controller="Auth" asp-action="Login" class="btn btn-outline-primary btn-lg px-5 py-3 fw-bold">

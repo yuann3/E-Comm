@@ -71,7 +71,49 @@ namespace E_Comm.Models
 
             return new AuthResult { IsSuccess = false };
         }
+        // NEW: Registration method
+        public async Task<RegistrationResult> RegisterUserAsync(User user, string password)
+        {
+            try
+            {
+                // Check if email already exists in database
+                var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == user.Email);
+                if (existingUser != null)
+                {
+                    return new RegistrationResult { IsSuccess = false, ErrorMessage = "Email is already registered." };
+                }
 
+                // Check if email exists in test credentials
+                if (_testCredentials.ContainsKey(user.Email ?? ""))
+                {
+                    return new RegistrationResult { IsSuccess = false, ErrorMessage = "Email is already registered." };
+                }
+
+                // Check if username already exists
+                var existingUsername = await _context.Users.FirstOrDefaultAsync(u => u.UserName == user.UserName);
+                if (existingUsername != null)
+                {
+                    return new RegistrationResult { IsSuccess = false, ErrorMessage = "Username is already taken." };
+                }
+
+                // Generate salt and hash password
+                user.Salt = GenerateSalt();
+                user.HashPW = HashPassword(password, user.Salt);
+
+                // Set default values for new users
+                user.IsAdmin = false; // New users are customers by default
+
+                // Add user to database
+                _context.Users.Add(user);
+                await _context.SaveChangesAsync();
+
+                return new RegistrationResult { IsSuccess = true };
+            }
+            catch (Exception ex)
+            {
+                return new RegistrationResult { IsSuccess = false, ErrorMessage = "Registration failed. Please try again." };
+            }
+        }
         private bool VerifyPassword(string password, string? salt, string? hashedPassword)
         {
             if (string.IsNullOrEmpty(salt) || string.IsNullOrEmpty(hashedPassword))
@@ -89,6 +131,17 @@ namespace E_Comm.Models
                 var hashBytes = sha256.ComputeHash(combinedBytes);
                 return Convert.ToHexString(hashBytes).ToLower();
             }
+        }
+
+        // NEW: Generate salt for new users
+        private string GenerateSalt()
+        {
+            var saltBytes = new byte[24];
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(saltBytes);
+            }
+            return Convert.ToBase64String(saltBytes);
         }
     }
 
@@ -110,4 +163,11 @@ namespace E_Comm.Models
         public bool IsEmployee { get; set; }
         public bool IsCustomer { get; set; }
     }
-} 
+
+    // NEW: Registration result class
+    public class RegistrationResult
+    {
+        public bool IsSuccess { get; set; }
+        public string? ErrorMessage { get; set; }
+    }
+}
