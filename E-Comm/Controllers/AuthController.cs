@@ -77,6 +77,82 @@ namespace E_Comm.Controllers
             return View();
         }
 
+        // Sign Up Method
+        [HttpGet]
+        public IActionResult Signup()
+        {
+            return View();
+        }
+
+        // Sign Up Logic
+        [HttpPost]
+        public async Task<IActionResult> Signup(User model, string password, string confirmPassword)
+        {
+            // Basic validation
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+            if (string.IsNullOrEmpty(password))
+            {
+                ViewBag.Error = "Password is required.";
+                return View(model);
+            }
+            if (password != confirmPassword)
+            {
+                ViewBag.Error = "Passwords do not match.";
+                return View(model);
+            }
+            try
+            {
+                var result = await _authService.RegisterUserAsync(model, password);
+                if (result.IsSuccess)
+                {
+                    // Auto-login user after successful registration
+                    var authResult = await _authService.AuthenticateAsync(model.Email, password);
+                    if (authResult.IsSuccess)
+                    {
+                        var claims = new List<Claim>
+                        {
+                            new Claim(ClaimTypes.Email, authResult.Email),
+                            new Claim(ClaimTypes.Name, authResult.Name),
+                            new Claim(ClaimTypes.Role, authResult.Role),
+                            new Claim("IsAdmin", authResult.IsAdmin.ToString()),
+                            new Claim("IsEmployee", authResult.IsEmployee.ToString()),
+                            new Claim("IsCustomer", authResult.IsCustomer.ToString())
+                        };
+
+                        var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                        var authProperties = new AuthenticationProperties
+                        {
+                            IsPersistent = true,
+                            ExpiresUtc = DateTimeOffset.UtcNow.AddHours(24)
+                        };
+
+                        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
+                            new ClaimsPrincipal(claimsIdentity), authProperties);
+
+                        // Redirect new users to page
+                        return RedirectToAction("Index", "Home");
+                    }
+
+                    // If auto-login fails, redirect to Login page
+                    TempData["Success"] = "Registration is successful! You may now log in.";
+                    return RedirectToAction("Login");
+                }
+                else
+                {
+                    ViewBag.Error = result.ErrorMessage ?? "Registration failed. Try again.";
+                    return View(model);
+                }
+            }
+            catch (Exception ex)
+            {
+                ViewBag.Error = "An error occurred during registration. Please try again.";
+                return View(model);
+            }
+        }
+
         [HttpPost]
         public async Task<IActionResult> Logout()
         {

@@ -1,0 +1,213 @@
+﻿@model E_Comm.Models.User
+@{
+    ViewData["Title"] = "Sign Up - 3B1G";
+}
+
+<!-- Hero Section -->
+<div class="bg-gradient text-white py-5 mb-5" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+    <div class="container">
+        <div class="row justify-content-center text-center">
+            <div class="col-lg-6">
+                <h1 class="display-5 fw-bold mb-3">Join 3B1G</h1>
+                <p class="lead">Create your account and start your entertainment journey</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8">
+            <div class="card border-0 shadow-lg">
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <i class="fas fa-user-plus text-primary fa-3x mb-3"></i>
+                        <h3 class="fw-bold">Create Account</h3>
+                        <p class="text-muted">Join the 3B1G community today</p>
+                    </div>
+
+                    @if (ViewBag.Error != null)
+                    {
+                        <div class="alert alert-danger border-0 shadow-sm">
+                            <i class="fas fa-exclamation-circle me-2"></i>@ViewBag.Error
+                        </div>
+                    }
+
+                    @if (TempData["Success"] != null)
+                    {
+                        <div class="alert alert-success border-0 shadow-sm">
+                            <i class="fas fa-check-circle me-2"></i>@TempData["Success"]
+                        </div>
+                    }
+
+                    <form asp-controller="Auth" asp-action="Signup" method="post">
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <label asp-for="UserName" class="form-label fw-semibold">
+                                    <i class="fas fa-user me-2 text-muted"></i>Username
+                                </label>
+                                <input asp-for="UserName" class="form-control form-control-lg"
+                                       placeholder="Choose a username" required>
+                                <span asp-validation-for="UserName" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-4">
+                                <label asp-for="Name" class="form-label fw-semibold">
+                                    <i class="fas fa-id-card me-2 text-muted"></i>Full Name
+                                </label>
+                                <input asp-for="Name" class="form-control form-control-lg"
+                                       placeholder="Enter your full name" required>
+                                <span asp-validation-for="Name" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Email" class="form-label fw-semibold">
+                                <i class="fas fa-envelope me-2 text-muted"></i>Email Address
+                            </label>
+                            <input asp-for="Email" type="email" class="form-control form-control-lg"
+                                   placeholder="Enter your email address" required>
+                            <span asp-validation-for="Email" class="text-danger small"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <label for="password" class="form-label fw-semibold">
+                                    <i class="fas fa-lock me-2 text-muted"></i>Password
+                                </label>
+                                <input type="password" class="form-control form-control-lg" id="password" name="password"
+                                       placeholder="Create a password" required>
+                                <div class="form-text">
+                                    <small class="text-muted">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        Password should be at least 6 characters long
+                                    </small>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 mb-4">
+                                <label for="confirmPassword" class="form-label fw-semibold">
+                                    <i class="fas fa-lock me-2 text-muted"></i>Confirm Password
+                                </label>
+                                <input type="password" class="form-control form-control-lg" id="confirmPassword" name="confirmPassword"
+                                       placeholder="Confirm your password" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="termsCheck" required>
+                                <label class="form-check-label" for="termsCheck">
+                                    I agree to the <a href="#" class="text-primary">Terms of Service</a> and
+                                    <a href="#" class="text-primary">Privacy Policy</a>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="d-grid mb-4">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-user-plus me-2"></i>Create Account
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="text-center">
+                        <p class="text-muted">
+                            Already have an account?
+                            <a asp-controller="Auth" asp-action="Login" class="text-primary text-decoration-none fw-semibold">
+                                Sign in here
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Benefits Card -->
+            <div class="card border-10 shadow-sm mt-4">
+                <div class="card-header bg-light border-0 d-flex justify-content-center align-items-center" style="height: 100px;">
+                    <h5 class="mb-0 text-center text-dark fs-1">
+                        <i class="fas fa-star me-2 text-primary"></i>Why Join 3B1G?
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3 text-center">
+                        <div class="col-md-4">
+                            <div class="p-3">
+                                <i class="fas fa-shopping-cart text-primary fa-2x mb-2"></i>
+                                <h6 class="fw-bold">Easy Shopping</h6>
+                                <small class="text-muted">Browse and purchase with ease</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="p-3">
+                                <i class="fas fa-history text-success fa-2x mb-2"></i>
+                                <h6 class="fw-bold">Order Tracking</h6>
+                                <small class="text-muted">Track your orders in real-time</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="p-3">
+                                <i class="fas fa-heart text-danger fa-2x mb-2"></i>
+                                <h6 class="fw-bold">Personalized</h6>
+                                <small class="text-muted">Get recommendations just for you</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Password confirmation validation
+        document.getElementById('confirmPassword').addEventListener('input', function() {
+            const password = document.getElementById('password').value;
+            const confirmPassword = this.value;
+
+            if (confirmPassword && password !== confirmPassword) {
+                this.setCustomValidity('Passwords do not match');
+                this.classList.add('is-invalid');
+            } else {
+                this.setCustomValidity('');
+                this.classList.remove('is-invalid');
+                if (confirmPassword) {
+                    this.classList.add('is-valid');
+                }
+            }
+        });
+
+        // Password strength indicator
+        document.getElementById('password').addEventListener('input', function() {
+            const password = this.value;
+            const confirmPassword = document.getElementById('confirmPassword');
+
+            // Reset confirm password validation when password changes
+            if (confirmPassword.value) {
+                confirmPassword.dispatchEvent(new Event('input'));
+            }
+        });
+
+        // Auto-focus username field
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('UserName').focus();
+        });
+
+        // Form validation feedback
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (password !== confirmPassword) {
+                e.preventDefault();
+                document.getElementById('confirmPassword').classList.add('is-invalid');
+                document.getElementById('confirmPassword').focus();
+            }
+        });
+    </script>
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
