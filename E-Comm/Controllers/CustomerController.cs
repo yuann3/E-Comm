@@ -19,8 +19,8 @@ namespace E_Comm.Controllers
         public async Task<IActionResult> Index()
         {
             ViewBag.UserName = User.Identity?.Name ?? "Customer";
-            
-            // Get customer's recent orders if any
+
+            // Load customer and their recent orders (optional for Home view)
             var customerEmail = User.Claims.FirstOrDefault(c => c.Type == "Email")?.Value;
             var customer = await _context.Customers
                 .Include(c => c.Orders)
@@ -34,33 +34,28 @@ namespace E_Comm.Controllers
                 .Take(6)
                 .ToListAsync();
 
-            return View();
+            // Render Home/Index.cshtml directly to avoid redirect loops
+            return View("~/Views/Home/Index.cshtml");
         }
 
-        // Browse Products (Business Scenario 1: Customer Searching for an Item)
+        // Browse Products
         public async Task<IActionResult> Browse(string searchTerm, int? genreId, int page = 1)
         {
             const int pageSize = 12;
-            
             var products = _context.Products
                 .Include(p => p.Genre)
                 .Include(p => p.Stocktakes)
-                .Where(p => p.Stocktakes.Any(s => s.Quantity > 0))
-                .AsQueryable();
+                .Where(p => p.Stocktakes.Any(s => s.Quantity > 0));
 
-            // Search functionality
             if (!string.IsNullOrEmpty(searchTerm))
             {
-                products = products.Where(p => 
-                    p.Name.Contains(searchTerm) || 
+                products = products.Where(p =>
+                    p.Name.Contains(searchTerm) ||
                     p.Author.Contains(searchTerm) ||
                     p.Description.Contains(searchTerm));
             }
-
             if (genreId.HasValue)
-            {
                 products = products.Where(p => p.GenreID == genreId);
-            }
 
             var totalProducts = await products.CountAsync();
             var paginatedProducts = await products
@@ -77,7 +72,7 @@ namespace E_Comm.Controllers
             return View(paginatedProducts);
         }
 
-        // Product Details
+        // Remaining actions unchanged...
         public async Task<IActionResult> ProductDetails(int id)
         {
             var product = await _context.Products
@@ -85,171 +80,114 @@ namespace E_Comm.Controllers
                 .Include(p => p.Stocktakes)
                 .ThenInclude(s => s.Source)
                 .FirstOrDefaultAsync(p => p.ID == id);
-
-            if (product == null)
-                return NotFound();
-
+            if (product == null) return NotFound();
             return View(product);
         }
 
-        // Add to Cart (simplified - in real implementation would use session/cookies)
         [HttpPost]
         public IActionResult AddToCart(int productId, int quantity = 1)
         {
-            // This would typically add to session cart
-            // For now, just redirect back with success message
             TempData["Success"] = "Item added to cart successfully!";
             return RedirectToAction("ProductDetails", new { id = productId });
         }
 
-        // My Account Management (Business Scenario 4: Manage a User Account)
         public async Task<IActionResult> MyAccount()
         {
             var customerEmail = User.Claims.FirstOrDefault(c => c.Type == "Email")?.Value;
-            var customer = await _context.Customers
-                .FirstOrDefaultAsync(c => c.Email == customerEmail);
-
-            if (customer == null)
-            {
-                // Redirect to create account if customer doesn't exist
-                return RedirectToAction("CreateAccount");
-            }
-
+            var customer = await _context.Customers.FirstOrDefaultAsync(c => c.Email == customerEmail);
+            if (customer == null) return RedirectToAction("CreateAccount");
             return View(customer);
         }
 
-        // Create Account (Business Scenario 3: Create a User Account)
         [HttpGet]
         [AllowAnonymous]
-        public IActionResult CreateAccount()
-        {
-            return View();
-        }
+        public IActionResult CreateAccount() => View();
 
         [HttpPost]
         [AllowAnonymous]
         public async Task<IActionResult> CreateAccount(Customer customer)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid) return View(customer);
+            var existing = await _context.Customers.FirstOrDefaultAsync(c => c.Email == customer.Email);
+            if (existing != null)
             {
-                // Check if customer with email already exists
-                var existingCustomer = await _context.Customers
-                    .FirstOrDefaultAsync(c => c.Email == customer.Email);
-
-                if (existingCustomer != null)
-                {
-                    ModelState.AddModelError("Email", "An account with this email already exists.");
-                    return View(customer);
-                }
-
-                _context.Customers.Add(customer);
-                await _context.SaveChangesAsync();
-
-                TempData["Success"] = "Account created successfully! You can now login.";
-                return RedirectToAction("Login", "Auth");
+                ModelState.AddModelError("Email", "An account with this email already exists.");
+                return View(customer);
             }
-
-            return View(customer);
+            _context.Customers.Add(customer);
+            await _context.SaveChangesAsync();
+            TempData["Success"] = "Account created successfully! You can now login.";
+            return RedirectToAction("Login", "Auth");
         }
 
-        // Edit Account Details
         [HttpGet]
         public async Task<IActionResult> EditAccount()
         {
-            var customerEmail = User.Claims.FirstOrDefault(c => c.Type == "Email")?.Value;
-            var customer = await _context.Customers
-                .FirstOrDefaultAsync(c => c.Email == customerEmail);
-
-            if (customer == null)
-                return RedirectToAction("CreateAccount");
-
+            var email = User.Claims.FirstOrDefault(c => c.Type == "Email")?.Value;
+            var customer = await _context.Customers.FirstOrDefaultAsync(c => c.Email == email);
+            if (customer == null) return RedirectToAction("CreateAccount");
             return View(customer);
         }
 
         [HttpPost]
         public async Task<IActionResult> EditAccount(Customer customer)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid) return View(customer);
+            var email = User.Claims.FirstOrDefault(c => c.Type == "Email")?.Value;
+            var existing = await _context.Customers.FirstOrDefaultAsync(c => c.Email == email);
+            if (existing != null)
             {
-                var customerEmail = User.Claims.FirstOrDefault(c => c.Type == "Email")?.Value;
-                var existingCustomer = await _context.Customers
-                    .FirstOrDefaultAsync(c => c.Email == customerEmail);
-
-                if (existingCustomer != null)
-                {
-                    // Update customer details (Business Scenario 4 - Address validation)
-                    existingCustomer.PhoneNumber = customer.PhoneNumber;
-                    existingCustomer.StreetAddress = customer.StreetAddress;
-                    existingCustomer.PostCode = customer.PostCode;
-                    existingCustomer.Suburb = customer.Suburb;
-                    existingCustomer.State = customer.State;
-                    existingCustomer.CardNumber = customer.CardNumber;
-                    existingCustomer.CardOwner = customer.CardOwner;
-                    existingCustomer.Expiry = customer.Expiry;
-                    existingCustomer.CVV = customer.CVV;
-
-                    await _context.SaveChangesAsync();
-                    TempData["Success"] = "Account details updated successfully!";
-                    return RedirectToAction("MyAccount");
-                }
+                existing.PhoneNumber = customer.PhoneNumber;
+                existing.StreetAddress = customer.StreetAddress;
+                existing.PostCode = customer.PostCode;
+                existing.Suburb = customer.Suburb;
+                existing.State = customer.State;
+                existing.CardNumber = customer.CardNumber;
+                existing.CardOwner = customer.CardOwner;
+                existing.Expiry = customer.Expiry;
+                existing.CVV = customer.CVV;
+                await _context.SaveChangesAsync();
+                TempData["Success"] = "Account details updated successfully!";
+                return RedirectToAction("MyAccount");
             }
-
             return View(customer);
         }
 
-        // Order History (Customers can track their order history)
         public async Task<IActionResult> OrderHistory()
         {
-            var customerEmail = User.Claims.FirstOrDefault(c => c.Type == "Email")?.Value;
+            var email = User.Claims.FirstOrDefault(c => c.Type == "Email")?.Value;
             var customer = await _context.Customers
                 .Include(c => c.Orders)
                 .ThenInclude(o => o.ProductsInOrders)
                 .ThenInclude(p => p.Stocktake)
                 .ThenInclude(s => s.Product)
-                .FirstOrDefaultAsync(c => c.Email == customerEmail);
-
-            if (customer == null)
-                return RedirectToAction("CreateAccount");
-
+                .FirstOrDefaultAsync(c => c.Email == email);
+            if (customer == null) return RedirectToAction("CreateAccount");
             return View(customer.Orders.OrderByDescending(o => o.OrderDate));
         }
 
-        // Order Details
         public async Task<IActionResult> OrderDetails(int id)
         {
-            var customerEmail = User.Claims.FirstOrDefault(c => c.Type == "Email")?.Value;
+            var email = User.Claims.FirstOrDefault(c => c.Type == "Email")?.Value;
             var order = await _context.Orders
                 .Include(o => o.Customer)
                 .Include(o => o.ProductsInOrders)
                 .ThenInclude(p => p.Stocktake)
                 .ThenInclude(s => s.Product)
-                .FirstOrDefaultAsync(o => o.OrderID == id && o.Customer.Email == customerEmail);
-
-            if (order == null)
-                return NotFound();
-
+                .FirstOrDefaultAsync(o => o.OrderID == id && o.Customer.Email == email);
+            if (order == null) return NotFound();
             return View(order);
         }
 
-        // Checkout (simplified)
         public async Task<IActionResult> Checkout()
         {
-            var customerEmail = User.Claims.FirstOrDefault(c => c.Type == "Email")?.Value;
-            var customer = await _context.Customers
-                .FirstOrDefaultAsync(c => c.Email == customerEmail);
-
-            if (customer == null)
-                return RedirectToAction("CreateAccount");
-
-            // In a real implementation, this would process cart items
+            var email = User.Claims.FirstOrDefault(c => c.Type == "Email")?.Value;
+            var customer = await _context.Customers.FirstOrDefaultAsync(c => c.Email == email);
+            if (customer == null) return RedirectToAction("CreateAccount");
             ViewBag.Customer = customer;
             return View();
         }
 
-        // Contact Support
-        public IActionResult ContactSupport()
-        {
-            return View();
-        }
+        public IActionResult ContactSupport() => View();
     }
-} 
+}
