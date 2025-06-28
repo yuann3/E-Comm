@@ -19,8 +19,8 @@ namespace E_Comm.Controllers
         public async Task<IActionResult> Index()
         {
             ViewBag.UserName = User.Identity?.Name ?? "Customer";
-            
-            // Get customer's recent orders if any
+
+            // Load customer and their recent orders (optional for Home view)
             var customerEmail = User.Claims.FirstOrDefault(c => c.Type == "Email")?.Value;
             var customer = await _context.Customers
                 .Include(c => c.Orders)
@@ -34,14 +34,15 @@ namespace E_Comm.Controllers
                 .Take(6)
                 .ToListAsync();
 
-            return View();
+            // Render the Home/Index view directly to avoid redirect loops
+            return View("~/Views/Home/Index.cshtml");
         }
 
         // Browse Products (Business Scenario 1: Customer Searching for an Item)
         public async Task<IActionResult> Browse(string searchTerm, int? genreId, int page = 1)
         {
             const int pageSize = 12;
-            
+
             var products = _context.Products
                 .Include(p => p.Genre)
                 .Include(p => p.Stocktakes)
@@ -51,8 +52,8 @@ namespace E_Comm.Controllers
             // Search functionality
             if (!string.IsNullOrEmpty(searchTerm))
             {
-                products = products.Where(p => 
-                    p.Name.Contains(searchTerm) || 
+                products = products.Where(p =>
+                    p.Name.Contains(searchTerm) ||
                     p.Author.Contains(searchTerm) ||
                     p.Description.Contains(searchTerm));
             }
@@ -97,7 +98,6 @@ namespace E_Comm.Controllers
         public IActionResult AddToCart(int productId, int quantity = 1)
         {
             // This would typically add to session cart
-            // For now, just redirect back with success message
             TempData["Success"] = "Item added to cart successfully!";
             return RedirectToAction("ProductDetails", new { id = productId });
         }
@@ -252,4 +252,4 @@ namespace E_Comm.Controllers
             return View();
         }
     }
-} 
+}
