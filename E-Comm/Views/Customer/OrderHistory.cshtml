@@ -1,0 +1,149 @@
+@model List<E_Comm.Models.Order>
+
+@{
+    ViewData["Title"] = "Order History";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <!-- Header -->
+            <div class="text-center mb-5">
+                <h1 class="display-5 mb-3">Order History</h1>
+                <p class="lead text-muted">Track your orders and view your complete purchase history</p>
+            </div>
+
+            @if (Model != null && Model.Count > 0)
+            {
+                <!-- Orders List -->
+                <div class="row g-4">
+                    @foreach (var order in Model)
+                    {
+                        <div class="col-12">
+                            <div class="card feature-card">
+                                <div class="card-body p-4">
+                                    <div class="row align-items-center">
+                                        <div class="col-auto">
+                                            <div class="feature-icon">
+                                                <i class="fas fa-shopping-bag text-white fa-2x"></i>
+                                            </div>
+                                        </div>
+                                        <div class="col">
+                                            <div class="row">
+                                                <div class="col-md-3">
+                                                    <h6 class="text-muted mb-1">Order ID</h6>
+                                                    <p class="mb-0 fw-semibold">#@order.OrderID</p>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <h6 class="text-muted mb-1">Customer ID</h6>
+                                                    <p class="mb-0 fw-semibold">@(order.CustomerId ?? 0)</p>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <h6 class="text-muted mb-1">Delivery Address</h6>
+                                                    <p class="mb-0 fw-semibold">
+                                                        @order.StreetAddress<br />
+                                                        @order.Suburb, @order.State @order.PostCode
+                                                    </p>
+                                                </div>
+                                                <div class="col-md-3 text-md-end">
+                                                    <span class="badge bg-primary fs-6 px-3 py-2">
+                                                        <i class="fas fa-check-circle me-2"></i>Completed
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <!-- Summary Card -->
+                <div class="row mt-5">
+                    <div class="col-lg-6 mx-auto">
+                        <div class="card feature-card text-center">
+                            <div class="card-body p-4">
+                                <div class="feature-icon">
+                                    <i class="fas fa-chart-bar text-white fa-2x"></i>
+                                </div>
+                                <h4 class="card-title">Order Summary</h4>
+                                <p class="card-text mb-4">Your purchase history at a glance</p>
+                                
+                                <div class="row g-3">
+                                    <div class="col-6">
+                                        <div class="border border-secondary rounded p-3">
+                                            <h3 class="text-primary mb-1">@Model.Count</h3>
+                                            <p class="text-muted mb-0 small">Total Orders</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="border border-secondary rounded p-3">
+                                            <h3 class="text-primary mb-1">@Model.Count</h3>
+                                            <p class="text-muted mb-0 small">Completed</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <!-- No Orders State -->
+                <div class="row">
+                    <div class="col-lg-6 mx-auto">
+                        <div class="card feature-card text-center">
+                            <div class="card-body p-5">
+                                <i class="fas fa-shopping-cart fa-4x text-muted mb-4"></i>
+                                <h3 class="card-title">No Orders Yet</h3>
+                                <p class="card-text mb-4">You haven't placed any orders yet. Start exploring our amazing collection!</p>
+                                
+                                <div class="d-grid gap-3">
+                                    <a href="@Url.Action("Catalog", "Home")" class="btn btn-primary btn-lg">
+                                        <i class="fas fa-search me-2"></i> Browse Products
+                                    </a>
+                                    <a href="@Url.Action("Index", "Customer")" class="btn btn-outline-primary">
+                                        <i class="fas fa-arrow-left me-2"></i> Back to Dashboard
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- Quick Actions -->
+            <div class="row g-3 mt-5">
+                <div class="col-md-4">
+                    <a href="@Url.Action("Index", "Customer")" class="card feature-card text-decoration-none h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-tachometer-alt fa-2x text-primary mb-3"></i>
+                            <h6 class="card-title">Dashboard</h6>
+                            <p class="card-text small text-muted">Return to main dashboard</p>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    <a href="@Url.Action("Catalog", "Home")" class="card feature-card text-decoration-none h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-shopping-cart fa-2x text-primary mb-3"></i>
+                            <h6 class="card-title">Continue Shopping</h6>
+                            <p class="card-text small text-muted">Browse our product catalog</p>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    <a href="@Url.Action("ContactSupport", "Customer")" class="card feature-card text-decoration-none h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-life-ring fa-2x text-primary mb-3"></i>
+                            <h6 class="card-title">Need Help?</h6>
+                            <p class="card-text small text-muted">Contact our support team</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

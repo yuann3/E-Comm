@@ -1,0 +1,210 @@
+@{
+    ViewData["Title"] = "Contact Support";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <!-- Header -->
+            <div class="text-center mb-5">
+                <h1 class="display-5 mb-3">Contact Support</h1>
+                <p class="lead text-muted">Our support team is here to help you with any questions or concerns</p>
+            </div>
+
+            <!-- Support Info Cards -->
+            <div class="row g-4 mb-5">
+                <div class="col-md-4">
+                    <div class="card feature-card text-center h-100">
+                        <div class="card-body">
+                            <i class="fas fa-clock fa-2x text-primary mb-3"></i>
+                            <h6 class="card-title">Response Time</h6>
+                            <p class="card-text small text-muted">Within 24 hours</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card feature-card text-center h-100">
+                        <div class="card-body">
+                            <i class="fas fa-envelope fa-2x text-primary mb-3"></i>
+                            <h6 class="card-title">Email Support</h6>
+                            <p class="card-text small text-muted">support@3b1g.com</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card feature-card text-center h-100">
+                        <div class="card-body">
+                            <i class="fas fa-phone fa-2x text-primary mb-3"></i>
+                            <h6 class="card-title">Phone Support</h6>
+                            <p class="card-text small text-muted">+1 (555) 123-4567</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Form -->
+            <div class="card feature-card">
+                <div class="card-body p-4">
+                    <div class="row align-items-center mb-4">
+                        <div class="col-auto">
+                            <div class="feature-icon">
+                                <i class="fas fa-life-ring text-white fa-2x"></i>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <h4 class="card-title mb-1">Send us a Message</h4>
+                            <p class="text-muted mb-0">Fill out the form below and we'll get back to you soon</p>
+                        </div>
+                    </div>
+
+                    <form asp-action="ContactSupport" method="post" id="contactForm">
+                        @if (ViewBag.Message != null)
+                        {
+                            <div class="alert alert-success">
+                                <i class="fas fa-check-circle me-2"></i>@ViewBag.Message
+                            </div>
+                        }
+
+                        <div class="row g-4">
+                            <!-- Name -->
+                            <div class="col-md-6">
+                                <label for="name" class="form-label">
+                                    <i class="fas fa-user me-2"></i> Full Name
+                                </label>
+                                <input type="text" class="form-control" id="name" name="name" 
+                                       value="@(User.Identity?.Name ?? "")" readonly style="background-color: var(--muted);" />
+                            </div>
+
+                            <!-- Email -->
+                            <div class="col-md-6">
+                                <label for="email" class="form-label">
+                                    <i class="fas fa-envelope me-2"></i> Email Address
+                                </label>
+                                <input type="email" class="form-control" id="email" name="email" 
+                                       placeholder="your.email@example.com" required />
+                            </div>
+
+                            <!-- Subject -->
+                            <div class="col-12">
+                                <label for="subject" class="form-label">
+                                    <i class="fas fa-tag me-2"></i> Subject
+                                </label>
+                                <select class="form-select" id="subject" name="subject" required>
+                                    <option value="">Select a topic</option>
+                                    <option value="Order Issue">Order Issue</option>
+                                    <option value="Payment Problem">Payment Problem</option>
+                                    <option value="Account Access">Account Access</option>
+                                    <option value="Product Question">Product Question</option>
+                                    <option value="Technical Issue">Technical Issue</option>
+                                    <option value="Feature Request">Feature Request</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+
+                            <!-- Priority -->
+                            <div class="col-12">
+                                <label for="priority" class="form-label">
+                                    <i class="fas fa-exclamation-circle me-2"></i> Priority Level
+                                </label>
+                                <select class="form-select" id="priority" name="priority" required>
+                                    <option value="">Select priority</option>
+                                    <option value="Low">Low - General inquiry</option>
+                                    <option value="Medium" selected>Medium - Standard support</option>
+                                    <option value="High">High - Urgent assistance needed</option>
+                                    <option value="Critical">Critical - Service disruption</option>
+                                </select>
+                            </div>
+
+                            <!-- Message -->
+                            <div class="col-12">
+                                <label for="message" class="form-label">
+                                    <i class="fas fa-comment me-2"></i> Message
+                                </label>
+                                <textarea class="form-control" id="message" name="message" rows="6" 
+                                          placeholder="Please describe your issue or question in detail..."
+                                          required></textarea>
+                                <div class="form-text">Please provide as much detail as possible to help us assist you better.</div>
+                            </div>
+
+                            <!-- Order ID (optional) -->
+                            <div class="col-md-6">
+                                <label for="orderId" class="form-label">
+                                    <i class="fas fa-shopping-bag me-2"></i> Order ID (if applicable)
+                                </label>
+                                <input type="text" class="form-control" id="orderId" name="orderId" 
+                                       placeholder="e.g. #12345" />
+                            </div>
+
+                            <!-- Attachment -->
+                            <div class="col-md-6">
+                                <label for="attachment" class="form-label">
+                                    <i class="fas fa-paperclip me-2"></i> Attachment (optional)
+                                </label>
+                                <input type="file" class="form-control" id="attachment" name="attachment" 
+                                       accept=".jpg,.jpeg,.png,.pdf,.txt" />
+                                <div class="form-text">Supported formats: JPG, PNG, PDF, TXT (max 10MB)</div>
+                            </div>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="d-flex gap-3 justify-content-end mt-4 pt-4 border-top">
+                            <a href="@Url.Action("Index", "Customer")" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i> Back to Dashboard
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-paper-plane me-2"></i> Send Message
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- FAQ Section -->
+            <div class="card feature-card mt-5">
+                <div class="card-body p-4">
+                    <div class="text-center mb-4">
+                        <h4 class="card-title">
+                            <i class="fas fa-question-circle me-2"></i> Frequently Asked Questions
+                        </h4>
+                        <p class="text-muted">Quick answers to common questions</p>
+                    </div>
+
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="border border-secondary rounded p-3">
+                                <h6 class="fw-semibold mb-2">
+                                    <i class="fas fa-shipping-fast me-2 text-primary"></i> How long does shipping take?
+                                </h6>
+                                <p class="text-muted small mb-0">Standard shipping takes 3-5 business days. Express shipping is available for next-day delivery.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="border border-secondary rounded p-3">
+                                <h6 class="fw-semibold mb-2">
+                                    <i class="fas fa-undo me-2 text-primary"></i> What's your return policy?
+                                </h6>
+                                <p class="text-muted small mb-0">You can return items within 30 days of purchase for a full refund, provided they're in original condition.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="border border-secondary rounded p-3">
+                                <h6 class="fw-semibold mb-2">
+                                    <i class="fas fa-lock me-2 text-primary"></i> Is my payment information secure?
+                                </h6>
+                                <p class="text-muted small mb-0">Yes, we use industry-standard encryption to protect all payment and personal information.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="border border-secondary rounded p-3">
+                                <h6 class="fw-semibold mb-2">
+                                    <i class="fas fa-search me-2 text-primary"></i> How can I track my order?
+                                </h6>
+                                <p class="text-muted small mb-0">You can track your order status from your account dashboard or by using the tracking number sent via email.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

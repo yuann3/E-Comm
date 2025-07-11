@@ -1,0 +1,247 @@
+@model E_Comm.Models.Customer
+
+@{
+    ViewData["Title"] = "Edit Account";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <!-- Header -->
+            <div class="text-center mb-5">
+                <h1 class="display-5 mb-3">Edit Account</h1>
+                <p class="lead text-muted">Update your address and contact information</p>
+            </div>
+
+            <!-- Edit Form Card -->
+            <div class="card feature-card">
+                <div class="card-body p-4">
+                    <div class="row align-items-center mb-4">
+                        <div class="col-auto">
+                            <div class="feature-icon">
+                                <i class="fas fa-edit text-white fa-2x"></i>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <h4 class="card-title mb-1">Account Information</h4>
+                            <p class="text-muted mb-0">Update your address details with Australian validation</p>
+                        </div>
+                    </div>
+
+                    <form asp-action="EditAccount" method="post" id="editAccountForm">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <!-- Email (Read-only) -->
+                        <div class="mb-4">
+                            <label asp-for="Email" class="form-label">
+                                <i class="fas fa-envelope me-2"></i> Email Address
+                            </label>
+                            <input asp-for="Email" class="form-control" readonly style="background-color: var(--muted);" />
+                            <div class="form-text">Email address cannot be changed</div>
+                        </div>
+
+                        <!-- Phone Number -->
+                        <div class="mb-4">
+                            <label asp-for="PhoneNumber" class="form-label">
+                                <i class="fas fa-phone me-2"></i> Phone Number
+                            </label>
+                            <input asp-for="PhoneNumber" class="form-control" placeholder="e.g. 0412 345 678" />
+                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                        </div>
+
+                        <!-- Address Section -->
+                        <div class="border border-secondary rounded p-4 mb-4">
+                            <h5 class="mb-3">
+                                <i class="fas fa-map-marker-alt me-2"></i> Australian Address
+                            </h5>
+                            
+                            <div class="row g-3">
+                                <!-- Street Address -->
+                                <div class="col-12">
+                                    <label asp-for="StreetAddress" class="form-label">Street Address</label>
+                                    <input asp-for="StreetAddress" class="form-control" 
+                                           placeholder="e.g. 377 Ring Road" 
+                                           data-validation="australian-address" />
+                                    <span asp-validation-for="StreetAddress" class="text-danger"></span>
+                                    <div id="streetAddressError" class="text-danger mt-1" style="display: none;"></div>
+                                </div>
+
+                                <!-- Suburb -->
+                                <div class="col-md-6">
+                                    <label asp-for="Suburb" class="form-label">Suburb</label>
+                                    <input asp-for="Suburb" class="form-control" placeholder="e.g. Sydney" />
+                                    <span asp-validation-for="Suburb" class="text-danger"></span>
+                                </div>
+
+                                <!-- State -->
+                                <div class="col-md-6">
+                                    <label asp-for="State" class="form-label">State</label>
+                                    <select asp-for="State" class="form-select" data-validation="australian-state">
+                                        <option value="">Select State</option>
+                                        <option value="NSW">NSW - New South Wales</option>
+                                        <option value="VIC">VIC - Victoria</option>
+                                        <option value="QLD">QLD - Queensland</option>
+                                        <option value="WA">WA - Western Australia</option>
+                                        <option value="SA">SA - South Australia</option>
+                                        <option value="TAS">TAS - Tasmania</option>
+                                        <option value="ACT">ACT - Australian Capital Territory</option>
+                                        <option value="NT">NT - Northern Territory</option>
+                                    </select>
+                                    <span asp-validation-for="State" class="text-danger"></span>
+                                </div>
+
+                                <!-- Post Code -->
+                                <div class="col-md-6">
+                                    <label asp-for="PostCode" class="form-label">Post Code</label>
+                                    <input asp-for="PostCode" class="form-control" 
+                                           placeholder="e.g. 2308" 
+                                           data-validation="australian-postcode" 
+                                           maxlength="4" />
+                                    <span asp-validation-for="PostCode" class="text-danger"></span>
+                                    <div id="postCodeError" class="text-danger mt-1" style="display: none;"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Payment Information -->
+                        <div class="border border-secondary rounded p-4 mb-4">
+                            <h5 class="mb-3">
+                                <i class="fas fa-credit-card me-2"></i> Payment Information
+                            </h5>
+                            
+                            <div class="row g-3">
+                                <!-- Card Owner -->
+                                <div class="col-md-6">
+                                    <label asp-for="CardOwner" class="form-label">Card Owner Name</label>
+                                    <input asp-for="CardOwner" class="form-control" placeholder="Full name on card" />
+                                    <span asp-validation-for="CardOwner" class="text-danger"></span>
+                                </div>
+
+                                <!-- Card Number -->
+                                <div class="col-md-6">
+                                    <label asp-for="CardNumber" class="form-label">Card Number</label>
+                                    <input asp-for="CardNumber" class="form-control" placeholder="1234 5678 9012 3456" />
+                                    <span asp-validation-for="CardNumber" class="text-danger"></span>
+                                </div>
+
+                                <!-- Expiry -->
+                                <div class="col-md-6">
+                                    <label asp-for="Expiry" class="form-label">Expiry Date</label>
+                                    <input asp-for="Expiry" class="form-control" placeholder="MM/YY" />
+                                    <span asp-validation-for="Expiry" class="text-danger"></span>
+                                </div>
+
+                                <!-- CVV -->
+                                <div class="col-md-6">
+                                    <label asp-for="CVV" class="form-label">CVV</label>
+                                    <input asp-for="CVV" class="form-control" placeholder="123" maxlength="4" />
+                                    <span asp-validation-for="CVV" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="d-flex gap-3 justify-content-end">
+                            <a href="@Url.Action("MyAccount", "Customer")" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-2"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i> Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Australian address validation
+            const streetAddressInput = document.querySelector('[data-validation="australian-address"]');
+            const postCodeInput = document.querySelector('[data-validation="australian-postcode"]');
+            
+            if (streetAddressInput) {
+                streetAddressInput.addEventListener('blur', function() {
+                    validateStreetAddress(this.value);
+                });
+                
+                streetAddressInput.addEventListener('input', function() {
+                    clearError('streetAddressError');
+                });
+            }
+            
+            if (postCodeInput) {
+                postCodeInput.addEventListener('blur', function() {
+                    validatePostCode(this.value);
+                });
+                
+                postCodeInput.addEventListener('input', function() {
+                    clearError('postCodeError');
+                    // Only allow numbers
+                    this.value = this.value.replace(/\D/g, '');
+                });
+            }
+            
+            // Form submission validation
+            document.getElementById('editAccountForm').addEventListener('submit', function(e) {
+                let isValid = true;
+                
+                if (streetAddressInput && !validateStreetAddress(streetAddressInput.value)) {
+                    isValid = false;
+                }
+                
+                if (postCodeInput && !validatePostCode(postCodeInput.value)) {
+                    isValid = false;
+                }
+                
+                if (!isValid) {
+                    e.preventDefault();
+                }
+            });
+        });
+        
+        function validateStreetAddress(address) {
+            const streetAddressRegex = /^[0-9]+[a-zA-Z]?\s+[a-zA-Z\s]+$/;
+            const errorElement = document.getElementById('streetAddressError');
+            
+            if (address && !streetAddressRegex.test(address.trim())) {
+                showError('streetAddressError', 'Street address must contain numbers and letters (e.g., "377 Ring Road")');
+                return false;
+            } else {
+                clearError('streetAddressError');
+                return true;
+            }
+        }
+        
+        function validatePostCode(postCode) {
+            const postCodeRegex = /^[0-9]{4}$/;
+            const errorElement = document.getElementById('postCodeError');
+            
+            if (postCode && !postCodeRegex.test(postCode)) {
+                showError('postCodeError', 'Post code must be exactly 4 numbers (e.g., "2308")');
+                return false;
+            } else {
+                clearError('postCodeError');
+                return true;
+            }
+        }
+        
+        function showError(elementId, message) {
+            const errorElement = document.getElementById(elementId);
+            if (errorElement) {
+                errorElement.textContent = message;
+                errorElement.style.display = 'block';
+            }
+        }
+        
+        function clearError(elementId) {
+            const errorElement = document.getElementById(elementId);
+            if (errorElement) {
+                errorElement.style.display = 'none';
+            }
+        }
+    </script>
+} 

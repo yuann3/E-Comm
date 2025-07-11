@@ -1,0 +1,199 @@
+@{
+    ViewData["Title"] = "Customer Dashboard";
+}
+
+<div class="container mt-4">
+    <!-- Welcome Header -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="text-center">
+                <h1 class="display-4 mb-3">Welcome back, @ViewBag.UserName! 👋</h1>
+                <p class="lead text-muted">Manage your account and explore our Entertainment Guild collection</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Dashboard Cards -->
+    <div class="row g-4 mb-5">
+        <!-- Account Management -->
+        <div class="col-lg-6">
+            <div class="card feature-card h-100">
+                <div class="card-body d-flex flex-column">
+                    <div class="text-center mb-4">
+                        <div class="feature-icon">
+                            <i class="fas fa-user-cog text-white fa-2x"></i>
+                        </div>
+                        <h4 class="card-title">Account Management</h4>
+                        <p class="card-text">View and update your personal information, address, and payment details securely.</p>
+                    </div>
+                    <div class="mt-auto">
+                        <div class="d-grid gap-3">
+                            <a href="@Url.Action("MyAccount", "Customer")" class="btn btn-primary">
+                                <i class="fas fa-user me-2"></i> View Account Details
+                            </a>
+                            <a href="@Url.Action("EditAccount", "Customer")" class="btn btn-outline-primary">
+                                <i class="fas fa-edit me-2"></i> Update Address
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Order History -->
+        <div class="col-lg-6">
+            <div class="card feature-card h-100">
+                <div class="card-body d-flex flex-column">
+                    <div class="text-center mb-4">
+                        <div class="feature-icon">
+                            <i class="fas fa-shopping-bag text-white fa-2x"></i>
+                        </div>
+                        <h4 class="card-title">Order History</h4>
+                        <p class="card-text">Track your orders and view your complete purchase history.</p>
+                    </div>
+                    
+                    @if (ViewBag.RecentOrders != null && ((List<E_Comm.Models.Order>)ViewBag.RecentOrders).Count > 0)
+                    {
+                        <div class="alert alert-info text-center mb-3">
+                            <i class="fas fa-info-circle me-2"></i>
+                            You have @((List<E_Comm.Models.Order>)ViewBag.RecentOrders).Count recent orders
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info text-center mb-3">
+                            <i class="fas fa-shopping-cart me-2"></i>
+                            No recent orders - time to start shopping!
+                        </div>
+                    }
+                    
+                    <div class="mt-auto">
+                        <div class="d-grid">
+                            <a href="@Url.Action("OrderHistory", "Customer")" class="btn btn-primary">
+                                <i class="fas fa-history me-2"></i> View Order History
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Secondary Actions -->
+    <div class="row g-4 mb-5">
+        <!-- Continue Shopping -->
+        <div class="col-lg-8">
+            <div class="card feature-card h-100">
+                <div class="card-body d-flex flex-column">
+                    <div class="row align-items-center flex-grow-1">
+                        <div class="col-md-2 text-center">
+                            <div class="feature-icon">
+                                <i class="fas fa-shopping-cart text-white fa-2x"></i>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h4 class="card-title mb-2">Continue Shopping</h4>
+                            <p class="card-text mb-0">Explore our Entertainment Guild collection and find your next favorite item. Books, games, movies and more!</p>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-grid gap-2">
+                                <a href="@Url.Action("Browse", "Customer")" class="btn btn-primary">
+                                    <i class="fas fa-search me-2"></i> Browse Products
+                                </a>
+                                <a href="@Url.Action("Catalog", "Home")" class="btn btn-outline-primary">
+                                    <i class="fas fa-th-large me-2"></i> View Catalog
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Need Help -->
+        <div class="col-lg-4">
+            <div class="card feature-card h-100">
+                <div class="card-body d-flex flex-column text-center">
+                    <div class="feature-icon">
+                        <i class="fas fa-life-ring text-white fa-2x"></i>
+                    </div>
+                    <h4 class="card-title">Need Help?</h4>
+                    <p class="card-text">Our support team is here to assist you with any questions or concerns.</p>
+                    <div class="mt-auto">
+                        <a href="@Url.Action("ContactSupport", "Customer")" class="btn btn-primary">
+                            <i class="fas fa-envelope me-2"></i> Contact Support
+                        </a>
+                        <div class="mt-3">
+                            <small class="text-muted">
+                                <i class="fas fa-clock me-1"></i> Response within 24 hours
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Featured Products Section -->
+    @if (ViewBag.FeaturedProducts != null && ((List<E_Comm.Models.Product>)ViewBag.FeaturedProducts).Count > 0)
+    {
+        <div class="row mb-4">
+            <div class="col-12 text-center">
+                <h3 class="display-6 mb-2">🌟 Featured Products</h3>
+                <p class="text-muted mb-4">Discover our handpicked entertainment collection</p>
+            </div>
+        </div>
+        
+        <div class="row g-3">
+            @foreach (var product in (List<E_Comm.Models.Product>)ViewBag.FeaturedProducts)
+            {
+                <div class="col-md-4 col-lg-2 mb-3">
+                    <div class="card product-card h-100">
+                        <div class="card-body text-center p-3">
+                            <div class="mb-3">
+                                @if (product.Genre?.Name == "Books")
+                                {
+                                    <i class="fas fa-book fa-2x text-primary"></i>
+                                }
+                                else if (product.Genre?.Name == "Games")
+                                {
+                                    <i class="fas fa-gamepad fa-2x text-primary"></i>
+                                }
+                                else if (product.Genre?.Name == "Movies")
+                                {
+                                    <i class="fas fa-film fa-2x text-primary"></i>
+                                }
+                                else
+                                {
+                                    <i class="fas fa-star fa-2x text-primary"></i>
+                                }
+                            </div>
+                            <h6 class="card-title text-truncate">@product.Name</h6>
+                            <p class="card-text small text-muted">@product.Author</p>
+                            <a href="@Url.Action("ProductDetails", "Customer", new { id = product.ID })" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-eye me-1"></i> View Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            <div class="col-12">
+                <div class="card text-center py-5">
+                    <div class="card-body">
+                        <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
+                        <h4>No Featured Products Available</h4>
+                        <p class="text-muted">Check back later for our latest entertainment recommendations!</p>
+                        <a href="@Url.Action("Catalog", "Home")" class="btn btn-primary">
+                            <i class="fas fa-search me-2"></i> Browse All Products
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div> 

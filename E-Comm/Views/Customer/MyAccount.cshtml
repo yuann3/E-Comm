@@ -1,0 +1,135 @@
+@model E_Comm.Models.Customer
+
+@{
+    ViewData["Title"] = "My Account";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <!-- Header -->
+            <div class="text-center mb-5">
+                <h1 class="display-5 mb-3">My Account</h1>
+                <p class="lead text-muted">View and manage your account information</p>
+            </div>
+
+            <!-- Account Information Card -->
+            <div class="card feature-card">
+                <div class="card-body p-4">
+                    <div class="row align-items-center mb-4">
+                        <div class="col-auto">
+                            <div class="feature-icon">
+                                <i class="fas fa-user text-white fa-2x"></i>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <h4 class="card-title mb-1">Account Information</h4>
+                            <p class="text-muted mb-0">Your personal details and contact information</p>
+                        </div>
+                        <div class="col-auto">
+                            <a href="@Url.Action("EditAccount", "Customer")" class="btn btn-outline-primary">
+                                <i class="fas fa-edit me-2"></i> Edit
+                            </a>
+                        </div>
+                    </div>
+
+                    @if (Model != null)
+                    {
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <div class="border border-secondary rounded p-3">
+                                    <h6 class="text-muted mb-2">
+                                        <i class="fas fa-envelope me-2"></i> Email Address
+                                    </h6>
+                                    <p class="mb-0 fw-semibold">@Model.Email</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="border border-secondary rounded p-3">
+                                    <h6 class="text-muted mb-2">
+                                        <i class="fas fa-phone me-2"></i> Phone Number
+                                    </h6>
+                                    <p class="mb-0 fw-semibold">@(Model.PhoneNumber ?? "Not provided")</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="border border-secondary rounded p-3">
+                                    <h6 class="text-muted mb-2">
+                                        <i class="fas fa-map-marker-alt me-2"></i> Address
+                                    </h6>
+                                    <p class="mb-0 fw-semibold">
+                                        @if (!string.IsNullOrEmpty(Model.StreetAddress))
+                                        {
+                                            <text>@Model.StreetAddress<br />
+                                            @Model.Suburb, @Model.State @Model.PostCode</text>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">Not provided</span>
+                                        }
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="border border-secondary rounded p-3">
+                                    <h6 class="text-muted mb-2">
+                                        <i class="fas fa-credit-card me-2"></i> Payment Method
+                                    </h6>
+                                    <p class="mb-0 fw-semibold">
+                                        @if (!string.IsNullOrEmpty(Model.CardNumber))
+                                        {
+                                            <span>•••• •••• •••• @Model.CardNumber.Substring(Math.Max(0, Model.CardNumber.Length - 4))</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">No card on file</span>
+                                        }
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <i class="fas fa-exclamation-triangle fa-3x text-muted mb-3"></i>
+                            <h4>Account Information Unavailable</h4>
+                            <p class="text-muted">We couldn't load your account information at this time.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="row g-3 mt-4">
+                <div class="col-md-4">
+                    <a href="@Url.Action("EditAccount", "Customer")" class="card feature-card text-decoration-none h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-edit fa-2x text-primary mb-3"></i>
+                            <h6 class="card-title">Update Address</h6>
+                            <p class="card-text small text-muted">Change your delivery address</p>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    <a href="@Url.Action("OrderHistory", "Customer")" class="card feature-card text-decoration-none h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-history fa-2x text-primary mb-3"></i>
+                            <h6 class="card-title">Order History</h6>
+                            <p class="card-text small text-muted">View your past purchases</p>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    <a href="@Url.Action("Index", "Customer")" class="card feature-card text-decoration-none h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-tachometer-alt fa-2x text-primary mb-3"></i>
+                            <h6 class="card-title">Dashboard</h6>
+                            <p class="card-text small text-muted">Return to main dashboard</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 
