@@ -7,6 +7,17 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+// Add Session support for shopping cart
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
+// Add IHttpContextAccessor for session access
+builder.Services.AddHttpContextAccessor();
+
 // Add Entity Framework with SQL Server
 builder.Services.AddDbContext<EntertainmentGuildContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -32,6 +43,7 @@ builder.Services.AddAuthorization(options =>
 
 // Register services
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<CartService>();
 
 var app = builder.Build();
 
@@ -58,6 +70,9 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseRouting();
+
+// Add Session middleware (must come before authentication)
+app.UseSession();
 
 // Add Authentication & Authorization middleware
 app.UseAuthentication();

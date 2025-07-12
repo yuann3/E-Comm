@@ -393,7 +393,10 @@ namespace E_Comm.Migrations
                         .HasColumnType("nvarchar(32)");
 
                     b.Property<int>("UserID")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserID"));
 
                     b.HasKey("UserName");
 

@@ -22,8 +22,6 @@ namespace E_Comm.Models
         [StringLength(50)]
         public string? State { get; set; }
         
-        public DateTime OrderDate { get; set; } = DateTime.Now;
-        
         // Navigation properties
         public virtual Customer? Customer { get; set; }
         public virtual ICollection<ProductsInOrder> ProductsInOrders { get; set; } = new List<ProductsInOrder>();

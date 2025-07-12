@@ -170,7 +170,7 @@ namespace E_Comm.Controllers
         {
             var recentOrders = await _context.Orders
                 .Include(o => o.Customer)
-                .OrderByDescending(o => o.OrderDate)
+                .OrderByDescending(o => o.OrderID)
                 .Take(10)
                 .ToListAsync();
 

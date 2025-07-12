@@ -170,13 +170,9 @@
                                             </a>
                                             @if (product.Stocktakes?.Any(s => s.Quantity > 0) == true)
                                             {
-                                                <form method="post" action="@Url.Action("AddToCart", "Customer")" class="d-inline">
-                                                    <input type="hidden" name="productId" value="@product.ID" />
-                                                    <input type="hidden" name="quantity" value="1" />
-                                                    <button type="submit" class="btn btn-primary w-100">
-                                                        <i class="fas fa-shopping-cart me-2"></i>Add to Cart
-                                                    </button>
-                                                </form>
+                                                <button type="button" class="btn btn-primary w-100" onclick="addToCart(@product.ID)">
+                                                    <i class="fas fa-shopping-cart me-2"></i>Add to Cart
+                                                </button>
                                             }
                                             else
                                             {
@@ -659,4 +655,85 @@ h1, h2, h3, h4, h5, h6 {
         font-size: 1.25rem !important;
     }
 }
-</style> 
+</style>
+
+@section Scripts {
+    <script>
+        function addToCart(productId) {
+            // Show loading state
+            const button = event.target.closest('button');
+            const originalContent = button.innerHTML;
+            button.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Adding...';
+            button.disabled = true;
+
+            // Add to cart functionality with modern toast notification
+            fetch('/Customer/AddToCart', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: `productId=${productId}&quantity=1`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast('success', data.message, 'fas fa-check-circle');
+                    // Update cart count
+                    if (typeof window.updateCartCount === 'function') {
+                        window.updateCartCount();
+                    }
+                    
+                    // Update button to show success temporarily
+                    button.innerHTML = '<i class="fas fa-check me-2"></i>Added!';
+                    button.classList.remove('btn-primary');
+                    button.classList.add('btn-success');
+                    
+                    // Restore button after 2 seconds
+                    setTimeout(() => {
+                        button.innerHTML = originalContent;
+                        button.classList.remove('btn-success');
+                        button.classList.add('btn-primary');
+                        button.disabled = false;
+                    }, 2000);
+                } else {
+                    showToast('error', data.message, 'fas fa-exclamation-circle');
+                    // Restore button
+                    button.innerHTML = originalContent;
+                    button.disabled = false;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('error', 'An error occurred. Please try again.', 'fas fa-exclamation-triangle');
+                // Restore button
+                button.innerHTML = originalContent;
+                button.disabled = false;
+            });
+        }
+
+        // Toast notification function
+        function showToast(type, message, icon) {
+            const toast = document.createElement('div');
+            toast.className = `toast align-items-center text-white bg-${type === 'success' ? 'success' : 'danger'} border-0`;
+            toast.setAttribute('role', 'alert');
+            toast.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body">
+                        <i class="${icon} me-2"></i>${message}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            `;
+            
+            document.body.appendChild(toast);
+            const bsToast = new bootstrap.Toast(toast);
+            bsToast.show();
+            
+            // Remove toast after it's hidden
+            toast.addEventListener('hidden.bs.toast', () => {
+                document.body.removeChild(toast);
+            });
+        }
+    </script>
+} 

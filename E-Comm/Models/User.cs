@@ -4,7 +4,6 @@ namespace E_Comm.Models
 {
     public class User
     {
-        [Key]
         public int UserID { get; set; }
         
         [Required]

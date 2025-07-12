@@ -57,15 +57,20 @@ namespace E_Comm.Models
 
             if (user != null && VerifyPassword(password, user.Salt, user.HashPW))
             {
+                // According to requirements: Admin, Employee, or Customer
+                // New registered users are Customers by default (IsAdmin = false)
+                // Only predefined test accounts are Employees
+                string role = user.IsAdmin ? "Admin" : "Customer";
+                
                 return new AuthResult
                 {
                     IsSuccess = true,
                     Email = user.Email ?? "",
                     Name = user.Name ?? "",
-                    Role = user.IsAdmin ? "Admin" : "Employee",
+                    Role = role,
                     IsAdmin = user.IsAdmin,
-                    IsEmployee = !user.IsAdmin,
-                    IsCustomer = false
+                    IsEmployee = false, // Database users are either Admin or Customer, not Employee
+                    IsCustomer = !user.IsAdmin // If not Admin, then Customer
                 };
             }
 
@@ -96,15 +101,22 @@ namespace E_Comm.Models
                     return new RegistrationResult { IsSuccess = false, ErrorMessage = "Username is already taken." };
                 }
 
+                var newUser = new User
+                {
+                    UserName = user.UserName,
+                    Email = user.Email,
+                    Name = user.Name
+                };
+
                 // Generate salt and hash password
-                user.Salt = GenerateSalt();
-                user.HashPW = HashPassword(password, user.Salt);
+                newUser.Salt = GenerateSalt();
+                newUser.HashPW = HashPassword(password, newUser.Salt);
 
                 // Set default values for new users
-                user.IsAdmin = false; // New users are customers by default
+                newUser.IsAdmin = false; // New users are customers by default
 
                 // Add user to database
-                _context.Users.Add(user);
+                _context.Users.Add(newUser);
                 await _context.SaveChangesAsync();
 
                 return new RegistrationResult { IsSuccess = true };

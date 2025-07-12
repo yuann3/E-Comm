@@ -15,6 +15,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Nabla&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true"/>
     <link rel="stylesheet" href="~/E_Comm.styles.css" asp-append-version="true"/>
+    @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
 <header>
@@ -54,6 +55,18 @@
                 <ul class="navbar-nav">
                     @if (User.Identity?.IsAuthenticated == true)
                     {
+                        @if (User.IsInRole("Customer"))
+                        {
+                            <li class="nav-item me-3">
+                                <a class="nav-link position-relative" asp-controller="Customer" asp-action="ViewCart">
+                                    <i class="fas fa-shopping-cart"></i>
+                                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary cart-count" 
+                                          style="font-size: 0.6rem; display: none;">
+                                        0
+                                    </span>
+                                </a>
+                            </li>
+                        }
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" 
                                role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -239,6 +252,39 @@
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 <script src="~/js/site.js" asp-append-version="true"></script>
+
+@if (User.Identity?.IsAuthenticated == true && User.IsInRole("Customer"))
+{
+    <script>
+        // Update cart count on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCartCount();
+        });
+
+        function updateCartCount() {
+            fetch('@Url.Action("GetCartCount", "Customer")')
+                .then(response => response.json())
+                .then(data => {
+                    const cartBadge = document.querySelector('.cart-count');
+                    if (cartBadge) {
+                        if (data.count > 0) {
+                            cartBadge.textContent = data.count;
+                            cartBadge.style.display = 'inline-block';
+                        } else {
+                            cartBadge.style.display = 'none';
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error updating cart count:', error);
+                });
+        }
+
+        // Update cart count when items are added (call this function from other pages)
+        window.updateCartCount = updateCartCount;
+    </script>
+}
+
 @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

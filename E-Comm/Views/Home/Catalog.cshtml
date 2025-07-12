@@ -324,6 +324,7 @@
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-Requested-With': 'XMLHttpRequest'
                 },
                 body: `productId=${productId}&quantity=1`
             })
@@ -331,6 +332,11 @@
                 if (response.ok) {
                     // Show success message
                     showToast('success', 'Item added to cart successfully!', 'fas fa-check-circle');
+                    
+                    // Update cart count
+                    if (typeof window.updateCartCount === 'function') {
+                        window.updateCartCount();
+                    }
                     
                     // Update button to show success temporarily
                     button.innerHTML = '<i class="fas fa-check me-2"></i>Added!';

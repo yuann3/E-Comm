@@ -250,6 +250,7 @@
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-Requested-With': 'XMLHttpRequest'
                 },
                 body: `productId=${productId}&quantity=1`
             })
@@ -257,6 +258,10 @@
                 if (response.ok) {
                     // Create modern toast notification
                     showToast('success', 'Item added to cart successfully!', 'fas fa-check-circle');
+                    // Update cart count
+                    if (typeof window.updateCartCount === 'function') {
+                        window.updateCartCount();
+                    }
                 } else {
                     showToast('error', 'Failed to add item to cart. Please try again.', 'fas fa-exclamation-circle');
                 }

@@ -132,7 +132,21 @@ namespace E_Comm.Controllers
                         await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
                             new ClaimsPrincipal(claimsIdentity), authProperties);
 
-                        // Redirect new users to page
+                        // Redirect new users based on their role (same logic as login)
+                        if (authResult.IsAdmin)
+                        {
+                            return RedirectToAction("Index", "Admin");
+                        }
+                        else if (authResult.IsEmployee)
+                        {
+                            return RedirectToAction("Index", "Employee");
+                        }
+                        else if (authResult.IsCustomer)
+                        {
+                            return RedirectToAction("Index", "Customer");
+                        }
+
+                        // Default redirect if no specific role
                         return RedirectToAction("Index", "Home");
                     }
 

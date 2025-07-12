@@ -117,7 +117,7 @@ namespace E_Comm.Controllers
                 .Include(o => o.ProductsInOrders)
                 .ThenInclude(p => p.Stocktake)
                 .ThenInclude(s => s.Product)
-                .OrderByDescending(o => o.OrderDate)
+                .OrderByDescending(o => o.OrderID)
                 .ToListAsync();
 
             return View(orders);

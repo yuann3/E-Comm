@@ -74,6 +74,7 @@ namespace E_Comm.Models
             {
                 entity.ToTable("User");
                 entity.HasKey(e => e.UserName);
+                entity.Property(e => e.UserID).ValueGeneratedOnAdd();
                 entity.Property(e => e.IsAdmin).HasColumnName("isAdmin");
             });
 
@@ -132,7 +133,8 @@ namespace E_Comm.Models
             modelBuilder.Entity<ProductsInOrder>(entity =>
             {
                 entity.ToTable("ProductsInOrders");
-                entity.HasKey(e => e.Id);
+                entity.HasKey(e => new { e.OrderId, e.ProduktId });
+                entity.Property(e => e.OrderId).HasColumnName("OrderId");
                 entity.Property(e => e.ProduktId).HasColumnName("produktId");
                 entity.HasOne(p => p.Order)
                       .WithMany(o => o.ProductsInOrders)
