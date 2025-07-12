@@ -1,0 +1,262 @@
+@model E_Comm.Models.Order
+
+@{
+    ViewData["Title"] = "Order Details";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <!-- Header -->
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <div>
+                    <h1 class="display-6 mb-2">Order Details</h1>
+                    <p class="text-muted mb-0">Complete information for order #@Model.OrderID</p>
+                </div>
+                <div>
+                    <a href="@Url.Action("OrderHistory", "Customer")" class="btn btn-outline-primary">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Order History
+                    </a>
+                </div>
+            </div>
+
+            <!-- Order Status Card -->
+            <div class="card feature-card mb-4">
+                <div class="card-body p-4">
+                    <div class="row align-items-center">
+                        <div class="col-auto">
+                            <div class="feature-icon">
+                                <i class="fas fa-check-circle text-white fa-2x"></i>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <h4 class="mb-1">Order #@Model.OrderID</h4>
+                            <p class="text-muted mb-0">Your order has been completed successfully</p>
+                        </div>
+                        <div class="col-auto">
+                            <span class="badge bg-success fs-6 px-3 py-2">
+                                <i class="fas fa-check-circle me-2"></i>Completed
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <!-- Order Items -->
+                <div class="col-lg-8">
+                    <div class="card feature-card">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-shopping-bag me-2"></i>Order Items
+                            </h5>
+                        </div>
+                        <div class="card-body p-0">
+                            @if (Model.ProductsInOrders != null && Model.ProductsInOrders.Any())
+                            {
+                                <div class="table-responsive">
+                                    <table class="table table-hover mb-0">
+                                        <thead class="table-dark">
+                                            <tr>
+                                                <th scope="col">Product</th>
+                                                <th scope="col">Author/Creator</th>
+                                                <th scope="col">Genre</th>
+                                                <th scope="col" class="text-center">Quantity</th>
+                                                <th scope="col" class="text-end">Unit Price</th>
+                                                <th scope="col" class="text-end">Total</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @{
+                                                decimal orderTotal = 0;
+                                            }
+                                            @foreach (var item in Model.ProductsInOrders)
+                                            {
+                                                var product = item.Stocktake?.Product;
+                                                var unitPrice = item.Stocktake?.Price ?? 0;
+                                                var itemTotal = (decimal)(unitPrice * item.Quantity);
+                                                orderTotal += itemTotal;
+                                                
+                                                <tr>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="product-icon me-3">
+                                                                <i class="fas fa-book text-primary"></i>
+                                                            </div>
+                                                            <div>
+                                                                <h6 class="mb-1">@(product?.Name ?? "Unknown Product")</h6>
+                                                                <small class="text-muted">@(product?.Description != null && product.Description.Length > 50 ? product.Description.Substring(0, 50) + "..." : product?.Description ?? "")</small>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td class="align-middle">@(product?.Author ?? "Unknown")</td>
+                                                    <td class="align-middle">
+                                                        <span class="badge bg-secondary">@(product?.Genre?.Name ?? "Unknown")</span>
+                                                    </td>
+                                                    <td class="text-center align-middle">
+                                                        <span class="badge bg-primary">@item.Quantity</span>
+                                                    </td>
+                                                    <td class="text-end align-middle">$@unitPrice.ToString("F2")</td>
+                                                    <td class="text-end align-middle fw-bold">$@itemTotal.ToString("F2")</td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                        <tfoot class="table-dark">
+                                            <tr>
+                                                <td colspan="5" class="text-end fw-bold">Order Total:</td>
+                                                <td class="text-end fw-bold fs-5">$@orderTotal.ToString("F2")</td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="p-4 text-center">
+                                    <i class="fas fa-exclamation-triangle text-warning fa-3x mb-3"></i>
+                                    <h5>No Items Found</h5>
+                                    <p class="text-muted">This order appears to have no items associated with it.</p>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Order Information Sidebar -->
+                <div class="col-lg-4">
+                    <!-- Customer Information -->
+                    <div class="card feature-card mb-4">
+                        <div class="card-header">
+                            <h6 class="mb-0">
+                                <i class="fas fa-user me-2"></i>Customer Information
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <small class="text-muted">Customer ID</small>
+                                <p class="mb-0 fw-semibold">@(Model.CustomerId?.ToString() ?? "0")</p>
+                            </div>
+                            <div class="mb-3">
+                                <small class="text-muted">Email</small>
+                                <p class="mb-0">@(Model.Customer?.Email ?? "Not available")</p>
+                            </div>
+                            @if (!string.IsNullOrEmpty(Model.Customer?.PhoneNumber))
+                            {
+                                <div class="mb-0">
+                                    <small class="text-muted">Phone</small>
+                                    <p class="mb-0">@Model.Customer.PhoneNumber</p>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Delivery Address -->
+                    <div class="card feature-card mb-4">
+                        <div class="card-header">
+                            <h6 class="mb-0">
+                                <i class="fas fa-map-marker-alt me-2"></i>Delivery Address
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            @if (!string.IsNullOrEmpty(Model.StreetAddress))
+                            {
+                                <address class="mb-0">
+                                    @Model.StreetAddress<br>
+                                    @Model.Suburb, @Model.State @Model.PostCode
+                                </address>
+                            }
+                            else
+                            {
+                                <p class="text-muted mb-0">No delivery address specified</p>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Order Actions -->
+                    <div class="card feature-card">
+                        <div class="card-header">
+                            <h6 class="mb-0">
+                                <i class="fas fa-cog me-2"></i>Order Actions
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-outline-primary" onclick="window.print()">
+                                    <i class="fas fa-print me-2"></i>Print Order
+                                </button>
+                                <a href="@Url.Action("ContactSupport", "Customer")" class="btn btn-outline-secondary">
+                                    <i class="fas fa-life-ring me-2"></i>Contact Support
+                                </a>
+                                <a href="@Url.Action("Browse", "Customer")" class="btn btn-primary">
+                                    <i class="fas fa-shopping-cart me-2"></i>Shop Again
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Additional Information -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card feature-card">
+                        <div class="card-body p-4">
+                            <h6 class="mb-3">
+                                <i class="fas fa-info-circle me-2"></i>Order Information
+                            </h6>
+                            <div class="row g-3">
+                                <div class="col-md-3">
+                                    <small class="text-muted">Order ID</small>
+                                    <p class="mb-0 fw-semibold">#@Model.OrderID</p>
+                                </div>
+                                <div class="col-md-3">
+                                    <small class="text-muted">Status</small>
+                                    <p class="mb-0">
+                                        <span class="badge bg-success">Completed</span>
+                                    </p>
+                                </div>
+                                <div class="col-md-3">
+                                    <small class="text-muted">Items Count</small>
+                                    <p class="mb-0 fw-semibold">@(Model.ProductsInOrders?.Sum(p => p.Quantity) ?? 0) items</p>
+                                </div>
+                                <div class="col-md-3">
+                                    <small class="text-muted">Customer ID</small>
+                                    <p class="mb-0 fw-semibold">@(Model.CustomerId?.ToString() ?? "0")</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.product-icon {
+    width: 40px;
+    height: 40px;
+    background: var(--bs-primary-bg-subtle);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@@media print {
+    .btn, .card-header, nav, footer {
+        display: none !important;
+    }
+    
+    .container {
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    
+    .card {
+        border: 1px solid #ddd !important;
+        box-shadow: none !important;
+    }
+}
+</style> 
