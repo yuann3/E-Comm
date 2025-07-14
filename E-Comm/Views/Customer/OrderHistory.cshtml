@@ -1,0 +1,322 @@
+@model List<E_Comm.Models.Order>
+
+@{
+    ViewData["Title"] = "Order History";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <!-- Header -->
+            <div class="text-center mb-5">
+                <h1 class="display-5 mb-3">
+                    <i class="fas fa-history me-3 text-primary"></i>Order History
+                </h1>
+                <p class="lead text-muted">Track your orders and view your complete purchase history</p>
+            </div>
+
+            <!-- Success/Info Messages -->
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle me-2"></i>
+                    <strong>Success!</strong> @TempData["Success"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            @if (ViewBag.Message != null)
+            {
+                <div class="alert alert-info" role="alert">
+                    <i class="fas fa-info-circle me-2"></i>@ViewBag.Message
+                </div>
+            }
+
+            @if (Model != null && Model.Count > 0)
+            {
+                <!-- Orders List -->
+                <div class="row g-4">
+                    @foreach (var order in Model)
+                    {
+                        <div class="col-12">
+                            <div class="card feature-card">
+                                <div class="card-body p-4">
+                                    <div class="row align-items-center">
+                                        <div class="col-auto">
+                                            <div class="feature-icon">
+                                                <i class="fas fa-shopping-bag text-white fa-2x"></i>
+                                            </div>
+                                        </div>
+                                        <div class="col">
+                                            <div class="row g-3">
+                                                <div class="col-md-2">
+                                                    <h6 class="text-muted mb-1">Order ID</h6>
+                                                    <p class="mb-0 fw-semibold">#@order.OrderID</p>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <h6 class="text-muted mb-1">Customer ID</h6>
+                                                    <p class="mb-0 fw-semibold">@(order.CustomerId?.ToString() ?? "0")</p>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <h6 class="text-muted mb-1">Items</h6>
+                                                    <p class="mb-0 fw-semibold">
+                                                        @(order.ProductsInOrders?.Sum(p => p.Quantity) ?? 0) items
+                                                        @if (order.ProductsInOrders?.Any() == true)
+                                                        {
+                                                            <br><small class="text-muted">@(order.ProductsInOrders.Count()) products</small>
+                                                        }
+                                                    </p>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <h6 class="text-muted mb-1">Delivery Address</h6>
+                                                    <p class="mb-0 fw-semibold">
+                                                        @if (!string.IsNullOrEmpty(order.StreetAddress))
+                                                        {
+                                                            <text>@order.StreetAddress<br />
+                                                            @order.Suburb, @order.State @order.PostCode</text>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span class="text-muted">No address specified</span>
+                                                        }
+                                                    </p>
+                                                </div>
+                                                <div class="col-md-2 text-md-end">
+                                                    <span class="badge bg-success fs-6 px-3 py-2 mb-2">
+                                                        <i class="fas fa-check-circle me-2"></i>Completed
+                                                    </span>
+                                                    <br>
+                                                    <a href="@Url.Action("OrderDetails", "Customer", new { id = order.OrderID })" 
+                                                       class="btn btn-outline-primary btn-sm">
+                                                        <i class="fas fa-eye me-2"></i>View Details
+                                                    </a>
+                                                </div>
+                                            </div>
+
+                                            <!-- Order Summary (expandable) -->
+                                            @if (order.ProductsInOrders?.Any() == true)
+                                            {
+                                                <div class="mt-3 pt-3 border-top">
+                                                    <div class="row align-items-center">
+                                                        <div class="col">
+                                                            <h6 class="text-muted mb-1">Order Total</h6>
+                                                            @{
+                                                                var orderTotal = order.ProductsInOrders.Sum(p => (decimal)(p.Stocktake?.Price ?? 0) * p.Quantity);
+                                                            }
+                                                            <p class="mb-0 fw-bold fs-5 text-success">$@String.Format("{0:F2}", orderTotal)</p>
+                                                        </div>
+                                                        <div class="col-auto">
+                                                            <button class="btn btn-outline-secondary btn-sm" type="button" 
+                                                                    data-bs-toggle="collapse" data-bs-target="#orderItems@(order.OrderID)" 
+                                                                    aria-expanded="false">
+                                                                <i class="fas fa-chevron-down me-2"></i>Show Items
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <!-- Collapsible Order Items -->
+                                                    <div class="collapse mt-3" id="orderItems@(order.OrderID)">
+                                                        <div class="card bg-light">
+                                                            <div class="card-body p-3">
+                                                                <h6 class="mb-3">Items in this order:</h6>
+                                                                <div class="row g-2">
+                                                                    @foreach (var item in order.ProductsInOrders.Take(3))
+                                                                    {
+                                                                        <div class="col-md-4">
+                                                                            <div class="d-flex align-items-center">
+                                                                                <div class="product-mini-icon me-2">
+                                                                                    <i class="fas fa-book text-primary"></i>
+                                                                                </div>
+                                                                                <div class="flex-grow-1">
+                                                                                    <small class="fw-semibold d-block">@(item.Stocktake?.Product?.Name ?? "Unknown")</small>
+                                                                                    <small class="text-muted">Qty: @item.Quantity × $@String.Format("{0:F2}", item.Stocktake?.Price ?? 0.0)</small>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    }
+                                                                    @if (order.ProductsInOrders.Count() > 3)
+                                                                    {
+                                                                        <div class="col-md-4">
+                                                                            <small class="text-muted">
+                                                                                +@(order.ProductsInOrders.Count() - 3) more items...
+                                                                            </small>
+                                                                        </div>
+                                                                    }
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <!-- Summary Card -->
+                <div class="row mt-5">
+                    <div class="col-lg-8 mx-auto">
+                        <div class="card feature-card text-center">
+                            <div class="card-body p-4">
+                                <div class="row align-items-center">
+                                    <div class="col-auto">
+                                        <div class="feature-icon">
+                                            <i class="fas fa-chart-bar text-white fa-2x"></i>
+                                        </div>
+                                    </div>
+                                    <div class="col">
+                                        <h4 class="card-title mb-1">Order Summary</h4>
+                                        <p class="text-muted mb-0">Your purchase history at a glance</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="row g-3 mt-3">
+                                    <div class="col-md-3">
+                                        <div class="border border-secondary rounded p-3">
+                                            <h3 class="text-primary mb-1">@Model.Count</h3>
+                                            <p class="text-muted mb-0 small">Total Orders</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="border border-secondary rounded p-3">
+                                            <h3 class="text-success mb-1">@Model.Count</h3>
+                                            <p class="text-muted mb-0 small">Completed</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="border border-secondary rounded p-3">
+                                            @{
+                                                var totalItems = Model.Sum(o => o.ProductsInOrders?.Sum(p => p.Quantity) ?? 0);
+                                            }
+                                            <h3 class="text-info mb-1">@totalItems</h3>
+                                            <p class="text-muted mb-0 small">Items Purchased</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="border border-secondary rounded p-3">
+                                            @{
+                                                var totalSpent = Model.Sum(o => o.ProductsInOrders?.Sum(p => (decimal)(p.Stocktake?.Price ?? 0) * p.Quantity) ?? 0);
+                                            }
+                                            <h3 class="text-warning mb-1">$@String.Format("{0:F0}", totalSpent)</h3>
+                                            <p class="text-muted mb-0 small">Total Spent</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <!-- No Orders State -->
+                <div class="row">
+                    <div class="col-lg-6 mx-auto">
+                        <div class="card feature-card text-center">
+                            <div class="card-body p-5">
+                                <i class="fas fa-shopping-cart fa-4x text-muted mb-4"></i>
+                                <h3 class="card-title">No Orders Yet</h3>
+                                <p class="card-text mb-4">
+                                    @if (ViewBag.Message != null)
+                                    {
+                                        <text>@ViewBag.Message</text>
+                                    }
+                                    else
+                                    {
+                                        <text>You haven't placed any orders yet. Start exploring our amazing collection!</text>
+                                    }
+                                </p>
+                                
+                                <div class="d-grid gap-3">
+                                    <a href="@Url.Action("Browse", "Customer")" class="btn btn-primary btn-lg">
+                                        <i class="fas fa-search me-2"></i> Browse Products
+                                    </a>
+                                    @if (ViewBag.Message != null)
+                                    {
+                                        <a href="@Url.Action("MyAccount", "Customer")" class="btn btn-outline-primary">
+                                            <i class="fas fa-user-edit me-2"></i> Complete Account Setup
+                                        </a>
+                                    }
+                                    <a href="@Url.Action("Index", "Customer")" class="btn btn-outline-secondary">
+                                        <i class="fas fa-arrow-left me-2"></i> Back to Dashboard
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- Quick Actions -->
+            <div class="row g-3 mt-5">
+                <div class="col-md-4">
+                    <a href="@Url.Action("Index", "Customer")" class="card feature-card text-decoration-none h-100">
+                        <div class="card-body text-center p-4">
+                            <i class="fas fa-tachometer-alt fa-2x text-primary mb-3"></i>
+                            <h6 class="card-title">Dashboard</h6>
+                            <p class="card-text small text-muted">Return to main dashboard</p>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    <a href="@Url.Action("Browse", "Customer")" class="card feature-card text-decoration-none h-100">
+                        <div class="card-body text-center p-4">
+                            <i class="fas fa-shopping-cart fa-2x text-primary mb-3"></i>
+                            <h6 class="card-title">Continue Shopping</h6>
+                            <p class="card-text small text-muted">Browse our product catalog</p>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    <a href="@Url.Action("ContactSupport", "Customer")" class="card feature-card text-decoration-none h-100">
+                        <div class="card-body text-center p-4">
+                            <i class="fas fa-life-ring fa-2x text-primary mb-3"></i>
+                            <h6 class="card-title">Need Help?</h6>
+                            <p class="card-text small text-muted">Contact our support team</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.product-mini-icon {
+    width: 24px;
+    height: 24px;
+    background: var(--bs-primary-bg-subtle);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+}
+
+.feature-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.collapse {
+    transition: all 0.3s ease;
+}
+
+@@media (max-width: 768px) {
+    .col-md-2, .col-md-3 {
+        margin-bottom: 1rem;
+    }
+    
+    .text-md-end {
+        text-align: left !important;
+        margin-top: 1rem;
+    }
+}
+</style> 
