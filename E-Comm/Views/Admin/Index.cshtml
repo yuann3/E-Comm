@@ -1,0 +1,333 @@
+@{
+    ViewData["Title"] = "Admin Dashboard - 3B1G";
+    Layout = "_AdminLayout";
+}
+
+<div class="admin-dashboard">
+    <!-- Dashboard Header -->
+    <div class="dashboard-header">
+        <div class="header-content">
+            <div class="header-title">
+                <h1 class="dashboard-title">
+                    <i class="fas fa-tachometer-alt me-3"></i>Admin Dashboard
+                </h1>
+                <p class="dashboard-subtitle">Welcome back, @ViewBag.UserName! Manage your Entertainment Guild store</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-primary" onclick="refreshDashboard()">
+                    <i class="fas fa-sync-alt me-2"></i>Refresh
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overview Cards -->
+    <div class="overview-section">
+        <div class="section-header">
+            <h3 class="section-title">
+                <i class="fas fa-chart-line me-2"></i>Overview
+            </h3>
+        </div>
+        <div class="overview-grid">
+            <div class="overview-card products-card">
+                <div class="card-icon">
+                    <i class="fas fa-box"></i>
+                </div>
+                <div class="card-content">
+                    <div class="card-number">@ViewBag.TotalProducts</div>
+                    <div class="card-label">Total Products</div>
+                    <div class="card-action">
+                        <a href="@Url.Action("ManageItems", "Admin")" class="action-link">
+                            <i class="fas fa-arrow-right me-1"></i>Manage Items
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="overview-card users-card">
+                <div class="card-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="card-content">
+                    <div class="card-number">@ViewBag.TotalUsers</div>
+                    <div class="card-label">Total Users</div>
+                    <div class="card-action">
+                        <a href="@Url.Action("ManageUsers", "Admin")" class="action-link">
+                            <i class="fas fa-arrow-right me-1"></i>Manage Users
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="overview-card orders-card">
+                <div class="card-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                </div>
+                <div class="card-content">
+                    <div class="card-number">@ViewBag.TotalOrders</div>
+                    <div class="card-label">Total Orders</div>
+                    <div class="card-action">
+                        <a href="@Url.Action("Reports", "Admin")" class="action-link">
+                            <i class="fas fa-arrow-right me-1"></i>View Reports
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="overview-card alert-card">
+                <div class="card-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="card-content">
+                    <div class="card-number">@ViewBag.LowStockItems</div>
+                    <div class="card-label">Low Stock Items</div>
+                    <div class="card-action">
+                        <a href="@Url.Action("ManageItems", "Admin")" class="action-link">
+                            <i class="fas fa-arrow-right me-1"></i>Check Stock
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="main-content-grid">
+        <!-- Quick Actions -->
+        <div class="quick-actions-section">
+            <div class="section-header">
+                <h3 class="section-title">
+                    <i class="fas fa-bolt me-2"></i>Quick Actions
+                </h3>
+            </div>
+            <div class="quick-actions-grid">
+                <a href="@Url.Action("CreateItem", "Admin")" class="quick-action-card">
+                    <div class="action-icon">
+                        <i class="fas fa-plus"></i>
+                    </div>
+                    <div class="action-content">
+                        <h5 class="action-title">Add New Item</h5>
+                        <p class="action-description">Add products to your store</p>
+                    </div>
+                </a>
+
+                <a href="@Url.Action("CreateUser", "Admin")" class="quick-action-card">
+                    <div class="action-icon">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <div class="action-content">
+                        <h5 class="action-title">Add New User</h5>
+                        <p class="action-description">Create admin or employee accounts</p>
+                    </div>
+                </a>
+
+                <a href="@Url.Action("ManageItems", "Admin")" class="quick-action-card">
+                    <div class="action-icon">
+                        <i class="fas fa-edit"></i>
+                    </div>
+                    <div class="action-content">
+                        <h5 class="action-title">Manage Inventory</h5>
+                        <p class="action-description">Update stock and prices</p>
+                    </div>
+                </a>
+
+                <a href="@Url.Action("Reports", "Admin")" class="quick-action-card">
+                    <div class="action-icon">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <div class="action-content">
+                        <h5 class="action-title">View Reports</h5>
+                        <p class="action-description">Analytics and insights</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="recent-activity-section">
+            <div class="section-header">
+                <h3 class="section-title">
+                    <i class="fas fa-clock me-2"></i>Recent Activity
+                </h3>
+            </div>
+            <div class="activity-feed">
+                <div class="activity-item">
+                    <div class="activity-icon">
+                        <i class="fas fa-plus text-success"></i>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-title">New Product Added</div>
+                        <div class="activity-description">The Adventures of Augie March was added to inventory</div>
+                        <div class="activity-time">2 hours ago</div>
+                    </div>
+                </div>
+
+                <div class="activity-item">
+                    <div class="activity-icon">
+                        <i class="fas fa-user text-info"></i>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-title">New User Registration</div>
+                        <div class="activity-description">Customer account created for john.doe@example.com</div>
+                        <div class="activity-time">4 hours ago</div>
+                    </div>
+                </div>
+
+                <div class="activity-item">
+                    <div class="activity-icon">
+                        <i class="fas fa-shopping-cart text-warning"></i>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-title">New Order Placed</div>
+                        <div class="activity-description">Order #1001 placed by customer@example.com</div>
+                        <div class="activity-time">6 hours ago</div>
+                    </div>
+                </div>
+
+                <div class="activity-item">
+                    <div class="activity-icon">
+                        <i class="fas fa-exclamation-triangle text-danger"></i>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-title">Low Stock Alert</div>
+                        <div class="activity-description">American Pastoral is running low on stock (3 remaining)</div>
+                        <div class="activity-time">8 hours ago</div>
+                    </div>
+                </div>
+            </div>
+            <div class="activity-footer">
+                <a href="@Url.Action("Reports", "Admin")" class="view-all-link">
+                    <i class="fas fa-arrow-right me-1"></i>View All Activity
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Analytics Section -->
+    <div class="analytics-section">
+        <div class="section-header">
+            <h3 class="section-title">
+                <i class="fas fa-chart-pie me-2"></i>Analytics
+            </h3>
+        </div>
+        <div class="analytics-grid">
+            <div class="analytics-card">
+                <div class="analytics-header">
+                    <h4 class="analytics-title">Popular Categories</h4>
+                </div>
+                <div class="analytics-content">
+                    <div class="category-item">
+                        <span class="category-name">Books</span>
+                        <div class="category-bar">
+                            <div class="category-progress" style="width: 75%"></div>
+                        </div>
+                        <span class="category-percentage">75%</span>
+                    </div>
+                    <div class="category-item">
+                        <span class="category-name">Movies</span>
+                        <div class="category-bar">
+                            <div class="category-progress" style="width: 60%"></div>
+                        </div>
+                        <span class="category-percentage">60%</span>
+                    </div>
+                    <div class="category-item">
+                        <span class="category-name">Games</span>
+                        <div class="category-bar">
+                            <div class="category-progress" style="width: 45%"></div>
+                        </div>
+                        <span class="category-percentage">45%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="analytics-card">
+                <div class="analytics-header">
+                    <h4 class="analytics-title">System Health</h4>
+                </div>
+                <div class="analytics-content">
+                    <div class="health-item">
+                        <div class="health-icon">
+                            <i class="fas fa-database text-success"></i>
+                        </div>
+                        <div class="health-info">
+                            <div class="health-label">Database</div>
+                            <div class="health-status">Online</div>
+                        </div>
+                    </div>
+                    <div class="health-item">
+                        <div class="health-icon">
+                            <i class="fas fa-server text-success"></i>
+                        </div>
+                        <div class="health-info">
+                            <div class="health-label">Server</div>
+                            <div class="health-status">Running</div>
+                        </div>
+                    </div>
+                    <div class="health-item">
+                        <div class="health-icon">
+                            <i class="fas fa-shield-alt text-success"></i>
+                        </div>
+                        <div class="health-info">
+                            <div class="health-label">Security</div>
+                            <div class="health-status">Secure</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function refreshDashboard() {
+            // Add loading state
+            const refreshBtn = document.querySelector('.dashboard-header .btn-primary');
+            const originalContent = refreshBtn.innerHTML;
+            refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Refreshing...';
+            refreshBtn.disabled = true;
+
+            // Simulate refresh (in real implementation, this would make an AJAX call)
+            setTimeout(() => {
+                refreshBtn.innerHTML = originalContent;
+                refreshBtn.disabled = false;
+                
+                // Show success message
+                showNotification('Dashboard refreshed successfully!', 'success');
+            }, 1500);
+        }
+
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+            notification.style.cssText = 'top: 20px; right: 20px; z-index: 1050; min-width: 300px;';
+            notification.innerHTML = `
+                <i class="fas fa-check-circle me-2"></i>${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.body.appendChild(notification);
+
+            // Auto-dismiss after 3 seconds
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 3000);
+        }
+
+        // Add smooth loading animation when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.overview-card, .quick-action-card, .analytics-card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                
+                setTimeout(() => {
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+        });
+    </script>
+} 

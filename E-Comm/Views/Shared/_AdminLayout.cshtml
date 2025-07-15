@@ -6,6 +6,7 @@
     <title>@ViewData["Title"] - Entertainment Guild Admin</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
     @await RenderSectionAsync("Styles", required: false)
 </head>
@@ -125,8 +126,8 @@
     <style>
         /* Admin Layout Styles */
         .admin-body {
-            background: var(--background);
-            color: var(--foreground);
+            background: #0a0a0a;
+            color: var(--admin-foreground);
             margin: 0;
             padding: 0;
         }
