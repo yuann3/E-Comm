@@ -1,0 +1,418 @@
+@model List<E_Comm.Models.User>
+@{
+    ViewData["Title"] = "Manage Users - Admin";
+    Layout = "_AdminLayout";
+}
+
+@Html.AntiForgeryToken()
+
+<div class="users-management">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="header-content">
+            <div class="header-title">
+                <h1 class="page-title">
+                    <i class="fas fa-users me-3"></i>User Management
+                </h1>
+                <p class="page-subtitle">Manage system users, roles, and permissions</p>
+            </div>
+            <div class="header-actions">
+                <a href="@Url.Action("CreateUser", "Admin")" class="btn btn-primary">
+                    <i class="fas fa-user-plus me-2"></i>Add New User
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Statistics -->
+    <div class="statistics-section">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="stat-card admin-stat">
+                    <div class="stat-icon">
+                        <i class="fas fa-crown"></i>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-number">@ViewBag.AdminCount</div>
+                        <div class="stat-label">Administrators</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="stat-card customer-stat">
+                    <div class="stat-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-number">@ViewBag.CustomerCount</div>
+                        <div class="stat-label">Customers</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search and Filter -->
+    <div class="search-filter-section">
+        <div class="search-filter-card">
+            <form method="get" asp-action="ManageUsers" class="search-form">
+                <div class="search-filter-grid">
+                    <div class="search-group">
+                        <label class="form-label">Search Users</label>
+                        <div class="search-input-group">
+                            <span class="search-icon">
+                                <i class="fas fa-search"></i>
+                            </span>
+                            <input type="text" name="searchTerm" class="form-control" 
+                                   placeholder="Search by username, email, or name..." 
+                                   value="@ViewBag.SearchTerm" />
+                        </div>
+                    </div>
+                    <div class="filter-group">
+                        <label class="form-label">Filter by Role</label>
+                        <select name="roleFilter" class="form-select">
+                            <option value="">All Roles</option>
+                            @if (ViewBag.RoleFilter == "admin")
+                            {
+                                <option value="admin" selected="selected">Administrators</option>
+                            }
+                            else
+                            {
+                                <option value="admin">Administrators</option>
+                            }
+                            @if (ViewBag.RoleFilter == "customer")
+                            {
+                                <option value="customer" selected="selected">Customers</option>
+                            }
+                            else
+                            {
+                                <option value="customer">Customers</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="filter-actions">
+                        <button type="submit" class="btn btn-outline-primary">
+                            <i class="fas fa-filter me-2"></i>Filter
+                        </button>
+                        <a href="@Url.Action("ManageUsers", "Admin")" class="btn btn-outline-secondary">
+                            <i class="fas fa-times me-2"></i>Clear
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Users Table -->
+    <div class="table-section">
+        <div class="table-header">
+            <div class="table-info">
+                <span class="users-count">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Showing @(Model?.Count ?? 0) users
+                </span>
+            </div>
+            <div class="table-actions">
+                <div class="bulk-actions" id="bulkActions" style="display: none;">
+                    <button type="button" class="btn btn-danger btn-sm" onclick="bulkDeleteUsers()">
+                        <i class="fas fa-trash me-2"></i>Delete Selected
+                    </button>
+                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="bulkChangeRole()">
+                        <i class="fas fa-user-cog me-2"></i>Change Role
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>
+                            <input type="checkbox" id="selectAllUsers" class="form-check-input">
+                        </th>
+                        <th>User Details</th>
+                        <th>Role</th>
+                        <th>Contact</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        @foreach (var user in Model)
+                        {
+                            <tr class="user-row">
+                                <td>
+                                    <input type="checkbox" class="user-checkbox form-check-input" value="@user.UserID">
+                                </td>
+                                <td>
+                                    <div class="cell-content">
+                                        <div class="cell-title">@user.UserName</div>
+                                        <div class="cell-subtitle">@(user.Name ?? "Not provided")</div>
+                                        <div class="cell-description">ID: @user.UserID</div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="user-role">
+                                        @if (user.IsAdmin)
+                                        {
+                                            <span class="badge bg-danger">
+                                                <i class="fas fa-user-shield me-1"></i>Administrator
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">
+                                                <i class="fas fa-user me-1"></i>Customer
+                                            </span>
+                                        }
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="user-contact">
+                                        @if (!string.IsNullOrEmpty(user.Email))
+                                        {
+                                            <div class="contact-email">
+                                                <i class="fas fa-envelope me-1"></i>
+                                                <a href="mailto:@user.Email">@user.Email</a>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">No email provided</span>
+                                        }
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="user-status">
+                                        <span class="status-indicator active">
+                                            <i class="fas fa-circle"></i>
+                                            <span>Active</span>
+                                        </span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="user-actions">
+                                        <div class="btn-group" role="group">
+                                            <a href="@Url.Action("EditUser", "Admin", new { userName = user.UserName })" 
+                                               class="btn btn-outline-primary btn-sm" title="Edit User">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="@Url.Action("UserProfile", "Admin", new { userName = user.UserName })" 
+                                               class="btn btn-outline-info btn-sm" title="View Profile">
+                                                <i class="fas fa-user-circle"></i>
+                                            </a>
+                                            <button class="btn btn-outline-danger btn-sm" 
+                                                    onclick="deleteUser(@user.UserID, '@user.UserName')" title="Delete User">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center py-4">
+                                <div class="no-data">
+                                    <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                                    <h5 class="text-muted">No users found</h5>
+                                    <p class="text-muted">Try adjusting your search criteria or add a new user.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        @if (ViewBag.TotalPages > 1)
+        {
+            <div class="pagination-section">
+                <nav aria-label="User pagination">
+                    <ul class="pagination">
+                        @if (ViewBag.CurrentPage > 1)
+                        {
+                            <li class="page-item">
+                                <a class="page-link" href="@Url.Action("ManageUsers", "Admin", new { 
+                                    searchTerm = ViewBag.SearchTerm, 
+                                    roleFilter = ViewBag.RoleFilter, 
+                                    page = ViewBag.CurrentPage - 1 
+                                })">Previous</a>
+                            </li>
+                        }
+
+                        @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                        {
+                            <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                                <a class="page-link" href="@Url.Action("ManageUsers", "Admin", new { 
+                                    searchTerm = ViewBag.SearchTerm, 
+                                    roleFilter = ViewBag.RoleFilter, 
+                                    page = i 
+                                })">@i</a>
+                            </li>
+                        }
+
+                        @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                        {
+                            <li class="page-item">
+                                <a class="page-link" href="@Url.Action("ManageUsers", "Admin", new { 
+                                    searchTerm = ViewBag.SearchTerm, 
+                                    roleFilter = ViewBag.RoleFilter, 
+                                    page = ViewBag.CurrentPage + 1 
+                                })">Next</a>
+                            </li>
+                        }
+                    </ul>
+                </nav>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Delete User Confirmation Modal -->
+<div class="modal fade" id="deleteUserModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Delete User</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete user <strong id="deleteUserName"></strong>?</p>
+                <p class="text-muted">This action cannot be undone and will remove all associated data.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteUserBtn">Delete User</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@section Scripts {
+    <script>
+        // Select All functionality
+        document.getElementById('selectAllUsers').addEventListener('change', function() {
+            const checkboxes = document.querySelectorAll('.user-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = this.checked;
+            });
+            toggleBulkActions();
+        });
+
+        // Individual checkbox functionality
+        document.querySelectorAll('.user-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                toggleBulkActions();
+                updateSelectAllState();
+            });
+        });
+
+        function toggleBulkActions() {
+            const selectedUsers = document.querySelectorAll('.user-checkbox:checked');
+            const bulkActions = document.getElementById('bulkActions');
+            
+            if (selectedUsers.length > 0) {
+                bulkActions.style.display = 'flex';
+            } else {
+                bulkActions.style.display = 'none';
+            }
+        }
+
+        function updateSelectAllState() {
+            const checkboxes = document.querySelectorAll('.user-checkbox');
+            const checkedBoxes = document.querySelectorAll('.user-checkbox:checked');
+            const selectAll = document.getElementById('selectAllUsers');
+            
+            selectAll.checked = checkboxes.length === checkedBoxes.length;
+            selectAll.indeterminate = checkedBoxes.length > 0 && checkedBoxes.length < checkboxes.length;
+        }
+
+        // Delete user functionality
+        function deleteUser(userId, userName) {
+            document.getElementById('deleteUserName').textContent = userName;
+            
+            document.getElementById('confirmDeleteUserBtn').onclick = function() {
+                // Create a form to submit the delete request
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '@Url.Action("DeleteUser", "Admin")';
+                
+                const idInput = document.createElement('input');
+                idInput.type = 'hidden';
+                idInput.name = 'id';
+                idInput.value = userId;
+                
+                form.appendChild(idInput);
+                document.body.appendChild(form);
+                form.submit();
+            };
+            
+            const modal = new bootstrap.Modal(document.getElementById('deleteUserModal'));
+            modal.show();
+        }
+
+        // View user details
+        function viewUserDetails(userId) {
+            // Redirect to user details page
+            window.location.href = '@Url.Action("UserDetails", "Admin")/' + userId;
+        }
+
+        // Bulk operations
+        function bulkDeleteUsers() {
+            const selectedUsers = document.querySelectorAll('.user-checkbox:checked');
+            if (selectedUsers.length === 0) return;
+            
+            if (confirm(`Are you sure you want to delete ${selectedUsers.length} selected users?`)) {
+                console.log('Bulk delete users:', Array.from(selectedUsers).map(cb => cb.value));
+                // Implementation for bulk delete
+            }
+        }
+
+        function bulkChangeRole() {
+            const selectedUsers = document.querySelectorAll('.user-checkbox:checked');
+            if (selectedUsers.length === 0) return;
+            
+            const newRole = prompt('Enter new role (admin/customer):');
+            if (newRole && ['admin', 'customer'].includes(newRole.toLowerCase())) {
+                console.log('Bulk role change:', Array.from(selectedUsers).map(cb => cb.value), 'New role:', newRole);
+                // Implementation for bulk role change
+            }
+        }
+
+        // Enhanced loading animations
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.stat-card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                
+                setTimeout(() => {
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 150);
+            });
+
+            const rows = document.querySelectorAll('.user-row');
+            rows.forEach((row, index) => {
+                row.style.opacity = '0';
+                row.style.transform = 'translateY(20px)';
+                row.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                
+                setTimeout(() => {
+                    row.style.opacity = '1';
+                    row.style.transform = 'translateY(0)';
+                }, index * 50);
+            });
+        });
+    </script>
+} 
