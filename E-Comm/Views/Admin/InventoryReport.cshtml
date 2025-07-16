@@ -1,0 +1,309 @@
+@model IEnumerable<E_Comm.Models.Stocktake>
+
+@{
+    ViewData["Title"] = "Inventory Report";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="admin-content">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="header-content">
+            <div>
+                <h1 class="page-title">
+                    <i class="fas fa-boxes"></i>
+                    Inventory Report
+                </h1>
+                <p class="page-subtitle">Stock levels, reorder alerts, and inventory analytics</p>
+            </div>
+            <div>
+                <a href="@Url.Action("Reports", "Admin")" class="btn btn-outline-primary">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Reports
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Inventory Statistics -->
+    <div class="statistics-section">
+        <div class="row">
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-dollar-sign"></i>
+                    </div>
+                    <div>
+                        <div class="stat-number">$@ViewBag.TotalStockValue.ToString("F2")</div>
+                        <div class="stat-label">Total Stock Value</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="stat-card low-stock-stat">
+                    <div class="stat-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div>
+                        <div class="stat-number">@ViewBag.LowStockItems.Count</div>
+                        <div class="stat-label">Low Stock Items</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="stat-card out-stock-stat">
+                    <div class="stat-icon">
+                        <i class="fas fa-times-circle"></i>
+                    </div>
+                    <div>
+                        <div class="stat-number">@ViewBag.OutOfStockItems.Count</div>
+                        <div class="stat-label">Out of Stock</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-boxes"></i>
+                    </div>
+                    <div>
+                        <div class="stat-number">@Model.Count()</div>
+                        <div class="stat-label">Total Stock Items</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alert Sections -->
+    @if (ViewBag.OutOfStockItems != null && ((IEnumerable<E_Comm.Models.Stocktake>)ViewBag.OutOfStockItems).Any())
+    {
+        <div class="form-section">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title text-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Out of Stock Items
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-container">
+                        <table class="table mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Source</th>
+                                    <th>Last Price</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in ViewBag.OutOfStockItems)
+                                {
+                                    <tr>
+                                        <td>
+                                            <div class="cell-content">
+                                                <div class="cell-title">@item.Product?.Name</div>
+                                                <div class="cell-subtitle">by @item.Product?.Author</div>
+                                                <div class="cell-description">
+                                                    <span class="badge bg-secondary">@item.Product?.Genre?.Name</span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="cell-content">
+                                                <div class="cell-title">@item.Source?.Source_name</div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="cell-content">
+                                                <div class="cell-title">$@item.Price?.ToString("F2")</div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-danger">
+                                                <i class="fas fa-times-circle me-1"></i>Out of Stock
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <a href="@Url.Action("EditItem", "Admin", new { id = item.ProductId })" 
+                                               class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-edit me-1"></i>Restock
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (ViewBag.LowStockItems != null && ((IEnumerable<E_Comm.Models.Stocktake>)ViewBag.LowStockItems).Any())
+    {
+        <div class="form-section">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title text-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Low Stock Items
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-container">
+                        <table class="table mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Source</th>
+                                    <th>Current Stock</th>
+                                    <th>Price</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in ViewBag.LowStockItems)
+                                {
+                                    <tr>
+                                        <td>
+                                            <div class="cell-content">
+                                                <div class="cell-title">@item.Product?.Name</div>
+                                                <div class="cell-subtitle">by @item.Product?.Author</div>
+                                                <div class="cell-description">
+                                                    <span class="badge bg-secondary">@item.Product?.Genre?.Name</span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="cell-content">
+                                                <div class="cell-title">@item.Source?.Source_name</div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="cell-content">
+                                                <div class="cell-title">@item.Quantity</div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="cell-content">
+                                                <div class="cell-title">$@item.Price?.ToString("F2")</div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-warning">
+                                                <i class="fas fa-exclamation-triangle me-1"></i>Low Stock
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <a href="@Url.Action("EditItem", "Admin", new { id = item.ProductId })" 
+                                               class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-edit me-1"></i>Restock
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Full Inventory Report -->
+    <div class="form-section">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="fas fa-list me-2"></i>Complete Inventory Report
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-container">
+                    @if (Model.Any())
+                    {
+                        <table class="table mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Source</th>
+                                    <th>Stock Level</th>
+                                    <th>Price</th>
+                                    <th>Stock Value</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.OrderBy(s => s.Quantity))
+                                {
+                                    var stockValue = (item.Quantity ?? 0) * (item.Price ?? 0);
+                                    var statusClass = (item.Quantity ?? 0) == 0 ? "bg-danger" : 
+                                                     (item.Quantity ?? 0) < 10 ? "bg-warning" : "bg-success";
+                                    var statusText = (item.Quantity ?? 0) == 0 ? "Out of Stock" : 
+                                                    (item.Quantity ?? 0) < 10 ? "Low Stock" : "In Stock";
+                                    var statusIcon = (item.Quantity ?? 0) == 0 ? "fa-times-circle" : 
+                                                    (item.Quantity ?? 0) < 10 ? "fa-exclamation-triangle" : "fa-check-circle";
+                                    
+                                    <tr>
+                                        <td>
+                                            <div class="cell-content">
+                                                <div class="cell-title">@item.Product?.Name</div>
+                                                <div class="cell-subtitle">by @item.Product?.Author</div>
+                                                <div class="cell-description">
+                                                    <span class="badge bg-secondary">@item.Product?.Genre?.Name</span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="cell-content">
+                                                <div class="cell-title">@item.Source?.Source_name</div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="cell-content">
+                                                <div class="cell-title">@item.Quantity</div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="cell-content">
+                                                <div class="cell-title">$@item.Price?.ToString("F2")</div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="cell-content">
+                                                <div class="cell-title">$@stockValue.ToString("F2")</div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="badge @statusClass">
+                                                <i class="fas @statusIcon me-1"></i>@statusText
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group">
+                                                <a href="@Url.Action("EditItem", "Admin", new { id = item.ProductId })" 
+                                                   class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                    else
+                    {
+                        <div class="no-data">
+                            <i class="fas fa-boxes"></i>
+                            <h5>No inventory data</h5>
+                            <p>No stock items found in the system.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 
