@@ -14,7 +14,6 @@ E-Comm/
 │   ├── HomeController.cs     # Public pages (Index, Catalog, About)
 │   ├── AuthController.cs     # Authentication (Login, Logout)
 │   ├── AdminController.cs    # Administrator functions
-│   ├── EmployeeController.cs # Employee functions
 │   └── CustomerController.cs # Customer functions
 ├── Models/               # Data models and business logic
 │   ├── EntertainmentGuildContext.cs # EF DbContext
@@ -33,7 +32,6 @@ E-Comm/
 │   ├── Home/                # Public pages
 │   ├── Auth/                # Authentication pages
 │   ├── Admin/               # Administrator interfaces
-│   ├── Employee/            # Employee interfaces
 │   └── Customer/            # Customer interfaces
 ├── wwwroot/              # Static files (CSS, JS, images)
 ├── Migrations/           # EF Core database migrations
@@ -51,7 +49,7 @@ The database follows the provided SQL schema with the following core entities:
 - `Product` - Entertainment items with metadata
 - `Source` - Suppliers/distributors
 - `Stocktake` - Inventory management (links Products to Sources)
-- `User` - System users (Admin/Employee authentication)
+- `User` - System users (Admin authentication)
 - `Customer` - Customer information (TO table)
 - `Order` - Customer orders
 - `ProductsInOrder` - Order line items
@@ -77,15 +75,13 @@ The application uses SQLite, Connection string is defined in `appsettings.json`:
 
 ### User Roles
 1. **Customer** - Can browse products, create accounts, place orders, manage profile
-2. **Employee** - Can view products, customers, and orders (read-only access)
-3. **Administrator** - Full system access including user and product management
+2. **Administrator** - Full system access including user and product management
 
 ### Authentication Implementation
 - Cookie-based authentication with 24-hour expiration
 - Role-based authorization using ASP.NET Core policies
 - Test credentials for development:
   - Customer: `customer@example.com` / `Password1`
-  - Employee: `employee@example.com` / `Passw0rd`
   - Administrator: `administrator@example.com` / `Pa$$w0rd`
 
 ### Authorization Policies
@@ -93,7 +89,6 @@ The application uses SQLite, Connection string is defined in `appsettings.json`:
 services.AddAuthorization(options =>
 {
     options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
-    options.AddPolicy("EmployeeOnly", policy => policy.RequireRole("Employee"));
     options.AddPolicy("CustomerOnly", policy => policy.RequireRole("Customer"));
 });
 ```
@@ -107,14 +102,15 @@ services.AddAuthorization(options =>
 4. **Account Management** - Implemented in `CustomerController` with address validation
 
 ### Access Control Matrix
-| Feature | Customer | Employee | Admin |
-|---------|----------|----------|-------|
-| Browse Products | Yes | Yes | Yes |
-| Purchase Items | Yes | No | No |
-| View Customer Data | Own Only | All | All |
-| Manage Products | No | No | Yes |
-| Manage Users | No | No | Yes |
-| View Orders | Own Only | All | All |
+| Feature | Customer | Admin |
+|---------|----------|-------|
+| Browse Products | Yes | Yes |
+| Purchase Items | Yes | Yes |
+| Access Main Website | Yes | Yes |
+| View Customer Data | Own Only | All |
+| Manage Products | No | Yes |
+| Manage Users | No | Yes |
+| View Orders | Own Only | All |
 
 ## Development Setup
 
@@ -154,13 +150,6 @@ The application automatically seeds sample data on startup through `DataSeeder.c
 - `POST /Customer/CreateAccount` - Account creation
 - `GET /Customer/OrderHistory` - Order history
 - `POST /Customer/AddToCart` - Add items to cart
-
-### Employee Routes (Requires Employee Role)
-- `GET /Employee` - Employee dashboard
-- `GET /Employee/ViewItems` - Product inventory
-- `GET /Employee/ViewAccounts` - Customer accounts
-- `GET /Employee/ViewOrders` - All orders
-- `GET /Employee/SearchItems` - Product search
 
 ### Admin Routes (Requires Admin Role)
 - `GET /Admin` - Admin dashboard

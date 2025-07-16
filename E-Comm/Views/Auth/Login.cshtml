@@ -95,49 +95,25 @@
                 
                 <div class="row g-3">
                     <div class="col-md-4">
-                        <div class="credential-card-modal">
-                            <div class="credential-icon-modal">
-                                <i class="fas fa-user"></i>
-                            </div>
-                            <h6 class="credential-title-modal">Customer</h6>
-                            <div class="credential-details-modal">
-                                <small class="credential-email-modal">customer@example.com</small>
-                                <small class="credential-password-modal">Password1</small>
-                            </div>
-                            <button class="btn btn-primary btn-sm" onclick="fillCredentialsFromModal('customer@example.com', 'Password1')">
-                                <i class="fas fa-copy me-1"></i>Use
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="col-md-4">
-                        <div class="credential-card-modal">
-                            <div class="credential-icon-modal">
-                                <i class="fas fa-id-badge"></i>
-                            </div>
-                            <h6 class="credential-title-modal">Employee</h6>
-                            <div class="credential-details-modal">
-                                <small class="credential-email-modal">employee@example.com</small>
-                                <small class="credential-password-modal">Passw0rd</small>
-                            </div>
-                            <button class="btn btn-primary btn-sm" onclick="fillCredentialsFromModal('employee@example.com', 'Passw0rd')">
-                                <i class="fas fa-copy me-1"></i>Use
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="col-md-4">
-                        <div class="credential-card-modal">
-                            <div class="credential-icon-modal">
-                                <i class="fas fa-crown"></i>
-                            </div>
+                        <div class="credential-group">
                             <h6 class="credential-title-modal">Admin</h6>
-                            <div class="credential-details-modal">
+                            <p class="credential-details-modal">
                                 <small class="credential-email-modal">administrator@example.com</small>
                                 <small class="credential-password-modal">Pa$$w0rd</small>
-                            </div>
+                            </p>
                             <button class="btn btn-primary btn-sm" onclick="fillCredentialsFromModal('administrator@example.com', 'Pa$$w0rd')">
-                                <i class="fas fa-copy me-1"></i>Use
+                                <i class="fas fa-copy me-1"></i>Use Admin Credentials
+                            </button>
+                        </div>
+                        
+                        <div class="credential-group">
+                            <h6 class="credential-title-modal">Customer</h6>
+                            <p class="credential-details-modal">
+                                <small class="credential-email-modal">customer@example.com</small>
+                                <small class="credential-password-modal">Password1</small>
+                            </p>
+                            <button class="btn btn-primary btn-sm" onclick="fillCredentialsFromModal('customer@example.com', 'Password1')">
+                                <i class="fas fa-copy me-1"></i>Use Customer Credentials
                             </button>
                         </div>
                     </div>
@@ -365,41 +341,9 @@
         }
 
         /* Modal Credential Cards */
-        .credential-card-modal {
-            background: var(--muted);
-            border: 1px solid var(--border);
-            border-radius: var(--border-radius);
-            padding: 1.5rem;
-            text-align: center;
-            transition: var(--transition);
-            height: 100%;
-        }
-
-        .credential-card-modal:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
-            border-color: var(--primary);
-        }
-
-        .credential-icon-modal {
-            width: 40px;
-            height: 40px;
-            background: var(--secondary);
-            border: 1px solid var(--border);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 1rem;
-            font-size: 1rem;
-            color: var(--primary);
-            transition: var(--transition);
-        }
-
-        .credential-card-modal:hover .credential-icon-modal {
-            transform: scale(1.1);
-            background: var(--primary);
-            color: var(--primary-foreground);
+        .credential-group {
+            text-align: left;
+            margin-bottom: 1rem;
         }
 
         .credential-title-modal {
@@ -441,8 +385,8 @@
                 margin: 1rem;
             }
 
-            .credential-card-modal {
-                padding: 1rem;
+            .credential-group {
+                padding: 0.75rem;
             }
         }
 
@@ -459,7 +403,7 @@
                 margin: 0.5rem;
             }
 
-            .credential-card-modal {
+            .credential-group {
                 padding: 0.75rem;
             }
         }

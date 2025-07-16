@@ -11,7 +11,7 @@
                 <h1 class="dashboard-title">
                     <i class="fas fa-tachometer-alt me-3"></i>Admin Dashboard
                 </h1>
-                <p class="dashboard-subtitle">Welcome back, @ViewBag.UserName! Manage your Entertainment Guild store</p>
+                <p class="dashboard-subtitle">Welcome back, @ViewBag.UserName! Manage 3B1G store</p>
             </div>
             <div class="header-actions">
                 <button class="btn btn-primary" onclick="refreshDashboard()">
@@ -117,7 +117,7 @@
                     </div>
                     <div class="action-content">
                         <h5 class="action-title">Add New User</h5>
-                        <p class="action-description">Create admin or employee accounts</p>
+                        <p class="action-description">Create admin or customer accounts</p>
                     </div>
                 </a>
 
@@ -128,6 +128,16 @@
                     <div class="action-content">
                         <h5 class="action-title">Manage Inventory</h5>
                         <p class="action-description">Update stock and prices</p>
+                    </div>
+                </a>
+
+                <a href="@Url.Action("ManageOrders", "Admin")" class="quick-action-card">
+                    <div class="action-icon">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                    <div class="action-content">
+                        <h5 class="action-title">Manage Orders</h5>
+                        <p class="action-description">View and process orders</p>
                     </div>
                 </a>
 
@@ -151,49 +161,38 @@
                 </h3>
             </div>
             <div class="activity-feed">
-                <div class="activity-item">
-                    <div class="activity-icon">
-                        <i class="fas fa-plus text-success"></i>
+                @{
+                    var activities = ViewBag.RecentActivity as List<E_Comm.Models.ActivityItem> ?? new List<E_Comm.Models.ActivityItem>();
+                }
+                @if (activities.Any())
+                {
+                    @foreach (var activity in activities)
+                    {
+                        <div class="activity-item">
+                            <div class="activity-icon">
+                                <i class="@activity.Icon @activity.IconColor"></i>
+                            </div>
+                            <div class="activity-content">
+                                <div class="activity-title">@activity.Title</div>
+                                <div class="activity-description">@activity.Description</div>
+                                <div class="activity-time">@activity.TimeAgo</div>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="activity-item">
+                        <div class="activity-icon">
+                            <i class="fas fa-info-circle text-muted"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">No Recent Activity</div>
+                            <div class="activity-description">No recent activity to display</div>
+                            <div class="activity-time">-</div>
+                        </div>
                     </div>
-                    <div class="activity-content">
-                        <div class="activity-title">New Product Added</div>
-                        <div class="activity-description">The Adventures of Augie March was added to inventory</div>
-                        <div class="activity-time">2 hours ago</div>
-                    </div>
-                </div>
-
-                <div class="activity-item">
-                    <div class="activity-icon">
-                        <i class="fas fa-user text-info"></i>
-                    </div>
-                    <div class="activity-content">
-                        <div class="activity-title">New User Registration</div>
-                        <div class="activity-description">Customer account created for john.doe@example.com</div>
-                        <div class="activity-time">4 hours ago</div>
-                    </div>
-                </div>
-
-                <div class="activity-item">
-                    <div class="activity-icon">
-                        <i class="fas fa-shopping-cart text-warning"></i>
-                    </div>
-                    <div class="activity-content">
-                        <div class="activity-title">New Order Placed</div>
-                        <div class="activity-description">Order #1001 placed by customer@example.com</div>
-                        <div class="activity-time">6 hours ago</div>
-                    </div>
-                </div>
-
-                <div class="activity-item">
-                    <div class="activity-icon">
-                        <i class="fas fa-exclamation-triangle text-danger"></i>
-                    </div>
-                    <div class="activity-content">
-                        <div class="activity-title">Low Stock Alert</div>
-                        <div class="activity-description">American Pastoral is running low on stock (3 remaining)</div>
-                        <div class="activity-time">8 hours ago</div>
-                    </div>
-                </div>
+                }
             </div>
             <div class="activity-footer">
                 <a href="@Url.Action("Reports", "Admin")" class="view-all-link">

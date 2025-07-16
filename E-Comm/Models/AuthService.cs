@@ -21,10 +21,6 @@ namespace E_Comm.Models
                 new UserCredentials { Email = "customer@example.com", Password = "Password1", Role = "Customer", Name = "Cus Tomer" }
             },
             {
-                "employee@example.com", 
-                new UserCredentials { Email = "employee@example.com", Password = "Passw0rd", Role = "Employee", Name = "Empl Oyee" }
-            },
-            {
                 "administrator@example.com", 
                 new UserCredentials { Email = "administrator@example.com", Password = "Pa$$w0rd", Role = "Admin", Name = "Admin Istrator" }
             }
@@ -45,7 +41,6 @@ namespace E_Comm.Models
                         Name = testUser.Name,
                         Role = testUser.Role,
                         IsAdmin = testUser.Role == "Admin",
-                        IsEmployee = testUser.Role == "Employee",
                         IsCustomer = testUser.Role == "Customer"
                     };
                 }
@@ -57,9 +52,8 @@ namespace E_Comm.Models
 
             if (user != null && VerifyPassword(password, user.Salt, user.HashPW))
             {
-                // According to requirements: Admin, Employee, or Customer
+                // According to requirements: Admin or Customer
                 // New registered users are Customers by default (IsAdmin = false)
-                // Only predefined test accounts are Employees
                 string role = user.IsAdmin ? "Admin" : "Customer";
                 
                 return new AuthResult
@@ -69,7 +63,6 @@ namespace E_Comm.Models
                     Name = user.Name ?? "",
                     Role = role,
                     IsAdmin = user.IsAdmin,
-                    IsEmployee = false, // Database users are either Admin or Customer, not Employee
                     IsCustomer = !user.IsAdmin // If not Admin, then Customer
                 };
             }
@@ -172,7 +165,6 @@ namespace E_Comm.Models
         public string Name { get; set; } = "";
         public string Role { get; set; } = "";
         public bool IsAdmin { get; set; }
-        public bool IsEmployee { get; set; }
         public bool IsCustomer { get; set; }
     }
 

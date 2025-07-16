@@ -41,7 +41,6 @@ namespace E_Comm.Controllers
                     new Claim(ClaimTypes.Name, authResult.Name),
                     new Claim(ClaimTypes.Role, authResult.Role),
                     new Claim("IsAdmin", authResult.IsAdmin.ToString()),
-                    new Claim("IsEmployee", authResult.IsEmployee.ToString()),
                     new Claim("IsCustomer", authResult.IsCustomer.ToString())
                 };
 
@@ -55,21 +54,20 @@ namespace E_Comm.Controllers
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, 
                     new ClaimsPrincipal(claimsIdentity), authProperties);
 
+                // Handle return URL if provided
+                if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+                {
+                    return Redirect(returnUrl);
+                }
+
                 // Redirect based on user role (Business Scenario requirement)
-                if (authResult.IsAdmin)
-                {
-                    return RedirectToAction("Index", "Admin");
-                }
-                else if (authResult.IsEmployee)
-                {
-                    return RedirectToAction("Index", "Employee");
-                }
-                else if (authResult.IsCustomer)
+                // Note: Admins and customers can access the main website without being forced to their dashboards
+                if (authResult.IsCustomer && !authResult.IsAdmin)
                 {
                     return RedirectToAction("Index", "Customer");
                 }
 
-                // Default redirect if no specific role
+                // Default redirect for admins and others - main website
                 return RedirectToAction("Index", "Home");
             }
 
@@ -118,7 +116,6 @@ namespace E_Comm.Controllers
                             new Claim(ClaimTypes.Name, authResult.Name),
                             new Claim(ClaimTypes.Role, authResult.Role),
                             new Claim("IsAdmin", authResult.IsAdmin.ToString()),
-                            new Claim("IsEmployee", authResult.IsEmployee.ToString()),
                             new Claim("IsCustomer", authResult.IsCustomer.ToString())
                         };
 
@@ -133,20 +130,13 @@ namespace E_Comm.Controllers
                             new ClaimsPrincipal(claimsIdentity), authProperties);
 
                         // Redirect new users based on their role (same logic as login)
-                        if (authResult.IsAdmin)
-                        {
-                            return RedirectToAction("Index", "Admin");
-                        }
-                        else if (authResult.IsEmployee)
-                        {
-                            return RedirectToAction("Index", "Employee");
-                        }
-                        else if (authResult.IsCustomer)
+                        // Note: Admins and customers can access the main website without being forced to their dashboards
+                        if (authResult.IsCustomer && !authResult.IsAdmin)
                         {
                             return RedirectToAction("Index", "Customer");
                         }
 
-                        // Default redirect if no specific role
+                        // Default redirect for admins and others - main website
                         return RedirectToAction("Index", "Home");
                     }
 

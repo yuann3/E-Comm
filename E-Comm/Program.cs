@@ -37,7 +37,6 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
-    options.AddPolicy("EmployeeOnly", policy => policy.RequireRole("Employee"));
     options.AddPolicy("CustomerOnly", policy => policy.RequireRole("Customer"));
 });
 
@@ -85,11 +84,6 @@ app.MapControllerRoute(
     name: "admin",
     pattern: "admin/{action=Index}/{id?}",
     defaults: new { controller = "Admin" });
-
-app.MapControllerRoute(
-    name: "employee", 
-    pattern: "employee/{action=Index}/{id?}",
-    defaults: new { controller = "Employee" });
 
 app.MapControllerRoute(
     name: "customer",

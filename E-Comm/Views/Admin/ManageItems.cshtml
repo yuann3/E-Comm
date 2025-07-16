@@ -20,6 +20,9 @@
                 <a href="@Url.Action("CreateItem", "Admin")" class="btn btn-primary">
                     <i class="fas fa-plus me-2"></i>Add New Item
                 </a>
+                <button type="button" class="btn btn-outline-secondary" onclick="testModal()">
+                    <i class="fas fa-test me-2"></i>Test Modal
+                </button>
             </div>
         </div>
     </div>
@@ -81,12 +84,12 @@
                 <div class="search-filter-grid">
                     <div class="search-group">
                         <label class="form-label">Search Items</label>
-                        <div class="search-input-group">
+                    <div class="search-input-group">
                             <span class="search-icon">
                                 <i class="fas fa-search"></i>
                             </span>
-                            <input type="text" name="searchTerm" class="form-control" 
-                                   placeholder="Search by name, author, or description..." 
+                        <input type="text" name="searchTerm" class="form-control" 
+                               placeholder="Search by name, author, or description..." 
                                    value="@ViewBag.SearchTerm" />
                         </div>
                     </div>
@@ -287,7 +290,7 @@
                                             <a href="@Url.Action("EditItem", "Admin", new { id = item.ID })" class="btn btn-outline-primary btn-sm" title="Edit Item">
                                                 <i class="fas fa-edit"></i>
                                             </a>
-                                            <a href="@Url.Action("ProductDetails", "Customer", new { id = item.ID })" class="btn btn-outline-secondary btn-sm" target="_blank" title="View Details">
+                                            <a href="@Url.Action("ProductDetails", "Admin", new { id = item.ID })" class="btn btn-outline-secondary btn-sm" target="_blank" title="View Details">
                                                 <i class="fas fa-eye"></i>
                                             </a>
                                             <button class="btn btn-outline-danger btn-sm" onclick="deleteItem(@item.ID, '@item.Name')" title="Delete Item">
@@ -312,14 +315,14 @@
                         </tr>
                     }
                 </tbody>
-                        </table>
-        </div>
+            </table>
+    </div>
 
-        <!-- Pagination -->
-        @if (ViewBag.TotalPages != null && (int)ViewBag.TotalPages > 1)
-        {
-            <div class="pagination-section">
-                <nav aria-label="Items pagination">
+    <!-- Pagination -->
+    @if (ViewBag.TotalPages != null && (int)ViewBag.TotalPages > 1)
+    {
+        <div class="pagination-section">
+            <nav aria-label="Items pagination">
                     <ul class="pagination">
                         @if (ViewBag.CurrentPage > 1)
                         {
@@ -333,9 +336,9 @@
                             </li>
                         }
 
-                        @for (int i = 1; i <= (int)ViewBag.TotalPages; i++)
-                        {
-                            <li class="page-item @(i == (ViewBag.CurrentPage ?? 1) ? "active" : "")">
+                    @for (int i = 1; i <= (int)ViewBag.TotalPages; i++)
+                    {
+                        <li class="page-item @(i == (ViewBag.CurrentPage ?? 1) ? "active" : "")">
                                 <a class="page-link" href="@Url.Action("ManageItems", "Admin", new { 
                                     searchTerm = ViewBag.SearchTerm, 
                                     genreFilter = ViewBag.GenreFilter, 
@@ -354,12 +357,12 @@
                                     stockFilter = ViewBag.StockFilter,
                                     page = ViewBag.CurrentPage + 1 
                                 })">Next</a>
-                            </li>
-                        }
-                    </ul>
-                </nav>
-            </div>
-        }
+                        </li>
+                    }
+                </ul>
+            </nav>
+        </div>
+    }
     </div>
 </div>
 
@@ -535,60 +538,136 @@
         // Bulk delete functionality
         function bulkDelete() {
             const selectedItems = document.querySelectorAll('.item-checkbox:checked');
-            if (selectedItems.length === 0) return;
+            if (selectedItems.length === 0) {
+                alert('Please select at least one item to delete.');
+                return;
+            }
             
-            if (confirm(`Are you sure you want to delete ${selectedItems.length} selected items?`)) {
-                // Implementation for bulk delete
-                console.log('Bulk delete:', Array.from(selectedItems).map(cb => cb.value));
+            if (confirm(`Are you sure you want to delete ${selectedItems.length} selected items? This action cannot be undone.`)) {
+                const itemIds = Array.from(selectedItems).map(cb => parseInt(cb.value));
+                
+                // Make AJAX call to delete items
+                fetch('@Url.Action("BulkDeleteItems", "Admin")', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                    },
+                    body: JSON.stringify({
+                        itemIds: itemIds
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Show success message
+                        alert(data.message);
+                        
+                        // Reload the page to reflect changes
+                        location.reload();
+                    } else {
+                        alert('Error: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while deleting items.');
+                });
             }
         }
 
         // Bulk update stock functionality
         function bulkUpdateStock() {
             const selectedItems = document.querySelectorAll('.item-checkbox:checked');
+            console.log('Selected items count:', selectedItems.length);
+            
             if (selectedItems.length === 0) {
                 alert('Please select at least one item to update stock.');
                 return;
             }
             
             // Update the modal with selected items information
-            document.getElementById('selectedItemsCount').textContent = selectedItems.length;
-            
+            const selectedItemsCountEl = document.getElementById('selectedItemsCount');
             const selectedItemsList = document.getElementById('selectedItemsList');
-            selectedItemsList.innerHTML = '';
             
-            selectedItems.forEach(checkbox => {
-                const row = checkbox.closest('tr');
-                const itemName = row.querySelector('.item-name').textContent.trim();
-                const itemAuthor = row.querySelector('.item-author').textContent.trim();
-                const stockNumber = row.querySelector('.stock-number').textContent.trim();
-                
-                const selectedItem = document.createElement('div');
-                selectedItem.className = 'selected-item';
-                selectedItem.innerHTML = `
-                    <div class="selected-item-info">
-                        <div class="selected-item-name">${itemName}</div>
-                        <div class="selected-item-details">by ${itemAuthor}</div>
-                    </div>
-                    <div class="selected-item-stock">
-                        <i class="fas fa-boxes"></i>
-                        <span>${stockNumber}</span>
-                    </div>
-                `;
-                selectedItemsList.appendChild(selectedItem);
+            console.log('Modal elements found:', {
+                selectedItemsCountEl: !!selectedItemsCountEl,
+                selectedItemsList: !!selectedItemsList
             });
             
+            if (selectedItemsCountEl) {
+                selectedItemsCountEl.textContent = selectedItems.length;
+            }
+            
+            if (selectedItemsList) {
+                selectedItemsList.innerHTML = '';
+                
+                selectedItems.forEach(checkbox => {
+                    const row = checkbox.closest('tr');
+                    const itemName = row.querySelector('.cell-title')?.textContent.trim() || 'Unknown Item';
+                    const itemAuthor = row.querySelector('.cell-subtitle')?.textContent.trim() || 'Unknown Author';
+                    const stockNumber = row.querySelector('.stock-number')?.textContent.trim() || '0';
+                    
+                    console.log('Processing item:', { itemName, itemAuthor, stockNumber });
+                    
+                    const selectedItem = document.createElement('div');
+                    selectedItem.className = 'selected-item';
+                    selectedItem.innerHTML = `
+                        <div class="selected-item-info">
+                            <div class="selected-item-name">${itemName}</div>
+                            <div class="selected-item-details">${itemAuthor}</div>
+                        </div>
+                        <div class="selected-item-stock">
+                            <i class="fas fa-boxes"></i>
+                            <span>${stockNumber}</span>
+                        </div>
+                    `;
+                    selectedItemsList.appendChild(selectedItem);
+                });
+            }
+            
             // Reset form
-            document.getElementById('updateType').value = 'set';
-            document.getElementById('stockQuantity').value = '0';
-            document.getElementById('updatePrice').checked = false;
-            document.getElementById('newPrice').disabled = true;
-            document.getElementById('newPrice').value = '0.00';
-            document.getElementById('updateReason').value = '';
+            const updateType = document.getElementById('updateType');
+            const stockQuantity = document.getElementById('stockQuantity');
+            const updatePrice = document.getElementById('updatePrice');
+            const newPrice = document.getElementById('newPrice');
+            const updateReason = document.getElementById('updateReason');
+            
+            console.log('Form elements found:', {
+                updateType: !!updateType,
+                stockQuantity: !!stockQuantity,
+                updatePrice: !!updatePrice,
+                newPrice: !!newPrice,
+                updateReason: !!updateReason
+            });
+            
+            if (updateType) updateType.value = 'set';
+            if (stockQuantity) stockQuantity.value = '0';
+            if (updatePrice) updatePrice.checked = false;
+            if (newPrice) {
+                newPrice.disabled = true;
+                newPrice.value = '0.00';
+            }
+            if (updateReason) updateReason.value = '';
             
             // Show modal
-            const modal = new bootstrap.Modal(document.getElementById('bulkStockModal'));
-            modal.show();
+            const modalElement = document.getElementById('bulkStockModal');
+            console.log('Modal element found:', !!modalElement);
+            
+            if (modalElement) {
+                try {
+                    const modal = new bootstrap.Modal(modalElement);
+                    console.log('Modal instance created successfully');
+                    modal.show();
+                    console.log('Modal show() called');
+                } catch (error) {
+                    console.error('Error showing modal:', error);
+                    alert('Error opening stock update modal: ' + error.message);
+                }
+            } else {
+                console.error('Modal element not found');
+                alert('Modal element not found. Please refresh the page and try again.');
+            }
         }
 
         // Bulk stock update modal functionality
@@ -630,7 +709,7 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+                        'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
                     },
                     body: JSON.stringify({
                         itemIds: itemIds,
@@ -649,9 +728,9 @@
                         modal.hide();
                         
                         // Show success message
-                        alert(`Stock updated successfully for ${data.updatedCount} items!`);
+                        alert(data.message);
                         
-                        // Refresh page to show updated stock
+                        // Reload the page to reflect changes
                         location.reload();
                     } else {
                         alert('Error: ' + data.message);
@@ -678,5 +757,29 @@
                 }, index * 50);
             });
         });
+
+        function testModal() {
+            const modalElement = document.getElementById('bulkStockModal');
+            console.log('Test modal - Modal element found:', !!modalElement);
+            
+            if (modalElement) {
+                try {
+                    // Set some test data
+                    document.getElementById('selectedItemsCount').textContent = '1';
+                    document.getElementById('selectedItemsList').innerHTML = '<div class="alert alert-info">Test modal functionality</div>';
+                    
+                    const modal = new bootstrap.Modal(modalElement);
+                    console.log('Test modal - Modal instance created successfully');
+                    modal.show();
+                    console.log('Test modal - Modal show() called');
+                } catch (error) {
+                    console.error('Test modal - Error showing modal:', error);
+                    alert('Test modal error: ' + error.message);
+                }
+            } else {
+                console.error('Test modal - Modal element not found');
+                alert('Test modal - Modal element not found');
+            }
+        }
     </script>
 } 

@@ -20,17 +20,14 @@ public class HomeController : Controller
     public async Task<IActionResult> Index()
     {
         // If user is already authenticated, redirect to appropriate dashboard
+        // Note: Admin users and customers can access this page directly without being redirected
         if (User.Identity?.IsAuthenticated == true)
         {
-            if (User.IsInRole("Admin"))
-                return RedirectToAction("Index", "Admin");
-            else if (User.IsInRole("Employee"))
-                return RedirectToAction("Index", "Employee");
-            else if (User.IsInRole("Customer"))
+            if (User.IsInRole("Customer") && !User.IsInRole("Admin"))
                 return RedirectToAction("Index", "Customer");
         }
 
-        // Show featured products for non-authenticated users
+        // Show featured products for non-authenticated users, admins, and customers
         ViewBag.FeaturedProducts = await _context.Products
             .Include(p => p.Genre)
             .Include(p => p.Stocktakes)

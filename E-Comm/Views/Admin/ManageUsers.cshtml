@@ -27,21 +27,10 @@
     <!-- User Statistics -->
     <div class="statistics-section">
         <div class="row">
-            <div class="col-md-3 col-sm-6">
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-users"></i>
-                    </div>
-                    <div class="stat-info">
-                        <div class="stat-number">@ViewBag.TotalUsersCount</div>
-                        <div class="stat-label">Total Users</div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3 col-sm-6">
+            <div class="col-md-6">
                 <div class="stat-card admin-stat">
                     <div class="stat-icon">
-                        <i class="fas fa-user-shield"></i>
+                        <i class="fas fa-crown"></i>
                     </div>
                     <div class="stat-info">
                         <div class="stat-number">@ViewBag.AdminCount</div>
@@ -49,21 +38,10 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-3 col-sm-6">
-                <div class="stat-card employee-stat">
-                    <div class="stat-icon">
-                        <i class="fas fa-user-tie"></i>
-                    </div>
-                    <div class="stat-info">
-                        <div class="stat-number">@ViewBag.EmployeeCount</div>
-                        <div class="stat-label">Employees</div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3 col-sm-6">
+            <div class="col-md-6">
                 <div class="stat-card customer-stat">
                     <div class="stat-icon">
-                        <i class="fas fa-user"></i>
+                        <i class="fas fa-users"></i>
                     </div>
                     <div class="stat-info">
                         <div class="stat-number">@ViewBag.CustomerCount</div>
@@ -218,14 +196,14 @@
                                 <td>
                                     <div class="user-actions">
                                         <div class="btn-group" role="group">
-                                            <a href="@Url.Action("EditUser", "Admin", new { id = user.UserID })" 
+                                            <a href="@Url.Action("EditUser", "Admin", new { userName = user.UserName })" 
                                                class="btn btn-outline-primary btn-sm" title="Edit User">
                                                 <i class="fas fa-edit"></i>
                                             </a>
-                                            <button class="btn btn-outline-info btn-sm" 
-                                                    onclick="viewUserDetails(@user.UserID)" title="View Details">
-                                                <i class="fas fa-eye"></i>
-                                            </button>
+                                            <a href="@Url.Action("UserProfile", "Admin", new { userName = user.UserName })" 
+                                               class="btn btn-outline-info btn-sm" title="View Profile">
+                                                <i class="fas fa-user-circle"></i>
+                                            </a>
                                             <button class="btn btn-outline-danger btn-sm" 
                                                     onclick="deleteUser(@user.UserID, '@user.UserName')" title="Delete User">
                                                 <i class="fas fa-trash"></i>
@@ -403,8 +381,8 @@
             const selectedUsers = document.querySelectorAll('.user-checkbox:checked');
             if (selectedUsers.length === 0) return;
             
-            const newRole = prompt('Enter new role (admin/employee/customer):');
-            if (newRole && ['admin', 'employee', 'customer'].includes(newRole.toLowerCase())) {
+            const newRole = prompt('Enter new role (admin/customer):');
+            if (newRole && ['admin', 'customer'].includes(newRole.toLowerCase())) {
                 console.log('Bulk role change:', Array.from(selectedUsers).map(cb => cb.value), 'New role:', newRole);
                 // Implementation for bulk role change
             }

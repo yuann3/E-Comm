@@ -49,6 +49,11 @@
 
 .admin-content {
     padding: 2rem;
+    color: var(--admin-foreground);
+}
+
+.admin-content * {
+    color: inherit;
 }
 
 /* ============================================
@@ -199,7 +204,7 @@
 
 .form-label {
     font-weight: 600;
-    color: var(--admin-foreground);
+    color: var(--admin-foreground) !important;
     margin-bottom: 0.5rem;
 }
 
@@ -317,14 +322,40 @@
 
 .btn-primary {
     background: var(--admin-primary);
-    color: var(--admin-secondary);
+    color: var(--admin-secondary) !important;
     border-color: var(--admin-primary);
 }
 
 .btn-primary:hover {
     background: var(--admin-muted-foreground);
-    color: #000000;
+    color: #000000 !important;
     border-color: var(--admin-muted-foreground);
+}
+
+/* Ensure primary button text is always black */
+.btn-primary,
+.admin-content .btn-primary,
+.btn-primary *,
+.admin-content .btn-primary *,
+button.btn-primary,
+.admin-content button.btn-primary,
+button.btn-primary *,
+.admin-content button.btn-primary *,
+input[type="submit"].btn-primary,
+.admin-content input[type="submit"].btn-primary {
+    color: var(--admin-secondary) !important;
+}
+
+/* Ensure primary button text on hover is also black */
+.btn-primary:hover,
+.admin-content .btn-primary:hover,
+.btn-primary:hover *,
+.admin-content .btn-primary:hover *,
+button.btn-primary:hover,
+.admin-content button.btn-primary:hover,
+button.btn-primary:hover *,
+.admin-content button.btn-primary:hover * {
+    color: #000000 !important;
 }
 
 .btn-outline-primary {
@@ -558,6 +589,37 @@
     color: var(--admin-foreground) !important;
 }
 
+/* Ensure badge text colors override global text color rules */
+.badge.bg-primary,
+.admin-content .badge.bg-primary {
+    color: var(--admin-secondary) !important;
+}
+
+.badge.bg-secondary,
+.admin-content .badge.bg-secondary {
+    color: var(--admin-foreground) !important;
+}
+
+.badge.bg-success,
+.admin-content .badge.bg-success {
+    color: var(--admin-foreground) !important;
+}
+
+.badge.bg-danger,
+.admin-content .badge.bg-danger {
+    color: var(--admin-foreground) !important;
+}
+
+.badge.bg-warning,
+.admin-content .badge.bg-warning {
+    color: #000000 !important;
+}
+
+.badge.bg-info,
+.admin-content .badge.bg-info {
+    color: var(--admin-foreground) !important;
+}
+
 /* Status Indicators */
 .status-indicator {
     display: flex;
@@ -763,6 +825,11 @@
     border-radius: var(--admin-border-radius-sm);
     box-shadow: var(--admin-shadow);
     transition: var(--admin-transition-fast);
+    color: var(--admin-foreground);
+}
+
+.card * {
+    color: inherit;
 }
 
 .card:hover {
@@ -837,6 +904,52 @@
 /* ============================================
    UTILITY CLASSES
    ============================================ */
+
+/* Override any default text colors in admin interface */
+.admin-content p,
+.admin-content span:not(.badge):not(.btn):not(.btn *),
+.admin-content div:not(.badge):not(.btn):not(.btn *),
+.admin-content h1, .admin-content h2, .admin-content h3, 
+.admin-content h4, .admin-content h5, .admin-content h6,
+.admin-content label,
+.admin-content td,
+.admin-content th {
+    color: var(--admin-foreground) !important;
+}
+
+/* Keep muted text where specifically intended */
+.text-muted,
+.admin-content .text-muted {
+    color: var(--admin-muted-foreground) !important;
+}
+
+/* Ensure badges maintain their intended text colors */
+.badge,
+.admin-content .badge,
+.admin-content .badge * {
+    color: inherit !important;
+}
+
+/* Ensure buttons maintain their intended text colors */
+.btn,
+.admin-content .btn,
+.admin-content .btn *,
+.admin-content button,
+.admin-content button * {
+    color: inherit !important;
+}
+
+/* Override Bootstrap default button text colors for primary buttons */
+.btn.btn-primary,
+.admin-content .btn.btn-primary,
+button.btn.btn-primary,
+.admin-content button.btn.btn-primary,
+.btn.btn-primary i,
+.admin-content .btn.btn-primary i,
+button.btn.btn-primary i,
+.admin-content button.btn.btn-primary i {
+    color: var(--admin-secondary) !important;
+}
 
 .text-primary {
     color: var(--admin-primary) !important;
@@ -1138,6 +1251,89 @@
 .slide-in.show {
     opacity: 1;
     transform: translateX(0);
+}
+
+/* ============================================
+   REPORTS & ANALYTICS STYLES
+   ============================================ */
+
+.reports-analytics {
+    padding: 2rem;
+    color: var(--admin-foreground);
+}
+
+.analytics-section {
+    margin-bottom: 2rem;
+}
+
+.analytics-card {
+    background: var(--admin-card);
+    border: 1px solid var(--admin-border);
+    border-radius: var(--admin-border-radius-sm);
+    box-shadow: var(--admin-shadow);
+    transition: var(--admin-transition-fast);
+    overflow: hidden;
+}
+
+.analytics-card:hover {
+    box-shadow: var(--admin-shadow-lg);
+    transform: translateY(-2px);
+    border-color: var(--admin-primary);
+}
+
+/* Analytics Grid Layout */
+.analytics-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.analytics-grid .full-width {
+    width: 100%;
+}
+
+.analytics-two-column {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    align-items: start;
+}
+
+.analytics-two-column .analytics-section,
+.analytics-two-column .recent-activity-section {
+    margin-bottom: 0;
+}
+
+/* Ensure Recent Orders matches Genre Performance height */
+.analytics-two-column .recent-activity-section {
+    height: fit-content;
+}
+
+.analytics-two-column .analytics-card,
+.analytics-two-column .activity-feed {
+    min-height: 300px;
+}
+
+/* Responsive adjustments for reports */
+@media (max-width: 1024px) {
+    .analytics-two-column {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .reports-analytics {
+        padding: 1rem;
+    }
+    
+    .analytics-grid {
+        gap: 1rem;
+    }
+    
+    .analytics-two-column {
+        gap: 1rem;
+    }
 }
 
 /* ============================================

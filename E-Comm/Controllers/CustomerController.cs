@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace E_Comm.Controllers
 {
-    [Authorize(Roles = "Customer")]
+    [Authorize(Roles = "Customer,Admin")]
     public class CustomerController : Controller
     {
         private readonly EntertainmentGuildContext _context;
