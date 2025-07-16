@@ -1,0 +1,785 @@
+@model List<E_Comm.Models.Product>
+@{
+    ViewData["Title"] = "Manage Items - Admin";
+    Layout = "_AdminLayout";
+}
+
+@Html.AntiForgeryToken()
+
+<div class="items-management">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="header-content">
+            <div class="header-title">
+                <h1 class="page-title">
+                    <i class="fas fa-box me-3"></i>Manage Items
+                </h1>
+                <p class="page-subtitle">Add, edit, and manage your store inventory</p>
+            </div>
+            <div class="header-actions">
+                <a href="@Url.Action("CreateItem", "Admin")" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Add New Item
+                </a>
+                <button type="button" class="btn btn-outline-secondary" onclick="testModal()">
+                    <i class="fas fa-test me-2"></i>Test Modal
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Item Statistics -->
+    <div class="statistics-section">
+        <div class="row">
+            <div class="col-md-3 col-sm-6">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-boxes"></i>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-number">@ViewBag.TotalProducts</div>
+                        <div class="stat-label">Total Items</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <div class="stat-card low-stock-stat">
+                    <div class="stat-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-number">@ViewBag.LowStockItems</div>
+                        <div class="stat-label">Low Stock</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <div class="stat-card out-stock-stat">
+                    <div class="stat-icon">
+                        <i class="fas fa-times-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-number">@(ViewBag.OutOfStockItems ?? 0)</div>
+                        <div class="stat-label">Out of Stock</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <div class="stat-card in-stock-stat">
+                    <div class="stat-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-number">@(ViewBag.InStockItems ?? 0)</div>
+                        <div class="stat-label">In Stock</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search and Filter -->
+    <div class="search-filter-section">
+        <div class="search-filter-card">
+            <form method="get" asp-action="ManageItems" class="search-form">
+                <div class="search-filter-grid">
+                    <div class="search-group">
+                        <label class="form-label">Search Items</label>
+                    <div class="search-input-group">
+                            <span class="search-icon">
+                                <i class="fas fa-search"></i>
+                            </span>
+                        <input type="text" name="searchTerm" class="form-control" 
+                               placeholder="Search by name, author, or description..." 
+                                   value="@ViewBag.SearchTerm" />
+                        </div>
+                    </div>
+                    <div class="filter-group">
+                        <label class="form-label">Filter by Genre</label>
+                        <select name="genreFilter" class="form-select">
+                            <option value="">All Genres</option>
+                            @if (ViewBag.Genres != null)
+                            {
+                                @foreach (var genre in (List<E_Comm.Models.Genre>)ViewBag.Genres)
+                                {
+                                    @if (ViewBag.GenreFilter?.ToString() == genre.GenreID.ToString())
+                                    {
+                                        <option value="@genre.GenreID" selected="selected">@genre.Name</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@genre.GenreID">@genre.Name</option>
+                                    }
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="form-label">Filter by Stock</label>
+                        <select name="stockFilter" class="form-select">
+                            <option value="">All Stock Levels</option>
+                            @if (ViewBag.StockFilter == "low")
+                            {
+                                <option value="low" selected="selected">Low Stock (&lt; 10)</option>
+                            }
+                            else
+                            {
+                                <option value="low">Low Stock (&lt; 10)</option>
+                            }
+                            @if (ViewBag.StockFilter == "out")
+                            {
+                                <option value="out" selected="selected">Out of Stock</option>
+                            }
+                            else
+                            {
+                                <option value="out">Out of Stock</option>
+                            }
+                            @if (ViewBag.StockFilter == "available")
+                            {
+                                <option value="available" selected="selected">In Stock</option>
+                            }
+                            else
+                            {
+                                <option value="available">In Stock</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="filter-actions">
+                        <button type="submit" class="btn btn-outline-primary">
+                            <i class="fas fa-filter me-2"></i>Filter
+                        </button>
+                        <a href="@Url.Action("ManageItems", "Admin")" class="btn btn-outline-secondary">
+                            <i class="fas fa-times me-2"></i>Clear
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Items Table -->
+    <div class="table-section">
+        <div class="table-header">
+            <div class="table-info">
+                <span class="items-count">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Showing @(Model?.Count ?? 0) items
+                </span>
+            </div>
+            <div class="table-actions">
+                <div class="bulk-actions" id="bulkActions" style="display: none;">
+                    <button type="button" class="btn btn-danger btn-sm" onclick="bulkDelete()">
+                        <i class="fas fa-trash me-2"></i>Delete Selected
+                    </button>
+                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="bulkUpdateStock()">
+                        <i class="fas fa-edit me-2"></i>Update Stock
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>
+                            <input type="checkbox" id="selectAll" class="form-check-input">
+                        </th>
+                        <th>Item Details</th>
+                        <th>Genre</th>
+                        <th>Stock Status</th>
+                        <th>Price Range</th>
+                        <th>Last Updated</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        @foreach (var item in Model)
+                        {
+                            <tr class="item-row">
+                                <td>
+                                    <input type="checkbox" name="selectedItems" value="@item.ID" class="form-check-input item-checkbox">
+                                </td>
+                                <td>
+                                    <div class="cell-content">
+                                        <div class="cell-title">@item.Name</div>
+                                        <div class="cell-subtitle">by @(item.Author ?? "Unknown")</div>
+                                        @if (!string.IsNullOrEmpty(item.Description))
+                                        {
+                                            <div class="cell-description">@(item.Description.Length > 100 ? item.Description.Substring(0, 100) + "..." : item.Description)</div>
+                                        }
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="genre-badge">
+                                        @if (item.Genre != null)
+                                        {
+                                            <span class="badge bg-primary">@item.Genre.Name</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">No Genre</span>
+                                        }
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="stock-status">
+                                        @{
+                                            var totalStock = item.Stocktakes?.Sum(s => s.Quantity) ?? 0;
+                                            var stockClass = totalStock == 0 ? "out-of-stock" : totalStock < 10 ? "low-stock" : "in-stock";
+                                            var stockIcon = totalStock == 0 ? "fas fa-times-circle" : totalStock < 10 ? "fas fa-exclamation-triangle" : "fas fa-check-circle";
+                                        }
+                                        <div class="stock-indicator @stockClass">
+                                            <i class="@stockIcon"></i>
+                                            <span class="stock-number">@totalStock</span>
+                                        </div>
+                                        <div class="stock-text">
+                                            @if (totalStock == 0)
+                                            {
+                                                <span class="text-danger">Out of Stock</span>
+                                            }
+                                            else if (totalStock < 10)
+                                            {
+                                                <span class="text-warning">Low Stock</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-success">In Stock</span>
+                                            }
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="price-range">
+                                        @if (item.Stocktakes?.Any() == true)
+                                        {
+                                            var minPrice = item.Stocktakes.Min(s => s.Price) ?? 0;
+                                            var maxPrice = item.Stocktakes.Max(s => s.Price) ?? 0;
+                                            if (minPrice == maxPrice)
+                                            {
+                                                <span class="price-single">$@String.Format("{0:F2}", minPrice)</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="price-range-text">$@String.Format("{0:F2}", minPrice) - $@String.Format("{0:F2}", maxPrice)</span>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <span class="price-none">No Price Set</span>
+                                        }
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="last-updated">
+                                        @if (item.LastUpdated.HasValue)
+                                        {
+                                            <div class="update-date">@item.LastUpdated.Value.ToString("MMM dd, yyyy")</div>
+                                            <div class="update-user">by @(item.LastUpdatedBy ?? "System")</div>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">Never updated</span>
+                                        }
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="item-actions">
+                                        <div class="btn-group" role="group">
+                                            <a href="@Url.Action("EditItem", "Admin", new { id = item.ID })" class="btn btn-outline-primary btn-sm" title="Edit Item">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="@Url.Action("ProductDetails", "Admin", new { id = item.ID })" class="btn btn-outline-secondary btn-sm" target="_blank" title="View Details">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <button class="btn btn-outline-danger btn-sm" onclick="deleteItem(@item.ID, '@item.Name')" title="Delete Item">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center py-4">
+                                <div class="no-data">
+                                    <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
+                                    <h5 class="text-muted">No items found</h5>
+                                    <p class="text-muted">Try adjusting your search criteria or add a new item.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+    </div>
+
+    <!-- Pagination -->
+    @if (ViewBag.TotalPages != null && (int)ViewBag.TotalPages > 1)
+    {
+        <div class="pagination-section">
+            <nav aria-label="Items pagination">
+                    <ul class="pagination">
+                        @if (ViewBag.CurrentPage > 1)
+                        {
+                            <li class="page-item">
+                                <a class="page-link" href="@Url.Action("ManageItems", "Admin", new { 
+                                    searchTerm = ViewBag.SearchTerm, 
+                                    genreFilter = ViewBag.GenreFilter, 
+                                    stockFilter = ViewBag.StockFilter,
+                                    page = ViewBag.CurrentPage - 1 
+                                })">Previous</a>
+                            </li>
+                        }
+
+                    @for (int i = 1; i <= (int)ViewBag.TotalPages; i++)
+                    {
+                        <li class="page-item @(i == (ViewBag.CurrentPage ?? 1) ? "active" : "")">
+                                <a class="page-link" href="@Url.Action("ManageItems", "Admin", new { 
+                                    searchTerm = ViewBag.SearchTerm, 
+                                    genreFilter = ViewBag.GenreFilter, 
+                                    stockFilter = ViewBag.StockFilter,
+                                    page = i 
+                                })">@i</a>
+                            </li>
+                        }
+
+                        @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                        {
+                            <li class="page-item">
+                                <a class="page-link" href="@Url.Action("ManageItems", "Admin", new { 
+                                    searchTerm = ViewBag.SearchTerm, 
+                                    genreFilter = ViewBag.GenreFilter, 
+                                    stockFilter = ViewBag.StockFilter,
+                                    page = ViewBag.CurrentPage + 1 
+                                })">Next</a>
+                        </li>
+                    }
+                </ul>
+            </nav>
+        </div>
+    }
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Delete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete <strong id="deleteItemName"></strong>?</p>
+                <p class="text-muted">This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete Item</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bulk Stock Update Modal -->
+<div class="modal fade" id="bulkStockModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-warehouse me-2"></i>Bulk Stock Update
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="bulk-update-info">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        You are about to update stock for <strong id="selectedItemsCount">0</strong> selected items.
+                    </div>
+                </div>
+                
+                <div class="selected-items-preview">
+                    <h6 class="mb-3">Selected Items:</h6>
+                    <div id="selectedItemsList" class="selected-items-list"></div>
+                </div>
+
+                <hr class="my-4">
+
+                <div class="stock-update-form">
+                    <h6 class="mb-3">Stock Update Options:</h6>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Update Type</label>
+                                <select id="updateType" class="form-select">
+                                    <option value="set">Set to specific quantity</option>
+                                    <option value="add">Add to current stock</option>
+                                    <option value="subtract">Subtract from current stock</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Quantity</label>
+                                <input type="number" id="stockQuantity" class="form-control" min="0" value="0" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Update Price</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="updatePrice">
+                                    <label class="form-check-label" for="updatePrice">
+                                        Also update price for all selected items
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">New Price</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="number" id="newPrice" class="form-control" min="0" step="0.01" value="0.00" disabled>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Reason for Update</label>
+                        <textarea id="updateReason" class="form-control" rows="3" placeholder="Optional: Provide a reason for this stock update..."></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="confirmBulkUpdate">
+                    <i class="fas fa-save me-2"></i>Update Stock
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Select All functionality
+        document.getElementById('selectAll').addEventListener('change', function() {
+            const checkboxes = document.querySelectorAll('.item-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = this.checked;
+            });
+            toggleBulkActions();
+        });
+
+        // Individual checkbox functionality
+        document.querySelectorAll('.item-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                toggleBulkActions();
+                updateSelectAllState();
+            });
+        });
+
+        function toggleBulkActions() {
+            const selectedItems = document.querySelectorAll('.item-checkbox:checked');
+            const bulkActions = document.getElementById('bulkActions');
+            
+            if (selectedItems.length > 0) {
+                bulkActions.style.display = 'flex';
+            } else {
+                bulkActions.style.display = 'none';
+            }
+        }
+
+        function updateSelectAllState() {
+            const checkboxes = document.querySelectorAll('.item-checkbox');
+            const checkedBoxes = document.querySelectorAll('.item-checkbox:checked');
+            const selectAll = document.getElementById('selectAll');
+            
+            selectAll.checked = checkboxes.length === checkedBoxes.length;
+            selectAll.indeterminate = checkedBoxes.length > 0 && checkedBoxes.length < checkboxes.length;
+        }
+
+        // Delete item functionality
+        function deleteItem(itemId, itemName) {
+            document.getElementById('deleteItemName').textContent = itemName;
+            
+            document.getElementById('confirmDeleteBtn').onclick = function() {
+                // Create a form to submit the delete request
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '@Url.Action("DeleteItem", "Admin")';
+                
+                const idInput = document.createElement('input');
+                idInput.type = 'hidden';
+                idInput.name = 'id';
+                idInput.value = itemId;
+                
+                form.appendChild(idInput);
+                document.body.appendChild(form);
+                form.submit();
+            };
+            
+            const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+            modal.show();
+        }
+
+        // Bulk delete functionality
+        function bulkDelete() {
+            const selectedItems = document.querySelectorAll('.item-checkbox:checked');
+            if (selectedItems.length === 0) {
+                alert('Please select at least one item to delete.');
+                return;
+            }
+            
+            if (confirm(`Are you sure you want to delete ${selectedItems.length} selected items? This action cannot be undone.`)) {
+                const itemIds = Array.from(selectedItems).map(cb => parseInt(cb.value));
+                
+                // Make AJAX call to delete items
+                fetch('@Url.Action("BulkDeleteItems", "Admin")', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                    },
+                    body: JSON.stringify({
+                        itemIds: itemIds
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Show success message
+                        alert(data.message);
+                        
+                        // Reload the page to reflect changes
+                        location.reload();
+                    } else {
+                        alert('Error: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while deleting items.');
+                });
+            }
+        }
+
+        // Bulk update stock functionality
+        function bulkUpdateStock() {
+            const selectedItems = document.querySelectorAll('.item-checkbox:checked');
+            console.log('Selected items count:', selectedItems.length);
+            
+            if (selectedItems.length === 0) {
+                alert('Please select at least one item to update stock.');
+                return;
+            }
+            
+            // Update the modal with selected items information
+            const selectedItemsCountEl = document.getElementById('selectedItemsCount');
+            const selectedItemsList = document.getElementById('selectedItemsList');
+            
+            console.log('Modal elements found:', {
+                selectedItemsCountEl: !!selectedItemsCountEl,
+                selectedItemsList: !!selectedItemsList
+            });
+            
+            if (selectedItemsCountEl) {
+                selectedItemsCountEl.textContent = selectedItems.length;
+            }
+            
+            if (selectedItemsList) {
+                selectedItemsList.innerHTML = '';
+                
+                selectedItems.forEach(checkbox => {
+                    const row = checkbox.closest('tr');
+                    const itemName = row.querySelector('.cell-title')?.textContent.trim() || 'Unknown Item';
+                    const itemAuthor = row.querySelector('.cell-subtitle')?.textContent.trim() || 'Unknown Author';
+                    const stockNumber = row.querySelector('.stock-number')?.textContent.trim() || '0';
+                    
+                    console.log('Processing item:', { itemName, itemAuthor, stockNumber });
+                    
+                    const selectedItem = document.createElement('div');
+                    selectedItem.className = 'selected-item';
+                    selectedItem.innerHTML = `
+                        <div class="selected-item-info">
+                            <div class="selected-item-name">${itemName}</div>
+                            <div class="selected-item-details">${itemAuthor}</div>
+                        </div>
+                        <div class="selected-item-stock">
+                            <i class="fas fa-boxes"></i>
+                            <span>${stockNumber}</span>
+                        </div>
+                    `;
+                    selectedItemsList.appendChild(selectedItem);
+                });
+            }
+            
+            // Reset form
+            const updateType = document.getElementById('updateType');
+            const stockQuantity = document.getElementById('stockQuantity');
+            const updatePrice = document.getElementById('updatePrice');
+            const newPrice = document.getElementById('newPrice');
+            const updateReason = document.getElementById('updateReason');
+            
+            console.log('Form elements found:', {
+                updateType: !!updateType,
+                stockQuantity: !!stockQuantity,
+                updatePrice: !!updatePrice,
+                newPrice: !!newPrice,
+                updateReason: !!updateReason
+            });
+            
+            if (updateType) updateType.value = 'set';
+            if (stockQuantity) stockQuantity.value = '0';
+            if (updatePrice) updatePrice.checked = false;
+            if (newPrice) {
+                newPrice.disabled = true;
+                newPrice.value = '0.00';
+            }
+            if (updateReason) updateReason.value = '';
+            
+            // Show modal
+            const modalElement = document.getElementById('bulkStockModal');
+            console.log('Modal element found:', !!modalElement);
+            
+            if (modalElement) {
+                try {
+                    const modal = new bootstrap.Modal(modalElement);
+                    console.log('Modal instance created successfully');
+                    modal.show();
+                    console.log('Modal show() called');
+                } catch (error) {
+                    console.error('Error showing modal:', error);
+                    alert('Error opening stock update modal: ' + error.message);
+                }
+            } else {
+                console.error('Modal element not found');
+                alert('Modal element not found. Please refresh the page and try again.');
+            }
+        }
+
+        // Bulk stock update modal functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Enable/disable price input based on checkbox
+            const updatePriceCheckbox = document.getElementById('updatePrice');
+            const newPriceInput = document.getElementById('newPrice');
+            
+            updatePriceCheckbox.addEventListener('change', function() {
+                newPriceInput.disabled = !this.checked;
+                if (!this.checked) {
+                    newPriceInput.value = '0.00';
+                }
+            });
+            
+            // Confirm bulk update
+            document.getElementById('confirmBulkUpdate').addEventListener('click', function() {
+                const selectedItems = document.querySelectorAll('.item-checkbox:checked');
+                const updateType = document.getElementById('updateType').value;
+                const stockQuantity = parseInt(document.getElementById('stockQuantity').value);
+                const updatePrice = document.getElementById('updatePrice').checked;
+                const newPrice = updatePrice ? parseFloat(document.getElementById('newPrice').value) : null;
+                const updateReason = document.getElementById('updateReason').value;
+                
+                if (isNaN(stockQuantity) || stockQuantity < 0) {
+                    alert('Please enter a valid stock quantity.');
+                    return;
+                }
+                
+                if (updatePrice && (isNaN(newPrice) || newPrice < 0)) {
+                    alert('Please enter a valid price.');
+                    return;
+                }
+                
+                const itemIds = Array.from(selectedItems).map(cb => parseInt(cb.value));
+                
+                // Make AJAX call to update stock
+                fetch('@Url.Action("BulkUpdateStock", "Admin")', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                    },
+                    body: JSON.stringify({
+                        itemIds: itemIds,
+                        updateType: updateType,
+                        quantity: stockQuantity,
+                        updatePrice: updatePrice,
+                        newPrice: newPrice,
+                        reason: updateReason
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Close modal
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('bulkStockModal'));
+                        modal.hide();
+                        
+                        // Show success message
+                        alert(data.message);
+                        
+                        // Reload the page to reflect changes
+                        location.reload();
+                    } else {
+                        alert('Error: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while updating stock.');
+                });
+            });
+        });
+
+        // Enhanced loading animations
+        document.addEventListener('DOMContentLoaded', function() {
+            const rows = document.querySelectorAll('.item-row');
+            rows.forEach((row, index) => {
+                row.style.opacity = '0';
+                row.style.transform = 'translateY(20px)';
+                row.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                
+                setTimeout(() => {
+                    row.style.opacity = '1';
+                    row.style.transform = 'translateY(0)';
+                }, index * 50);
+            });
+        });
+
+        function testModal() {
+            const modalElement = document.getElementById('bulkStockModal');
+            console.log('Test modal - Modal element found:', !!modalElement);
+            
+            if (modalElement) {
+                try {
+                    // Set some test data
+                    document.getElementById('selectedItemsCount').textContent = '1';
+                    document.getElementById('selectedItemsList').innerHTML = '<div class="alert alert-info">Test modal functionality</div>';
+                    
+                    const modal = new bootstrap.Modal(modalElement);
+                    console.log('Test modal - Modal instance created successfully');
+                    modal.show();
+                    console.log('Test modal - Modal show() called');
+                } catch (error) {
+                    console.error('Test modal - Error showing modal:', error);
+                    alert('Test modal error: ' + error.message);
+                }
+            } else {
+                console.error('Test modal - Modal element not found');
+                alert('Test modal - Modal element not found');
+            }
+        }
+    </script>
+} 

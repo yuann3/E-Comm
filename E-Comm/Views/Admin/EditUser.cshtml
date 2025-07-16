@@ -1,0 +1,319 @@
+@model E_Comm.Models.UserViewModel
+
+@{
+    ViewData["Title"] = "Edit User";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="admin-content">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="header-content">
+            <div>
+                <h1 class="page-title">
+                    <i class="fas fa-user-edit"></i>
+                    Edit User
+                </h1>
+                <p class="page-subtitle">Update user information and customer details</p>
+            </div>
+            <div>
+                <a href="@Url.Action("ManageUsers", "Admin")" class="btn btn-outline-primary">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Users
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success/Error Messages -->
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>
+            <strong>Success!</strong> @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Edit User Form -->
+    <div class="form-section">
+        <form asp-action="EditUser" method="post" class="needs-validation" novalidate>
+            <input type="hidden" asp-for="UserID" />
+            
+            <div class="form-card">
+                <div class="card-header">
+                    <h5 class="card-title">
+                        <i class="fas fa-user me-2"></i>User Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <!-- Basic User Information -->
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label asp-for="UserName" class="form-label required">Username</label>
+                            <input asp-for="UserName" class="form-control" placeholder="Enter username" required readonly>
+                            <span asp-validation-for="UserName" class="text-danger"></span>
+                            <div class="form-text">Username cannot be changed after creation</div>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Email" class="form-label required">Email Address</label>
+                            <input asp-for="Email" type="email" class="form-control" placeholder="Enter email address" required>
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label asp-for="Name" class="form-label required">Full Name</label>
+                            <input asp-for="Name" class="form-control" placeholder="Enter full name" required>
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="IsAdmin" class="form-label">User Role</label>
+                            <select asp-for="IsAdmin" class="form-select" required>
+                                <option value="">Select Role</option>
+                                <option value="false">Customer</option>
+                                <option value="true">Administrator</option>
+                            </select>
+                            <span asp-validation-for="IsAdmin" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <!-- Password Management -->
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="Password" class="form-label">New Password</label>
+                            <input type="password" id="Password" name="Password" class="form-control" 
+                                   placeholder="Leave blank to keep current password" minlength="6">
+                            <div class="form-text">Leave blank to keep current password. New password must be at least 6 characters.</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="ConfirmPassword" class="form-label">Confirm New Password</label>
+                            <input type="password" id="ConfirmPassword" name="ConfirmPassword" class="form-control" 
+                                   placeholder="Confirm new password">
+                            <div class="form-text">Must match the new password if provided</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Customer Details Section -->
+            <div class="form-card">
+                <div class="card-header">
+                    <h5 class="card-title">
+                        <i class="fas fa-address-card me-2"></i>Customer Details
+                        @if (Model.HasCustomerProfile)
+                        {
+                            <span class="badge bg-success ms-2">
+                                <i class="fas fa-check me-1"></i>Has Profile
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary ms-2">
+                                <i class="fas fa-info me-1"></i>No Profile
+                            </span>
+                        }
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="PhoneNumber" class="form-label">Phone Number</label>
+                        <input type="tel" id="PhoneNumber" name="PhoneNumber" class="form-control" 
+                               placeholder="e.g., +61 2 1234 5678" value="@Model.PhoneNumber">
+                    </div>
+
+                    <!-- Australian Address Section -->
+                    <h6 class="mt-4 mb-3">
+                        <i class="fas fa-map-marker-alt me-2"></i>Australian Address
+                    </h6>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="StreetAddress" class="form-label">Street Address</label>
+                            <input type="text" id="StreetAddress" name="StreetAddress" class="form-control" 
+                                   placeholder="e.g., 123 Collins Street" value="@Model.StreetAddress">
+                            <div class="form-text">Must contain both letters and numbers</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="Suburb" class="form-label">Suburb</label>
+                            <input type="text" id="Suburb" name="Suburb" class="form-control" 
+                                   placeholder="e.g., Melbourne" value="@Model.Suburb">
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="State" class="form-label">State</label>
+                            <select id="State" name="State" class="form-select">
+                                <option value="">Select State</option>
+                                <option value="NSW" selected="@(Model.State == "NSW")">New South Wales</option>
+                                <option value="VIC" selected="@(Model.State == "VIC")">Victoria</option>
+                                <option value="QLD" selected="@(Model.State == "QLD")">Queensland</option>
+                                <option value="WA" selected="@(Model.State == "WA")">Western Australia</option>
+                                <option value="SA" selected="@(Model.State == "SA")">South Australia</option>
+                                <option value="TAS" selected="@(Model.State == "TAS")">Tasmania</option>
+                                <option value="ACT" selected="@(Model.State == "ACT")">Australian Capital Territory</option>
+                                <option value="NT" selected="@(Model.State == "NT")">Northern Territory</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="PostCode" class="form-label">Postcode</label>
+                            <input type="text" id="PostCode" name="PostCode" class="form-control" 
+                                   placeholder="e.g., 3000" pattern="[0-9]{4}" maxlength="4" value="@Model.PostCode">
+                            <div class="form-text">Must be 4 digits only</div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Information -->
+                    <h6 class="mt-4 mb-3">
+                        <i class="fas fa-credit-card me-2"></i>Payment Information
+                    </h6>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="CardNumber" class="form-label">Card Number</label>
+                            <input type="text" id="CardNumber" name="CardNumber" class="form-control" 
+                                   placeholder="**** **** **** ****" value="@Model.CardNumber">
+                        </div>
+                        <div class="form-group">
+                            <label for="CardOwner" class="form-label">Card Owner</label>
+                            <input type="text" id="CardOwner" name="CardOwner" class="form-control" 
+                                   placeholder="Name on card" value="@Model.CardOwner">
+                        </div>
+                    </div>
+
+                    <div class="form-grid-3">
+                        <div class="form-group">
+                            <label for="Expiry" class="form-label">Expiry Date</label>
+                            <input type="text" id="Expiry" name="Expiry" class="form-control" 
+                                   placeholder="MM/YY" pattern="[0-9]{2}/[0-9]{2}" maxlength="5" value="@Model.Expiry">
+                        </div>
+                        <div class="form-group">
+                            <label for="CVV" class="form-label">CVV</label>
+                            <input type="text" id="CVV" name="CVV" class="form-control" 
+                                   placeholder="123" pattern="[0-9]{3,4}" maxlength="4" value="@Model.CVV">
+                        </div>
+                        <div class="form-group">
+                            <!-- Spacer for grid alignment -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save me-2"></i>Update User
+                </button>
+                <a href="@Url.Action("UserProfile", "Admin", new { userName = Model.UserName })" class="btn btn-outline-info">
+                    <i class="fas fa-user-circle me-2"></i>View Profile
+                </a>
+                <a href="@Url.Action("ManageUsers", "Admin")" class="btn btn-outline-secondary">
+                    <i class="fas fa-times me-2"></i>Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Form validation (same as CreateUser but with optional password)
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('.needs-validation');
+            
+            form.addEventListener('submit', function(event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                
+                // Custom validation
+                if (!validatePasswords()) {
+                    event.preventDefault();
+                }
+                
+                if (!validateAustralianAddress()) {
+                    event.preventDefault();
+                }
+                
+                form.classList.add('was-validated');
+            });
+            
+            // Real-time password validation (optional for edit)
+            const password = document.getElementById('Password');
+            const confirmPassword = document.getElementById('ConfirmPassword');
+            
+            password.addEventListener('input', validatePasswords);
+            confirmPassword.addEventListener('input', validatePasswords);
+            
+            function validatePasswords() {
+                const passwordValue = password.value;
+                const confirmPasswordValue = confirmPassword.value;
+                
+                // Only validate if either password field has content
+                if (passwordValue || confirmPasswordValue) {
+                    const isValid = passwordValue === confirmPasswordValue;
+                    
+                    if (isValid) {
+                        confirmPassword.setCustomValidity('');
+                        confirmPassword.classList.remove('is-invalid');
+                        password.classList.remove('is-invalid');
+                    } else {
+                        confirmPassword.setCustomValidity('Passwords do not match');
+                        confirmPassword.classList.add('is-invalid');
+                    }
+                    
+                    return isValid;
+                }
+                
+                // Clear any validation errors if both fields are empty
+                confirmPassword.setCustomValidity('');
+                confirmPassword.classList.remove('is-invalid');
+                password.classList.remove('is-invalid');
+                
+                return true;
+            }
+            
+            // Australian address validation
+            function validateAustralianAddress() {
+                const streetAddress = document.getElementById('StreetAddress').value;
+                const postCode = document.getElementById('PostCode').value;
+                
+                let isValid = true;
+                
+                // Validate street address (must contain both letters and numbers)
+                if (streetAddress && !(/[a-zA-Z]/.test(streetAddress) && /[0-9]/.test(streetAddress))) {
+                    document.getElementById('StreetAddress').setCustomValidity('Address must contain both letters and numbers');
+                    isValid = false;
+                } else {
+                    document.getElementById('StreetAddress').setCustomValidity('');
+                }
+                
+                // Validate postcode (must be 4 digits)
+                if (postCode && !/^[0-9]{4}$/.test(postCode)) {
+                    document.getElementById('PostCode').setCustomValidity('Postcode must be exactly 4 digits');
+                    isValid = false;
+                } else {
+                    document.getElementById('PostCode').setCustomValidity('');
+                }
+                
+                return isValid;
+            }
+            
+            // Format card number
+            document.getElementById('CardNumber').addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+                let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
+                e.target.value = formattedValue;
+            });
+            
+            // Format expiry date
+            document.getElementById('Expiry').addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, '');
+                if (value.length >= 2) {
+                    value = value.substring(0, 2) + '/' + value.substring(2, 4);
+                }
+                e.target.value = value;
+            });
+        });
+    </script>
+} 

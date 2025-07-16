@@ -1,0 +1,349 @@
+@model E_Comm.Models.User
+
+@{
+    ViewData["Title"] = "User Profile";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var customer = ViewBag.Customer as E_Comm.Models.Customer;
+}
+
+<div class="admin-content">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="header-content">
+            <div>
+                <h1 class="page-title">
+                    <i class="fas fa-user-circle"></i>
+                    User Profile
+                </h1>
+                <p class="page-subtitle">Complete profile information for @Model.UserName</p>
+            </div>
+            <div>
+                <a href="@Url.Action("ManageUsers", "Admin")" class="btn btn-outline-primary">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Users
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Status Card -->
+    <div class="form-section">
+        <div class="card">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-auto">
+                        <div class="stat-icon">
+                            <i class="fas fa-user text-primary"></i>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <h4 class="mb-1">@Model.Name</h4>
+                        <p class="text-muted mb-0">@Model.Email</p>
+                    </div>
+                    <div class="col-auto">
+                        <span class="badge @(Model.IsAdmin ? "bg-danger" : "bg-info")">
+                            <i class="fas @(Model.IsAdmin ? "fa-shield-alt" : "fa-user") me-1"></i>
+                            @(Model.IsAdmin ? "Administrator" : "Customer")
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Information -->
+    <div class="row">
+        <!-- Account Information -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">
+                        <i class="fas fa-user me-2"></i>Account Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <strong>Username:</strong>
+                        </div>
+                        <div class="col-sm-8">
+                            @Model.UserName
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-sm-4">
+                            <strong>Email:</strong>
+                        </div>
+                        <div class="col-sm-8">
+                            @Model.Email
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-sm-4">
+                            <strong>Full Name:</strong>
+                        </div>
+                        <div class="col-sm-8">
+                            @Model.Name
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-sm-4">
+                            <strong>Role:</strong>
+                        </div>
+                        <div class="col-sm-8">
+                            @(Model.IsAdmin ? "Administrator" : "Customer")
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-sm-4">
+                            <strong>Status:</strong>
+                        </div>
+                        <div class="col-sm-8">
+                            <span class="badge bg-success">
+                                <i class="fas fa-check-circle me-1"></i>Active
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Role Management -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">
+                        <i class="fas fa-shield-alt me-2"></i>Role Management
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">User Role</label>
+                        <select id="userRole" class="form-select">
+                            <option value="false" selected="@(!Model.IsAdmin)">Customer</option>
+                            <option value="true" selected="@(Model.IsAdmin)">Administrator</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Account Status</label>
+                        <select id="userStatus" class="form-select">
+                            <option value="active" selected>Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (customer != null)
+    {
+        <!-- Customer Profile Information -->
+        <div class="row">
+            <!-- Contact Information -->
+            <div class="col-lg-6 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title">
+                            <i class="fas fa-address-card me-2"></i>Contact Information
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <strong>Phone:</strong>
+                            </div>
+                            <div class="col-sm-8">
+                                @customer.PhoneNumber
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-sm-4">
+                                <strong>Address:</strong>
+                            </div>
+                            <div class="col-sm-8">
+                                @customer.StreetAddress
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-sm-4">
+                                <strong>Suburb:</strong>
+                            </div>
+                            <div class="col-sm-8">
+                                @customer.Suburb
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-sm-4">
+                                <strong>State:</strong>
+                            </div>
+                            <div class="col-sm-8">
+                                @customer.State
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-sm-4">
+                                <strong>Postcode:</strong>
+                            </div>
+                            <div class="col-sm-8">
+                                @customer.PostCode
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Statistics -->
+            <div class="col-lg-6 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title">
+                            <i class="fas fa-chart-bar me-2"></i>Order Statistics
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <strong>Total Orders:</strong>
+                            </div>
+                            <div class="col-sm-6">
+                                @customer.Orders.Count()
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-sm-6">
+                                <strong>Total Spent:</strong>
+                            </div>
+                            <div class="col-sm-6">
+                                $@customer.Orders.SelectMany(o => o.ProductsInOrders).Sum(p => (p.Quantity ?? 0) * (p.Stocktake?.Price ?? 0)).ToString("F2")
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-sm-6">
+                                <strong>Average Order:</strong>
+                            </div>
+                            <div class="col-sm-6">
+                                @{
+                                    var totalSpent = customer.Orders.SelectMany(o => o.ProductsInOrders).Sum(p => (p.Quantity ?? 0) * (p.Stocktake?.Price ?? 0));
+                                    var averageOrder = customer.Orders.Count() > 0 ? totalSpent / customer.Orders.Count() : 0;
+                                }
+                                $@averageOrder.ToString("F2")
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Order History -->
+        @if (customer.Orders.Any())
+        {
+            <div class="form-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title">
+                            <i class="fas fa-history me-2"></i>Order History
+                        </h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-container">
+                            <table class="table mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Order ID</th>
+                                        <th>Items</th>
+                                        <th>Total</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var order in customer.Orders.OrderByDescending(o => o.OrderID))
+                                    {
+                                        var orderTotal = order.ProductsInOrders.Sum(p => (p.Quantity ?? 0) * (p.Stocktake?.Price ?? 0));
+                                        var itemCount = order.ProductsInOrders.Sum(p => p.Quantity ?? 0);
+                                        
+                                        <tr>
+                                            <td>
+                                                <div class="cell-content">
+                                                    <div class="cell-title">Order #@order.OrderID</div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="cell-content">
+                                                    <div class="cell-title">@itemCount items</div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="cell-content">
+                                                    <div class="cell-title">$@orderTotal.ToString("F2")</div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-success">
+                                                    <i class="fas fa-check-circle me-1"></i>Completed
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <a href="@Url.Action("OrderDetails", "Admin", new { id = order.OrderID })" 
+                                                   class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-eye me-1"></i>View
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <!-- No Customer Profile -->
+        <div class="form-section">
+            <div class="card">
+                <div class="card-body text-center">
+                    <i class="fas fa-user-slash fa-3x text-muted mb-3"></i>
+                    <h5>No Customer Profile</h5>
+                    <p class="text-muted">This user has not created a customer profile yet.</p>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        function updateUserRole() {
+            const userName = '@Model.UserName';
+            const isAdmin = document.getElementById('userRole').value === 'true';
+            
+            fetch('@Url.Action("UpdateUserRole", "Admin")', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value
+                },
+                body: JSON.stringify({
+                    userName: userName,
+                    isAdmin: isAdmin
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('User role updated successfully!');
+                    location.reload();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while updating the user role.');
+            });
+        }
+    </script>
+} 

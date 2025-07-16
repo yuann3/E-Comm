@@ -1,0 +1,304 @@
+@{
+    ViewData["Title"] = "Reports & Analytics - Admin";
+    Layout = "_AdminLayout";
+}
+
+<div class="reports-analytics">
+    <!-- Dashboard Header -->
+    <div class="dashboard-header">
+        <div class="header-content">
+            <div class="header-title">
+                <h1 class="dashboard-title">
+                    <i class="fas fa-chart-line me-3"></i>Reports & Analytics
+                </h1>
+                <p class="dashboard-subtitle">Business insights, sales reports, and system analytics</p>
+            </div>
+            <div class="header-actions">
+                <a href="@Url.Action("InventoryReport", "Admin")" class="btn btn-primary">
+                    <i class="fas fa-boxes me-2"></i>Inventory Report
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overview Cards -->
+    <div class="overview-section">
+        <div class="section-header">
+            <h3 class="section-title">
+                <i class="fas fa-chart-bar me-2"></i>Key Metrics
+            </h3>
+        </div>
+        <div class="overview-grid">
+            <div class="overview-card">
+                <div class="card-icon">
+                    <i class="fas fa-dollar-sign"></i>
+                </div>
+                <div class="card-content">
+                    <div class="card-number">$@ViewBag.TotalRevenue.ToString("F2")</div>
+                    <div class="card-label">Total Revenue</div>
+                </div>
+            </div>
+
+            <div class="overview-card">
+                <div class="card-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                </div>
+                <div class="card-content">
+                    <div class="card-number">@ViewBag.TotalOrders</div>
+                    <div class="card-label">Total Orders</div>
+                </div>
+            </div>
+
+            <div class="overview-card">
+                <div class="card-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="card-content">
+                    <div class="card-number">@ViewBag.TotalCustomers</div>
+                    <div class="card-label">Total Customers</div>
+                </div>
+            </div>
+
+            <div class="overview-card">
+                <div class="card-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="card-content">
+                    <div class="card-number">$@((double)ViewBag.TotalRevenue / Math.Max(ViewBag.TotalOrders, 1))</div>
+                    <div class="card-label">Average Order Value</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Analytics Grid -->
+    <div class="analytics-grid">
+        <!-- Popular Products - Full Width -->
+        <div class="analytics-section full-width">
+            <div class="section-header">
+                <h3 class="section-title">
+                    <i class="fas fa-star me-2"></i>Popular Products
+                </h3>
+            </div>
+            <div class="analytics-card">
+                @if (ViewBag.PopularProducts != null && ((IEnumerable<dynamic>)ViewBag.PopularProducts).Any())
+                {
+                    <div class="table-section">
+                        <div class="table-container">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Product</th>
+                                        <th>Units Sold</th>
+                                        <th>Revenue</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var product in ViewBag.PopularProducts)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div class="cell-content">
+                                                    <div class="cell-title">@product.Product.Name</div>
+                                                    <div class="cell-subtitle">by @product.Product.Author</div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="cell-content">
+                                                    <div class="cell-title">@product.TotalSold</div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="cell-content">
+                                                    <div class="cell-title">$@product.Revenue.ToString("F2")</div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="no-data">
+                        <i class="fas fa-chart-bar"></i>
+                        <h5>No sales data available</h5>
+                        <p>Sales data will appear here once orders are placed.</p>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Two Column Section -->
+        <div class="analytics-two-column">
+            <!-- Genre Performance -->
+            <div class="analytics-section">
+                <div class="section-header">
+                    <h3 class="section-title">
+                        <i class="fas fa-tags me-2"></i>Genre 
+                    </h3>
+                </div>
+                <div class="analytics-card">
+                    @if (ViewBag.GenreStats != null && ((IEnumerable<dynamic>)ViewBag.GenreStats).Any())
+                    {
+                        <div class="table-section">
+                            <div class="table-container">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Genre</th>
+                                            <th>Units Sold</th>
+                                            <th>Revenue</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var genre in ViewBag.GenreStats)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    <div class="cell-content">
+                                                        <div class="cell-title">@genre.Genre</div>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="cell-content">
+                                                        <div class="cell-title">@genre.TotalSold</div>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="cell-content">
+                                                        <div class="cell-title">$@genre.Revenue.ToString("F2")</div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="no-data">
+                            <i class="fas fa-tags"></i>
+                            <h5>No genre data available</h5>
+                            <p>Genre statistics will appear here once orders are placed.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Recent Orders -->
+            <div class="recent-activity-section">
+                <div class="section-header">
+                    <h3 class="section-title">
+                        <i class="fas fa-clock me-2"></i>Recent Orders
+                    </h3>
+                </div>
+                <div class="activity-feed">
+                    @if (ViewBag.RecentOrders != null && ((IEnumerable<E_Comm.Models.Order>)ViewBag.RecentOrders).Any())
+                    {
+                        @foreach (var order in ViewBag.RecentOrders)
+                        {
+                            <div class="activity-item">
+                                <div class="activity-icon">
+                                    <i class="fas fa-shopping-cart text-success"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">Order #@order.OrderID</div>
+                                    <div class="activity-description">@order.Customer?.Email</div>
+                                    <div class="activity-time">@order.StreetAddress</div>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="activity-item">
+                            <div class="activity-icon">
+                                <i class="fas fa-shopping-cart text-muted"></i>
+                            </div>
+                            <div class="activity-content">
+                                <div class="activity-title">No recent orders</div>
+                                <div class="activity-description">Recent orders will appear here</div>
+                                <div class="activity-time">-</div>
+                            </div>
+                        </div>
+                    }
+                </div>
+                <div class="activity-footer">
+                    <a href="@Url.Action("ManageOrders", "Admin")" class="view-all-link">
+                        <i class="fas fa-arrow-right me-1"></i>View All Orders
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Customers - Full Width -->
+        <div class="analytics-section full-width">
+            <div class="section-header">
+                <h3 class="section-title">
+                    <i class="fas fa-user-friends me-2"></i>Top Customers
+                </h3>
+            </div>
+            <div class="analytics-card">
+                @if (ViewBag.CustomerStats != null && ((IEnumerable<dynamic>)ViewBag.CustomerStats).Any())
+                {
+                    <div class="table-section">
+                        <div class="table-container">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Customer</th>
+                                        <th>Orders</th>
+                                        <th>Total Spent</th>
+                                        <th>Average Order</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var customer in ViewBag.CustomerStats)
+                                    {
+                                        var averageOrder = customer.TotalOrders > 0 ? customer.TotalSpent / customer.TotalOrders : 0;
+                                        <tr>
+                                            <td>
+                                                <div class="cell-content">
+                                                    <div class="cell-title">@customer.Customer.Email</div>
+                                                    <div class="cell-subtitle">@customer.Customer.PhoneNumber</div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="cell-content">
+                                                    <div class="cell-title">@customer.TotalOrders</div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="cell-content">
+                                                    <div class="cell-title">$@customer.TotalSpent.ToString("F2")</div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="cell-content">
+                                                    <div class="cell-title">$@averageOrder.ToString("F2")</div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="no-data">
+                        <i class="fas fa-users"></i>
+                        <h5>No customer data available</h5>
+                        <p>Customer statistics will appear here once orders are placed.</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div> 

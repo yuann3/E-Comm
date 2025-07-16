@@ -1,0 +1,219 @@
+@model IEnumerable<E_Comm.Models.Order>
+
+@{
+    ViewData["Title"] = "Manage Orders";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="admin-content">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="header-content">
+            <div>
+                <h1 class="page-title">
+                    <i class="fas fa-shopping-cart"></i>
+                    Order Management
+                </h1>
+                <p class="page-subtitle">Manage customer orders, track order history, and view order details</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="statistics-section">
+        <div class="row">
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                    <div>
+                        <div class="stat-number">@ViewBag.TotalOrdersCount</div>
+                        <div class="stat-label">Total Orders</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-dollar-sign"></i>
+                    </div>
+                    <div>
+                        <div class="stat-number">$@ViewBag.TotalRevenue.ToString("F2")</div>
+                        <div class="stat-label">Total Revenue</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div>
+                        <div class="stat-number">$@ViewBag.AverageOrderValue.ToString("F2")</div>
+                        <div class="stat-label">Average Order Value</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div>
+                        <div class="stat-number">@ViewBag.TotalOrdersCount</div>
+                        <div class="stat-label">Completed Orders</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search and Filter Section -->
+    <div class="search-filter-section">
+        <div class="search-filter-card">
+            <form method="get" action="@Url.Action("ManageOrders", "Admin")" class="search-filter-form">
+                <div class="search-filter-grid">
+                    <div class="search-group">
+                        <label class="form-label">Search Orders</label>
+                        <div class="search-input-group">
+                            <i class="fas fa-search search-icon"></i>
+                            <input type="text" name="searchTerm" value="@ViewBag.SearchTerm" 
+                                   class="form-control" placeholder="Search by order ID, customer email, or address...">
+                        </div>
+                    </div>
+                    <div class="filter-group">
+                        <label class="form-label">Status Filter</label>
+                        <select name="statusFilter" class="form-select">
+                            <option value="">All Statuses</option>
+                            <option value="completed" selected="@(ViewBag.StatusFilter == "completed")">Completed</option>
+                            <option value="processing" selected="@(ViewBag.StatusFilter == "processing")">Processing</option>
+                            <option value="shipped" selected="@(ViewBag.StatusFilter == "shipped")">Shipped</option>
+                        </select>
+                    </div>
+                    <div class="filter-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search me-2"></i>Search
+                        </button>
+                        <a href="@Url.Action("ManageOrders", "Admin")" class="btn btn-outline-secondary">
+                            <i class="fas fa-times me-2"></i>Clear
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Orders Table -->
+    <div class="table-section">
+        <div class="table-header">
+            <div class="table-info">
+                <i class="fas fa-info-circle me-2"></i>
+                Showing @(Model.Count()) of @ViewBag.TotalOrders orders
+            </div>
+        </div>
+        
+        <div class="table-container">
+            @if (Model.Any())
+            {
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Order Details</th>
+                            <th>Customer</th>
+                            <th>Items</th>
+                            <th>Order Value</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var order in Model)
+                        {
+                            var orderTotal = order.ProductsInOrders.Sum(p => (p.Quantity ?? 0) * (p.Stocktake?.Price ?? 0));
+                            var itemCount = order.ProductsInOrders.Sum(p => p.Quantity ?? 0);
+                            
+                            <tr>
+                                <td>
+                                    <div class="cell-content">
+                                        <div class="cell-title">Order #@order.OrderID</div>
+                                        <div class="cell-subtitle">@order.StreetAddress</div>
+                                        <div class="cell-description">@order.Suburb, @order.State @order.PostCode</div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="cell-content">
+                                        <div class="cell-title">@order.Customer?.Email</div>
+                                        <div class="cell-subtitle">@order.Customer?.PhoneNumber</div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="cell-content">
+                                        <div class="cell-title">@itemCount items</div>
+                                        <div class="cell-subtitle">@order.ProductsInOrders.Count() products</div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="cell-content">
+                                        <div class="cell-title">$@orderTotal.ToString("F2")</div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-success">
+                                        <i class="fas fa-check-circle me-1"></i>Completed
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="btn-group">
+                                        <a href="@Url.Action("OrderDetails", "Admin", new { id = order.OrderID })" 
+                                           class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <div class="no-data">
+                    <i class="fas fa-shopping-cart"></i>
+                    <h5>No orders found</h5>
+                    <p>No orders match your current search criteria.</p>
+                </div>
+            }
+        </div>
+
+        <!-- Pagination -->
+        @if (ViewBag.TotalPages > 1)
+        {
+            <div class="pagination-section">
+                <nav>
+                    <ul class="pagination">
+                        @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                        {
+                            <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                                <a class="page-link" href="@Url.Action("ManageOrders", "Admin", new { 
+                                    page = i, 
+                                    searchTerm = ViewBag.SearchTerm, 
+                                    statusFilter = ViewBag.StatusFilter 
+                                })">@i</a>
+                            </li>
+                        }
+                    </ul>
+                </nav>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Auto-submit form on filter change
+        document.querySelector('select[name="statusFilter"]').addEventListener('change', function() {
+            this.form.submit();
+        });
+    </script>
+} 
