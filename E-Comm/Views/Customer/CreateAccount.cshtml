@@ -1,0 +1,294 @@
+@model E_Comm.Models.Customer
+
+@{
+    ViewData["Title"] = "Create Account";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <!-- Header -->
+            <div class="text-center mb-5">
+                <h1 class="display-5 mb-3">Create Your Account</h1>
+                <p class="lead text-muted">Join the Entertainment Guild and start your journey</p>
+            </div>
+
+            <!-- Create Account Form Card -->
+            <div class="card feature-card">
+                <div class="card-body p-4">
+                    <div class="row align-items-center mb-4">
+                        <div class="col-auto">
+                            <div class="feature-icon">
+                                <i class="fas fa-user-plus text-white fa-2x"></i>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <h4 class="card-title mb-1">Account Registration</h4>
+                            <p class="text-muted mb-0">Fill in your details to create your Entertainment Guild account</p>
+                        </div>
+                    </div>
+
+                    @if (TempData["Success"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="fas fa-check-circle me-2"></i>@TempData["Success"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    <form asp-action="CreateAccount" method="post" id="createAccountForm">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <!-- Email Address -->
+                        <div class="mb-4">
+                            <label asp-for="Email" class="form-label required">
+                                <i class="fas fa-envelope me-2"></i> Email Address
+                            </label>
+                            <input asp-for="Email" class="form-control" placeholder="your.email@example.com" required />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                            <div class="form-text">This will be your login email address</div>
+                        </div>
+
+                        <!-- Phone Number -->
+                        <div class="mb-4">
+                            <label asp-for="PhoneNumber" class="form-label">
+                                <i class="fas fa-phone me-2"></i> Phone Number
+                            </label>
+                            <input asp-for="PhoneNumber" class="form-control" placeholder="e.g. 0412 345 678" />
+                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                        </div>
+
+                        <!-- Address Section Header -->
+                        <div class="border-top pt-4 mb-4">
+                            <h5 class="mb-3">
+                                <i class="fas fa-map-marker-alt me-2"></i> Delivery Address
+                            </h5>
+                            <p class="text-muted small mb-3">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Australian address validation: Address must contain letters and numbers, postcode must be 4 digits
+                            </p>
+                        </div>
+
+                        <!-- Street Address -->
+                        <div class="mb-4">
+                            <label asp-for="StreetAddress" class="form-label required">
+                                <i class="fas fa-road me-2"></i> Street Address
+                            </label>
+                            <input asp-for="StreetAddress" class="form-control" placeholder="e.g. 377 Ring Road" required />
+                            <span asp-validation-for="StreetAddress" class="text-danger"></span>
+                            <div class="form-text">Must contain both letters and numbers (e.g. 377 Ring Road)</div>
+                        </div>
+
+                        <!-- Suburb and State Row -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label asp-for="Suburb" class="form-label required">
+                                    <i class="fas fa-building me-2"></i> Suburb
+                                </label>
+                                <input asp-for="Suburb" class="form-control" placeholder="e.g. Callaghan" required />
+                                <span asp-validation-for="Suburb" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="State" class="form-label required">
+                                    <i class="fas fa-map me-2"></i> State
+                                </label>
+                                <select asp-for="State" class="form-select" required>
+                                    <option value="">Select State</option>
+                                    <option value="NSW">NSW - New South Wales</option>
+                                    <option value="VIC">VIC - Victoria</option>
+                                    <option value="QLD">QLD - Queensland</option>
+                                    <option value="WA">WA - Western Australia</option>
+                                    <option value="SA">SA - South Australia</option>
+                                    <option value="TAS">TAS - Tasmania</option>
+                                    <option value="ACT">ACT - Australian Capital Territory</option>
+                                    <option value="NT">NT - Northern Territory</option>
+                                </select>
+                                <span asp-validation-for="State" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Post Code -->
+                        <div class="mb-4">
+                            <label asp-for="PostCode" class="form-label required">
+                                <i class="fas fa-mail-bulk me-2"></i> Post Code
+                            </label>
+                            <input asp-for="PostCode" class="form-control" placeholder="e.g. 2308" pattern="[0-9]{4}" maxlength="4" required />
+                            <span asp-validation-for="PostCode" class="text-danger"></span>
+                            <div class="form-text">Must be 4 digits (e.g. 2308, not "two thousand and eight")</div>
+                        </div>
+
+                        <!-- Payment Information Section Header -->
+                        <div class="border-top pt-4 mb-4">
+                            <h5 class="mb-3">
+                                <i class="fas fa-credit-card me-2"></i> Payment Information <span class="text-muted small">(Optional)</span>
+                            </h5>
+                            <p class="text-muted small mb-3">
+                                <i class="fas fa-lock me-1"></i>
+                                Your payment information is securely encrypted and stored
+                            </p>
+                        </div>
+
+                        <!-- Card Owner -->
+                        <div class="mb-4">
+                            <label asp-for="CardOwner" class="form-label">
+                                <i class="fas fa-user me-2"></i> Card Holder Name
+                            </label>
+                            <input asp-for="CardOwner" class="form-control" placeholder="Name as it appears on card" />
+                            <span asp-validation-for="CardOwner" class="text-danger"></span>
+                        </div>
+
+                        <!-- Card Number -->
+                        <div class="mb-4">
+                            <label asp-for="CardNumber" class="form-label">
+                                <i class="fas fa-credit-card me-2"></i> Card Number
+                            </label>
+                            <input asp-for="CardNumber" class="form-control" placeholder="1234 5678 9012 3456" maxlength="19" />
+                            <span asp-validation-for="CardNumber" class="text-danger"></span>
+                        </div>
+
+                        <!-- Expiry and CVV Row -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label asp-for="Expiry" class="form-label">
+                                    <i class="fas fa-calendar me-2"></i> Expiry Date
+                                </label>
+                                <input asp-for="Expiry" class="form-control" placeholder="MM/YY" pattern="[0-9]{2}/[0-9]{2}" maxlength="5" />
+                                <span asp-validation-for="Expiry" class="text-danger"></span>
+                                <div class="form-text">Format: MM/YY</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="CVV" class="form-label">
+                                    <i class="fas fa-lock me-2"></i> CVV
+                                </label>
+                                <input asp-for="CVV" class="form-control" placeholder="123" maxlength="4" />
+                                <span asp-validation-for="CVV" class="text-danger"></span>
+                                <div class="form-text">3-4 digit security code</div>
+                            </div>
+                        </div>
+
+                        <!-- Terms and Conditions -->
+                        <div class="mb-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="acceptTerms" required>
+                                <label class="form-check-label" for="acceptTerms">
+                                    I agree to the <a href="#" class="text-decoration-none">Terms of Service</a> and <a href="#" class="text-decoration-none">Privacy Policy</a>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="d-grid gap-2 mb-4">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-user-plus me-2"></i> Create Account
+                            </button>
+                        </div>
+
+                        <!-- Login Link -->
+                        <div class="text-center">
+                            <p class="text-muted">
+                                Already have an account? 
+                                <a href="@Url.Action("Login", "Auth")" class="text-decoration-none">
+                                    <i class="fas fa-sign-in-alt me-1"></i> Login here
+                                </a>
+                            </p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Benefits Section -->
+            <div class="row g-3 mt-4">
+                <div class="col-md-4">
+                    <div class="card feature-card text-center h-100">
+                        <div class="card-body">
+                            <i class="fas fa-shipping-fast fa-2x text-primary mb-3"></i>
+                            <h6 class="card-title">Fast Shipping</h6>
+                            <p class="card-text small text-muted">Free delivery on orders over $50</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card feature-card text-center h-100">
+                        <div class="card-body">
+                            <i class="fas fa-star fa-2x text-primary mb-3"></i>
+                            <h6 class="card-title">Exclusive Deals</h6>
+                            <p class="card-text small text-muted">Member-only discounts and offers</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card feature-card text-center h-100">
+                        <div class="card-body">
+                            <i class="fas fa-history fa-2x text-primary mb-3"></i>
+                            <h6 class="card-title">Order Tracking</h6>
+                            <p class="card-text small text-muted">Track your purchases and history</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Client-side validation for card number formatting -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Format card number input
+    const cardNumberInput = document.querySelector('input[name="CardNumber"]');
+    if (cardNumberInput) {
+        cardNumberInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\s/g, '').replace(/[^0-9]/gi, '');
+            let formattedValue = value.match(/.{1,4}/g)?.join(' ');
+            e.target.value = formattedValue || value;
+        });
+    }
+
+    // Format expiry date input
+    const expiryInput = document.querySelector('input[name="Expiry"]');
+    if (expiryInput) {
+        expiryInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length >= 2) {
+                value = value.substring(0,2) + '/' + value.substring(2,4);
+            }
+            e.target.value = value;
+        });
+    }
+
+    // Postcode validation
+    const postCodeInput = document.querySelector('input[name="PostCode"]');
+    if (postCodeInput) {
+        postCodeInput.addEventListener('input', function(e) {
+            e.target.value = e.target.value.replace(/[^0-9]/g, '');
+        });
+    }
+});
+</script>
+
+<style>
+.required::after {
+    content: " *";
+    color: #dc3545;
+}
+
+.feature-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+}
+
+.card.feature-card {
+    border: none;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    transition: box-shadow 0.15s ease-in-out;
+}
+
+.card.feature-card:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+</style> 

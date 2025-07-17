@@ -1,0 +1,466 @@
+@model E_Comm.Models.Product
+@{
+    ViewData["Title"] = "Add New Item - Admin";
+    Layout = "_AdminLayout";
+}
+
+<div class="create-item">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="header-content">
+            <div class="header-title">
+                <h1 class="page-title">
+                    <i class="fas fa-plus me-3"></i>Add New Item
+                </h1>
+                <p class="page-subtitle">Add a new product to your store inventory</p>
+            </div>
+            <div class="header-actions">
+                <a href="@Url.Action("ManageItems", "Admin")" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Items
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Form Section -->
+    <div class="form-section">
+        <div class="row">
+            <div class="col-lg-8">
+                <!-- Main Form Card -->
+                <div class="form-card">
+                    <div class="card-header">
+                        <h4 class="card-title">
+                            <i class="fas fa-info-circle me-2"></i>Product Information
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <form asp-controller="Admin" asp-action="CreateItem" method="post" id="createItemForm">
+                            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                            <div class="form-group">
+                                <label asp-for="Name" class="form-label required">Product Name</label>
+                                <input asp-for="Name" class="form-control" placeholder="Enter product name" required />
+                                <span asp-validation-for="Name" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label asp-for="Author" class="form-label">Author/Creator</label>
+                                <input asp-for="Author" class="form-control" placeholder="Enter author or creator name" />
+                                <span asp-validation-for="Author" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label asp-for="GenreID" class="form-label required">Genre</label>
+                                <select asp-for="GenreID" class="form-select" required>
+                                    <option value="">Select a genre</option>
+                                    @if (ViewBag.Genres != null)
+                                    {
+                                        @foreach (var genre in (List<E_Comm.Models.Genre>)ViewBag.Genres)
+                                        {
+                                            <option value="@genre.GenreID">@genre.Name</option>
+                                        }
+                                    }
+                                </select>
+                                <span asp-validation-for="GenreID" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label asp-for="Description" class="form-label">Description</label>
+                                <textarea asp-for="Description" class="form-control" rows="4" 
+                                          placeholder="Enter product description"></textarea>
+                                <span asp-validation-for="Description" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label asp-for="Published" class="form-label">Publication Date</label>
+                                <input asp-for="Published" type="date" class="form-control" />
+                                <span asp-validation-for="Published" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-2"></i>Create Item
+                                </button>
+                                <a href="@Url.Action("ManageItems", "Admin")" class="btn btn-outline-secondary">
+                                    <i class="fas fa-times me-2"></i>Cancel
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <!-- Stock Information Card -->
+                <div class="info-card">
+                    <div class="card-header">
+                        <h4 class="card-title">
+                            <i class="fas fa-warehouse me-2"></i>Stock Information
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="stock-form">
+                            <div class="form-group">
+                                <label for="sourceId" class="form-label required">Source</label>
+                                <select name="sourceId" id="sourceId" class="form-select" required>
+                                    <option value="">Select a source</option>
+                                    @if (ViewBag.Sources != null)
+                                    {
+                                        @foreach (var source in (List<E_Comm.Models.Source>)ViewBag.Sources)
+                                        {
+                                            <option value="@source.SourceId">@source.Source_name</option>
+                                        }
+                                    }
+                                </select>
+                                <small class="form-text">Choose where this item is sourced from</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="quantity" class="form-label required">Initial Quantity</label>
+                                <input type="number" name="quantity" id="quantity" class="form-control" 
+                                       min="0" value="0" required />
+                                <small class="form-text">Number of items in stock</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="price" class="form-label required">Price</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="number" name="price" id="price" class="form-control" 
+                                           min="0" step="0.01" value="0.00" required />
+                                </div>
+                                <small class="form-text">Price per item</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Guidelines Card -->
+                <div class="guidelines-card">
+                    <div class="card-header">
+                        <h4 class="card-title">
+                            <i class="fas fa-lightbulb me-2"></i>Guidelines
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="guideline-item">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <span>Use descriptive product names</span>
+                        </div>
+                        <div class="guideline-item">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <span>Include author for books and creators for games</span>
+                        </div>
+                        <div class="guideline-item">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <span>Write detailed descriptions</span>
+                        </div>
+                        <div class="guideline-item">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <span>Set appropriate genre categories</span>
+                        </div>
+                        <div class="guideline-item">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <span>Set realistic stock quantities</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        /* Create Item Styles */
+        .create-item {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Page Header */
+        .page-header {
+            margin-bottom: 2rem;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--foreground);
+            margin: 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .page-title i {
+            color: var(--primary);
+        }
+
+        .page-subtitle {
+            color: var(--muted-foreground);
+            margin: 0.5rem 0 0 0;
+        }
+
+        /* Form Section */
+        .form-section {
+            margin-bottom: 2rem;
+        }
+
+        .form-card,
+        .info-card,
+        .guidelines-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--border-radius);
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 1.5rem;
+            background: var(--secondary);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .card-title {
+            color: var(--foreground);
+            font-weight: 600;
+            margin: 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .card-title i {
+            color: var(--primary);
+        }
+
+        .card-body {
+            padding: 2rem;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            color: var(--foreground);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .form-label.required::after {
+            content: ' *';
+            color: var(--destructive);
+        }
+
+        .form-control,
+        .form-select {
+            padding: 0.875rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: var(--border-radius-sm);
+            background: var(--input);
+            color: var(--foreground);
+            transition: var(--transition-fast);
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.25);
+            background: var(--input);
+            color: var(--foreground);
+        }
+
+        .form-control::placeholder {
+            color: var(--muted-foreground);
+        }
+
+        .form-text {
+            color: var(--muted-foreground);
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+
+        .input-group-text {
+            background: var(--secondary);
+            border: 1px solid var(--border);
+            color: var(--foreground);
+        }
+
+        .text-danger {
+            color: var(--destructive);
+            font-size: 0.875rem;
+        }
+
+        /* Form Actions */
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border);
+        }
+
+        /* Stock Information */
+        .stock-form .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        /* Guidelines */
+        .guideline-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            color: var(--muted-foreground);
+            font-size: 0.9rem;
+        }
+
+        .guideline-item:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Validation Styles */
+        .input-validation-error {
+            border-color: var(--destructive);
+        }
+
+        .field-validation-error {
+            color: var(--destructive);
+            font-size: 0.875rem;
+        }
+
+        .validation-summary-errors {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid var(--destructive);
+            border-radius: var(--border-radius-sm);
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .validation-summary-errors ul {
+            margin: 0;
+            padding-left: 1.5rem;
+        }
+
+        .validation-summary-errors li {
+            color: var(--destructive);
+        }
+
+        /* Responsive Design */
+        @@media (max-width: 768px) {
+            .page-title {
+                font-size: 2rem;
+            }
+
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .card-body {
+                padding: 1.5rem;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Form validation
+            const form = document.getElementById('createItemForm');
+            const sourceSelect = document.getElementById('sourceId');
+            const quantityInput = document.getElementById('quantity');
+            const priceInput = document.getElementById('price');
+
+            // Add stock fields to form submission
+            form.addEventListener('submit', function(e) {
+                // Create hidden inputs for stock information
+                const sourceInput = document.createElement('input');
+                sourceInput.type = 'hidden';
+                sourceInput.name = 'sourceId';
+                sourceInput.value = sourceSelect.value;
+
+                const quantityHidden = document.createElement('input');
+                quantityHidden.type = 'hidden';
+                quantityHidden.name = 'quantity';
+                quantityHidden.value = quantityInput.value;
+
+                const priceHidden = document.createElement('input');
+                priceHidden.type = 'hidden';
+                priceHidden.name = 'price';
+                priceHidden.value = priceInput.value;
+
+                form.appendChild(sourceInput);
+                form.appendChild(quantityHidden);
+                form.appendChild(priceHidden);
+
+                // Basic validation
+                if (!sourceSelect.value) {
+                    e.preventDefault();
+                    alert('Please select a source');
+                    return false;
+                }
+
+                if (!quantityInput.value || quantityInput.value < 0) {
+                    e.preventDefault();
+                    alert('Please enter a valid quantity');
+                    return false;
+                }
+
+                if (!priceInput.value || priceInput.value < 0) {
+                    e.preventDefault();
+                    alert('Please enter a valid price');
+                    return false;
+                }
+
+                // Show loading state
+                const submitBtn = form.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Creating Item...';
+                submitBtn.disabled = true;
+
+                // Re-enable button after 10 seconds if form doesn't submit
+                setTimeout(() => {
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                }, 10000);
+            });
+
+            // Auto-focus first input
+            const firstInput = document.querySelector('input[name="Name"]');
+            if (firstInput) {
+                firstInput.focus();
+            }
+
+            // Add loading animation
+            const cards = document.querySelectorAll('.form-card, .info-card, .guidelines-card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                
+                setTimeout(() => {
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 200);
+            });
+        });
+    </script>
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+} 

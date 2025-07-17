@@ -1,0 +1,662 @@
+@model List<E_Comm.Models.Product>
+
+@{
+    ViewData["Title"] = "Browse Products";
+}
+
+<div class="dark-page">
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <!-- Header -->
+            <div class="text-center mb-5">
+                <h1 class="display-5 mb-3">
+                    <i class="fas fa-search me-3 text-primary"></i>Browse Products
+                </h1>
+                <p class="lead text-muted">Discover amazing books, movies, and games in our collection</p>
+            </div>
+
+            <!-- Search and Filter Section -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <form method="get" action="@Url.Action("Browse", "Customer")">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label for="searchTerm" class="form-label">Search Products</label>
+                                        <input type="text" 
+                                               class="form-control" 
+                                               id="searchTerm" 
+                                               name="searchTerm" 
+                                               value="@ViewBag.SearchTerm" 
+                                               placeholder="Search by title, author, or description...">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="genreId" class="form-label">Filter by Genre</label>
+                                        <select class="form-select" id="genreId" name="genreId">
+                                            <option value="">All Genres</option>
+                                            @foreach (var genre in ViewBag.Genres as List<E_Comm.Models.Genre>)
+                                            {
+                                                @if (ViewBag.SelectedGenre?.ToString() == genre.GenreID.ToString())
+                                                {
+                                                    <option value="@genre.GenreID" selected>@genre.Name</option>
+                                                }
+                                                else
+                                                {
+                                                    <option value="@genre.GenreID">@genre.Name</option>
+                                                }
+                                            }
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2 d-flex align-items-end">
+                                        <button type="submit" class="btn btn-primary w-100">
+                                            <i class="fas fa-search me-2"></i>Search
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search Results Info -->
+            @if (!string.IsNullOrEmpty(ViewBag.SearchTerm as string) || ViewBag.SelectedGenre != null)
+            {
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            @if (!string.IsNullOrEmpty(ViewBag.SearchTerm as string))
+                            {
+                                <span>Search results for: <strong>"@ViewBag.SearchTerm"</strong></span>
+                            }
+                            @if (ViewBag.SelectedGenre != null)
+                            {
+                                var selectedGenre = ((List<E_Comm.Models.Genre>)ViewBag.Genres).FirstOrDefault(g => g.GenreID == ViewBag.SelectedGenre);
+                                if (selectedGenre != null)
+                                {
+                                    <span>@(!string.IsNullOrEmpty(ViewBag.SearchTerm as string) ? " | " : "")Genre: <strong>@selectedGenre.Name</strong></span>
+                                }
+                            }
+                            <span class="float-end">@Model.Count products found</span>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- Products Grid -->
+            @if (Model != null && Model.Count > 0)
+            {
+                <div class="row g-4">
+                    @foreach (var product in Model)
+                    {
+                                                 <div class="col-lg-3 col-md-4 col-sm-6">
+                             <div class="card h-100 product-card">
+                                 <div class="card-body d-flex flex-column">
+                                     <div class="product-icon mb-3 text-center">
+                                         @{
+                                             var genreName = product.Genre?.Name?.ToLower() ?? "";
+                                             string iconClass = "fas fa-book";
+                                             string iconColor = "text-info";
+                                             
+                                             if (genreName.Contains("movie") || genreName.Contains("film"))
+                                             {
+                                                 iconClass = "fas fa-film";
+                                                 iconColor = "text-danger";
+                                             }
+                                             else if (genreName.Contains("game") || genreName.Contains("gaming"))
+                                             {
+                                                 iconClass = "fas fa-gamepad";
+                                                 iconColor = "text-success";
+                                             }
+                                             else if (genreName.Contains("book") || genreName.Contains("literature"))
+                                             {
+                                                 iconClass = "fas fa-book";
+                                                 iconColor = "text-info";
+                                             }
+                                             else if (genreName.Contains("music") || genreName.Contains("audio"))
+                                             {
+                                                 iconClass = "fas fa-music";
+                                                 iconColor = "text-warning";
+                                             }
+                                         }
+                                         <div class="icon-background">
+                                             <i class="@iconClass fa-3x @iconColor"></i>
+                                         </div>
+                                     </div>
+                                     <h5 class="card-title product-name">@product.Name</h5>
+                                     <p class="product-author mb-2">
+                                         <i class="fas fa-user me-2"></i>@product.Author
+                                     </p>
+                                     <p class="product-genre mb-2">
+                                         <i class="fas fa-tag me-2"></i>@(product.Genre?.Name ?? "Unknown Genre")
+                                     </p>
+                                    <p class="card-text flex-grow-1">
+                                        @if (product.Description != null && product.Description.Length > 100)
+                                        {
+                                            <text>@product.Description.Substring(0, 100)...</text>
+                                        }
+                                        else
+                                        {
+                                            <text>@product.Description</text>
+                                        }
+                                    </p>
+                                    
+                                    <!-- Price and Stock Info -->
+                                    <div class="mt-auto">
+                                        @if (product.Stocktakes?.Any() == true)
+                                        {
+                                            var stocktake = product.Stocktakes.FirstOrDefault();
+                                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                                <span class="h5 text-success mb-0">$@String.Format("{0:F2}", stocktake.Price ?? 0)</span>
+                                                <span class="badge bg-success">@(stocktake.Quantity ?? 0) in stock</span>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                                <span class="h5 text-muted mb-0">Price N/A</span>
+                                                <span class="badge bg-secondary">Out of Stock</span>
+                                            </div>
+                                        }
+                                        
+                                        <!-- Action Buttons -->
+                                        <div class="d-grid gap-2">
+                                            <a href="@Url.Action("ProductDetails", "Customer", new { id = product.ID })" 
+                                               class="btn btn-outline-primary">
+                                                <i class="fas fa-eye me-2"></i>View Details
+                                            </a>
+                                            @if (product.Stocktakes?.Any(s => s.Quantity > 0) == true)
+                                            {
+                                                <form method="post" action="@Url.Action("AddToCart", "Customer")" class="d-inline">
+                                                    <input type="hidden" name="productId" value="@product.ID" />
+                                                    <input type="hidden" name="quantity" value="1" />
+                                                    <button type="submit" class="btn btn-primary w-100">
+                                                        <i class="fas fa-shopping-cart me-2"></i>Add to Cart
+                                                    </button>
+                                                </form>
+                                            }
+                                            else
+                                            {
+                                                <button type="button" class="btn btn-secondary w-100" disabled>
+                                                    <i class="fas fa-times me-2"></i>Out of Stock
+                                                </button>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <!-- Pagination -->
+                @if (ViewBag.TotalPages > 1)
+                {
+                    <div class="row mt-5">
+                        <div class="col-12">
+                            <nav aria-label="Product pagination">
+                                <ul class="pagination justify-content-center">
+                                    @if (ViewBag.CurrentPage > 1)
+                                    {
+                                        <li class="page-item">
+                                            <a class="page-link" href="@Url.Action("Browse", "Customer", new { searchTerm = ViewBag.SearchTerm, genreId = ViewBag.SelectedGenre, page = ViewBag.CurrentPage - 1 })">
+                                                <i class="fas fa-chevron-left"></i> Previous
+                                            </a>
+                                        </li>
+                                    }
+                                    else
+                                    {
+                                        <li class="page-item disabled">
+                                            <span class="page-link"><i class="fas fa-chevron-left"></i> Previous</span>
+                                        </li>
+                                    }
+
+                                    @for (int i = Math.Max(1, ViewBag.CurrentPage - 2); i <= Math.Min(ViewBag.TotalPages, ViewBag.CurrentPage + 2); i++)
+                                    {
+                                        <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                                            <a class="page-link" href="@Url.Action("Browse", "Customer", new { searchTerm = ViewBag.SearchTerm, genreId = ViewBag.SelectedGenre, page = i })">@i</a>
+                                        </li>
+                                    }
+
+                                    @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                                    {
+                                        <li class="page-item">
+                                            <a class="page-link" href="@Url.Action("Browse", "Customer", new { searchTerm = ViewBag.SearchTerm, genreId = ViewBag.SelectedGenre, page = ViewBag.CurrentPage + 1 })">
+                                                Next <i class="fas fa-chevron-right"></i>
+                                            </a>
+                                        </li>
+                                    }
+                                    else
+                                    {
+                                        <li class="page-item disabled">
+                                            <span class="page-link">Next <i class="fas fa-chevron-right"></i></span>
+                                        </li>
+                                    }
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <!-- No Products Found -->
+                <div class="row">
+                    <div class="col-lg-6 mx-auto">
+                        <div class="card text-center">
+                            <div class="card-body p-5">
+                                <i class="fas fa-search fa-4x text-muted mb-4"></i>
+                                <h3 class="card-title">No Products Found</h3>
+                                <p class="card-text mb-4">
+                                    @if (!string.IsNullOrEmpty(ViewBag.SearchTerm as string) || ViewBag.SelectedGenre != null)
+                                    {
+                                        <text>We couldn't find any products matching your search criteria. Try adjusting your search or browse all products.</text>
+                                    }
+                                    else
+                                    {
+                                        <text>No products are currently available. Please check back later.</text>
+                                    }
+                                </p>
+                                
+                                <div class="d-grid gap-3">
+                                    @if (!string.IsNullOrEmpty(ViewBag.SearchTerm as string) || ViewBag.SelectedGenre != null)
+                                    {
+                                        <a href="@Url.Action("Browse", "Customer")" class="btn btn-primary">
+                                            <i class="fas fa-list me-2"></i>View All Products
+                                        </a>
+                                    }
+                                    <a href="@Url.Action("Index", "Customer")" class="btn btn-outline-secondary">
+                                        <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- Quick Actions -->
+            <div class="row g-3 mt-5">
+                <div class="col-md-4">
+                    <a href="@Url.Action("Index", "Customer")" class="card text-decoration-none h-100">
+                        <div class="card-body text-center p-4">
+                            <i class="fas fa-tachometer-alt fa-2x text-primary mb-3"></i>
+                            <h6 class="card-title">Dashboard</h6>
+                            <p class="card-text small text-muted">Return to main dashboard</p>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    <a href="@Url.Action("OrderHistory", "Customer")" class="card text-decoration-none h-100">
+                        <div class="card-body text-center p-4">
+                            <i class="fas fa-history fa-2x text-primary mb-3"></i>
+                            <h6 class="card-title">Order History</h6>
+                            <p class="card-text small text-muted">View your past orders</p>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    <a href="@Url.Action("MyAccount", "Customer")" class="card text-decoration-none h-100">
+                        <div class="card-body text-center p-4">
+                            <i class="fas fa-user-cog fa-2x text-primary mb-3"></i>
+                            <h6 class="card-title">My Account</h6>
+                            <p class="card-text small text-muted">Manage your account settings</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<style>
+/* Dark theme variables */
+:root {
+    --primary-color: #ffffff;
+    --primary-dark: #e5e5e5;
+    --primary-foreground: #000000;
+    --secondary-color: #1a1a1a;
+    --background-color: #000000;
+    --foreground-color: #ffffff;
+    --card-bg: #0a0a0a;
+    --muted-color: #1a1a1a;
+    --muted-foreground: #a1a1aa;
+    --border-color: #27272a;
+    --input-bg: #27272a;
+    --border-radius: 12px;
+    --box-shadow: 0 4px 20px rgba(255, 255, 255, 0.08);
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dark-page {
+    background: linear-gradient(135deg, #000000 0%, #0a0a0a 25%, #1a1a1a 50%, #0a0a0a 75%, #000000 100%);
+    min-height: 100vh;
+    color: var(--foreground-color);
+}
+
+.product-card {
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    background: linear-gradient(135deg, var(--card-bg) 0%, var(--muted-color) 50%, var(--card-bg) 100%);
+    transition: var(--transition);
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+.product-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0.05) 50%, rgba(255,255,255,0.02) 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.product-card:hover {
+    border-color: var(--primary-color);
+    box-shadow: 0 10px 25px -3px rgba(255, 255, 255, 0.1), 0 4px 6px -2px rgba(255, 255, 255, 0.05);
+    transform: translateY(-2px);
+    background: linear-gradient(135deg, var(--muted-color) 0%, var(--secondary-color) 50%, var(--muted-color) 100%);
+}
+
+.product-card:hover::before {
+    opacity: 1;
+}
+
+.product-icon {
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+.icon-background {
+    width: 60px;
+    height: 60px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--muted-color) 0%, var(--secondary-color) 50%, var(--muted-color) 100%);
+    border: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+}
+
+.icon-background::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.05) 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.product-card:hover .icon-background {
+    background: linear-gradient(135deg, var(--secondary-color) 0%, var(--muted-color) 50%, var(--secondary-color) 100%);
+    transform: scale(1.05);
+    border-color: var(--primary-color);
+}
+
+.product-card:hover .icon-background::before {
+    opacity: 1;
+}
+
+.product-name {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--foreground-color);
+    margin-bottom: 0.5rem;
+    line-height: 1.4;
+    min-height: 2.8rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.product-author {
+    color: var(--muted-foreground);
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+}
+
+.product-author i {
+    color: var(--primary-color);
+}
+
+.product-genre {
+    color: var(--muted-foreground);
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+}
+
+.product-genre i {
+    color: var(--primary-color);
+}
+
+.card-text {
+    font-size: 0.875rem;
+    color: var(--muted-foreground);
+    line-height: 1.5;
+    margin-bottom: 1rem;
+}
+
+.btn-outline-primary {
+    border: 1px solid var(--border-color);
+    color: var(--muted-foreground);
+    background: var(--card-bg);
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: var(--transition);
+}
+
+.btn-outline-primary:hover {
+    background: var(--muted-color);
+    border-color: var(--primary-color);
+    color: var(--foreground-color);
+    transform: translateY(-1px);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 50%, var(--primary-color) 100%);
+    border: none;
+    color: var(--primary-foreground);
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-primary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(0,0,0,0.1) 0%, rgba(255,255,255,0.1) 50%, rgba(0,0,0,0.1) 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, var(--primary-dark) 0%, var(--muted-foreground) 50%, var(--primary-dark) 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.15);
+}
+
+.btn-primary:hover::before {
+    opacity: 1;
+}
+
+.badge {
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+}
+
+.badge.bg-success {
+    background-color: #34d399 !important;
+    color: var(--primary-foreground) !important;
+}
+
+.badge.bg-secondary {
+    background-color: var(--muted-color) !important;
+    color: var(--foreground-color) !important;
+    border: 1px solid var(--border-color);
+}
+
+.page-link {
+    color: var(--muted-foreground);
+    border: 1px solid var(--border-color);
+    padding: 0.5rem 0.75rem;
+    background: var(--card-bg);
+    transition: var(--transition);
+}
+
+.page-link:hover {
+    background: var(--muted-color);
+    border-color: var(--primary-color);
+    color: var(--foreground-color);
+}
+
+.page-item.active .page-link {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 50%, var(--primary-color) 100%);
+    border-color: var(--primary-color);
+    color: var(--primary-foreground);
+    box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1);
+}
+
+.page-item.disabled .page-link {
+    color: var(--muted-foreground);
+    background: var(--card-bg);
+    border-color: var(--border-color);
+    opacity: 0.5;
+}
+
+.alert-info {
+    background: linear-gradient(135deg, var(--muted-color) 0%, var(--secondary-color) 50%, var(--muted-color) 100%);
+    border: 1px solid var(--border-color);
+    color: var(--foreground-color);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+}
+
+/* Typography and general elements */
+h1, h2, h3, h4, h5, h6 {
+    color: var(--foreground-color);
+}
+
+.lead {
+    color: var(--muted-foreground);
+}
+
+.display-5 {
+    color: var(--foreground-color);
+}
+
+.form-control, .form-select {
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    font-size: 0.875rem;
+    background: var(--input-bg);
+    color: var(--foreground-color);
+    transition: var(--transition);
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+    outline: none;
+    background: var(--input-bg);
+    color: var(--foreground-color);
+}
+
+.form-control::placeholder {
+    color: var(--muted-foreground);
+}
+
+.card {
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    background: linear-gradient(135deg, var(--card-bg) 0%, var(--muted-color) 50%, var(--card-bg) 100%);
+    box-shadow: var(--box-shadow);
+}
+
+/* Icon colors for different product types */
+.text-info {
+    color: #60a5fa !important;
+}
+
+.text-danger {
+    color: #f87171 !important;
+}
+
+.text-success {
+    color: #34d399 !important;
+}
+
+.text-warning {
+    color: #fbbf24 !important;
+}
+
+/* Price styling */
+.h5.text-success {
+    color: var(--foreground-color) !important;
+    font-weight: 600;
+}
+
+@@media (max-width: 768px) {
+    .product-card {
+        margin-bottom: 1rem;
+    }
+    
+    .pagination {
+        flex-wrap: wrap;
+    }
+    
+    .product-name {
+        font-size: 0.95rem;
+    }
+    
+    .icon-background {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .icon-background i {
+        font-size: 1.5rem !important;
+    }
+}
+
+@@media (max-width: 576px) {
+    .product-icon {
+        height: 70px;
+    }
+    
+    .icon-background {
+        width: 45px;
+        height: 45px;
+    }
+    
+    .icon-background i {
+        font-size: 1.25rem !important;
+    }
+}
+</style> 

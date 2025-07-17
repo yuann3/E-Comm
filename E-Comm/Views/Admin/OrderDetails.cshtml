@@ -1,0 +1,256 @@
+@model E_Comm.Models.Order
+
+@{
+    ViewData["Title"] = "Order Details";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="admin-content">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="header-content">
+            <div>
+                <h1 class="page-title">
+                    <i class="fas fa-shopping-cart"></i>
+                    Order Details
+                </h1>
+                <p class="page-subtitle">Complete information for order #@Model.OrderID</p>
+            </div>
+            <div>
+                <a href="@Url.Action("ManageOrders", "Admin")" class="btn btn-outline-primary">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Orders
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Status Card -->
+    <div class="form-section">
+        <div class="card">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-auto">
+                        <div class="stat-icon">
+                            <i class="fas fa-check-circle text-success"></i>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <h4 class="mb-1">Order #@Model.OrderID</h4>
+                        <p class="text-muted mb-0">Order has been completed successfully</p>
+                    </div>
+                    <div class="col-auto">
+                        <span class="badge bg-success">
+                            <i class="fas fa-check-circle me-1"></i>Completed
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Information -->
+    <div class="row">
+        <!-- Customer Information -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">
+                        <i class="fas fa-user me-2"></i>Customer Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <strong>Email:</strong>
+                        </div>
+                        <div class="col-sm-8">
+                            @Model.Customer?.Email
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-sm-4">
+                            <strong>Phone:</strong>
+                        </div>
+                        <div class="col-sm-8">
+                            @Model.Customer?.PhoneNumber
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-sm-4">
+                            <strong>Payment Method:</strong>
+                        </div>
+                        <div class="col-sm-8">
+                            @if (!string.IsNullOrEmpty(Model.Customer?.CardNumber))
+                            {
+                                <span>Card ending in @Model.Customer.CardNumber.Substring(Math.Max(0, Model.Customer.CardNumber.Length - 4))</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">No payment method on file</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Delivery Information -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">
+                        <i class="fas fa-shipping-fast me-2"></i>Delivery Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <strong>Address:</strong>
+                        </div>
+                        <div class="col-sm-8">
+                            @Model.StreetAddress
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-sm-4">
+                            <strong>Suburb:</strong>
+                        </div>
+                        <div class="col-sm-8">
+                            @Model.Suburb
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-sm-4">
+                            <strong>State:</strong>
+                        </div>
+                        <div class="col-sm-8">
+                            @Model.State
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-sm-4">
+                            <strong>Postcode:</strong>
+                        </div>
+                        <div class="col-sm-8">
+                            @Model.PostCode
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Items -->
+    <div class="form-section">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="fas fa-list me-2"></i>Order Items
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-container">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Source</th>
+                                <th>Price</th>
+                                <th>Quantity</th>
+                                <th>Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.ProductsInOrders)
+                            {
+                                var subtotal = (item.Quantity ?? 0) * (item.Stocktake?.Price ?? 0);
+                                <tr>
+                                    <td>
+                                        <div class="cell-content">
+                                            <div class="cell-title">@item.Stocktake?.Product?.Name</div>
+                                            <div class="cell-subtitle">
+                                                by @item.Stocktake?.Product?.Author
+                                            </div>
+                                            <div class="cell-description">
+                                                <span class="badge bg-secondary">@item.Stocktake?.Product?.Genre?.Name</span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="cell-content">
+                                            <div class="cell-title">@item.Stocktake?.Source?.Source_name</div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="cell-content">
+                                            <div class="cell-title">$@item.Stocktake?.Price?.ToString("F2")</div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="cell-content">
+                                            <div class="cell-title">@item.Quantity</div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="cell-content">
+                                            <div class="cell-title">$@subtotal.ToString("F2")</div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Summary -->
+    <div class="row">
+        <div class="col-lg-8"></div>
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">
+                        <i class="fas fa-calculator me-2"></i>Order Summary
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-6">
+                            <strong>Items:</strong>
+                        </div>
+                        <div class="col-6 text-end">
+                            @Model.ProductsInOrders.Sum(p => p.Quantity ?? 0)
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-6">
+                            <strong>Subtotal:</strong>
+                        </div>
+                        <div class="col-6 text-end">
+                            $@ViewBag.OrderTotal.ToString("F2")
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-6">
+                            <strong>Shipping:</strong>
+                        </div>
+                        <div class="col-6 text-end">
+                            Free
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-6">
+                            <strong>Total:</strong>
+                        </div>
+                        <div class="col-6 text-end">
+                            <strong>$@ViewBag.OrderTotal.ToString("F2")</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

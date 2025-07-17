@@ -1,151 +1,1117 @@
-﻿@model E_Comm.Models.Customer
+@model E_Comm.Models.Customer
+
 @{
-    // Set the page title that appears in the browser tab and for SEO
-    ViewData["Title"] = "My Account - 3B1G";
+    ViewData["Title"] = "My Account";
+    bool isNewCustomer = ViewBag.IsNewCustomer ?? false;
 }
 
-<!-- Main Container: Centered account information display -->
-<div class="container py-5">
-    <!-- Bootstrap row with centered content -->
-    <div class="row justify-content-center">
-        <!-- Responsive column: medium screens and up use 8/12 width for better readability -->
-        <div class="col-md-8">
-            
-            <!-- Page Header: Main title with user icon -->
-            <h2 class="mb-4 text-center">
-                <i class="fas fa-user me-2"></i>My Account
-            </h2>
-
-            <!-- CONTACT INFORMATION SECTION -->
-            <!-- Card container for contact details with subtle shadow and no border -->
-            <div class="card shadow-sm border-0 mb-4">
-                <div class="card-body">
-                    <!-- Section title -->
-                    <h5 class="card-title mb-3">Contact Information</h5>
-                    
-                    <!-- Display customer's email address -->
-                    <!-- @Model.Email accesses the Email property from the Customer model -->
-                    <p><strong>Email:</strong> @Model.Email</p>
-                    
-                    <!-- Display phone number with null check -->
-                    <!-- Uses conditional operator to show "Not Provided" if phone is null/empty -->
-                    <p><strong>Phone:</strong> @(string.IsNullOrEmpty(Model.PhoneNumber) ? "Not Provided" : Model.PhoneNumber)</p>
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <!-- Modern Header with Gradient -->
+            <div class="account-header text-center mb-5">
+                <div class="header-content">
+                    <h1 class="display-4 mb-3">
+                        <i class="fas fa-user-circle me-3 text-primary"></i>My Account
+                    </h1>
+                    <p class="lead">
+                        @if (isNewCustomer)
+                        {
+                            <text>Complete your profile to unlock all features</text>
+                        }
+                        else
+                        {
+                            <text>Manage your account information and preferences</text>
+                        }
+                    </p>
                 </div>
             </div>
 
-            <!-- SHIPPING ADDRESS SECTION -->
-            <!-- Card container for shipping address information -->
-            <div class="card shadow-sm border-0 mb-4">
-                <div class="card-body">
-                    <!-- Section title -->
-                    <h5 class="card-title mb-3">Shipping Address</h5>
-                    
-                    <!-- Conditional rendering: Only show address if street address exists -->
-                    @if (!string.IsNullOrEmpty(Model.StreetAddress))
-                    {
-                        <!-- Display street address on first line -->
-                        <p>@Model.StreetAddress</p>
-                        <!-- Display suburb, state, and postcode on second line -->
-                        <p>@Model.Suburb, @Model.State @Model.PostCode</p>
-                    }
-                    else
-                    {
-                        <!-- Show placeholder message if no address is provided -->
-                        <!-- Uses Bootstrap's text-muted class for subtle gray text -->
-                        <p class="text-muted">Address not provided.</p>
-                    }
+            <!-- Success/Info Messages -->
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show modern-alert" role="alert">
+                    <i class="fas fa-check-circle me-2"></i>
+                    <strong>Success!</strong> @TempData["Success"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
-            </div>
+            }
 
-            <!-- PAYMENT INFORMATION SECTION -->
-            <!-- Card container for payment method details -->
-            <div class="card shadow-sm border-0 mb-4">
-                <div class="card-body">
-                    <!-- Section title -->
-                    <h5 class="card-title mb-3">Payment Information</h5>
-                    
-                    <!-- Conditional rendering: Only show payment info if card number exists -->
-                    @if (!string.IsNullOrEmpty(Model.CardNumber))
-                    {
-                        <!-- Display masked card number for security -->
-                        <!-- Uses C# 8.0 range operator [^4..] to get last 4 digits -->
-                        <!-- Shows: **** **** **** 1234 instead of full card number -->
-                        <p><strong>Card:</strong> **** **** **** @Model.CardNumber[^4..]</p>
-                        
-                        <!-- Display the name as it appears on the card -->
-                        <p><strong>Name on Card:</strong> @Model.CardOwner</p>
-                        
-                        <!-- Display card expiry date -->
-                        <!-- Note: Consider formatting this date for better presentation -->
-                        <p><strong>Expiry:</strong> @Model.Expiry</p>
-                    }
-                    else
-                    {
-                        <!-- Show placeholder message if no payment method is saved -->
-                        <!-- Uses Bootstrap's text-muted class for subtle gray text -->
-                        <p class="text-muted">No payment method saved.</p>
-                    }
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show modern-alert" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <strong>Error!</strong> @TempData["Error"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
-            </div>
+            }
 
-            <!-- ACTION BUTTONS SECTION -->
-            <!-- Right-aligned container for account actions -->
-            <div class="text-end">
-                <!-- Edit Account Link -->
-                <!-- Uses ASP.NET Core tag helper to generate link to EditAccount action -->
-                <!-- Assumes EditAccount action exists in the same controller -->
-                <a asp-action="EditAccount" class="btn btn-primary">
-                    <i class="fas fa-edit me-1"></i>Edit Account
-                </a>
-                
-                <!-- POTENTIAL IMPROVEMENTS: Consider adding more action buttons -->
-                <!-- Examples:
-                <a asp-action="ChangePassword" class="btn btn-outline-secondary ms-2">
-                    <i class="fas fa-key me-1"></i>Change Password
-                </a>
-                <a asp-action="OrderHistory" class="btn btn-outline-info ms-2">
-                    <i class="fas fa-history me-1"></i>Order History
-                </a>
-                <button type="button" class="btn btn-outline-danger ms-2" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
-                    <i class="fas fa-trash me-1"></i>Delete Account
-                </button>
-                -->
+            @if (ViewBag.Message != null)
+            {
+                <div class="alert alert-info modern-alert" role="alert">
+                    <i class="fas fa-info-circle me-2"></i>@ViewBag.Message
+                </div>
+            }
+
+            @if (isNewCustomer)
+            {
+                <!-- New Customer Setup Form -->
+                <div class="modern-card">
+                    <div class="card-header">
+                        <div class="d-flex align-items-center">
+                            <div class="header-icon">
+                                <i class="fas fa-user-plus"></i>
+                            </div>
+                            <div>
+                                <h4 class="mb-1">Complete Your Profile</h4>
+                                <p class="text-muted mb-0">Let's get you set up in just a few steps</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                        <!-- Progress Steps -->
+                        <div class="progress-steps mb-5">
+                            <div class="step active">
+                                <div class="step-icon"><i class="fas fa-user"></i></div>
+                                <div class="step-label">Personal Info</div>
+                            </div>
+                            <div class="step">
+                                <div class="step-icon"><i class="fas fa-map-marker-alt"></i></div>
+                                <div class="step-label">Address</div>
+                            </div>
+                            <div class="step">
+                                <div class="step-icon"><i class="fas fa-credit-card"></i></div>
+                                <div class="step-label">Payment (Optional)</div>
+                            </div>
+                        </div>
+
+                        <form asp-action="MyAccount" method="post" class="modern-form">
+                            <div asp-validation-summary="ModelOnly" class="alert alert-danger modern-alert"></div>
+
+                            <!-- Step 1: Personal Information -->
+                            <div class="form-section active" id="step1">
+                                <div class="section-header">
+                                    <h5><i class="fas fa-user me-2"></i>Personal Information</h5>
+                                    <p class="text-muted">Your basic account details</p>
+                                </div>
+
+                                <!-- Email Field with Fixed Styling -->
+                                <div class="form-group">
+                                    <label asp-for="Email" class="form-label">
+                                        <i class="fas fa-envelope text-primary me-2"></i>Email Address
+                                    </label>
+                                    <div class="input-group">
+                                        <input asp-for="Email" class="form-control email-readonly" readonly />
+                                        <span class="input-group-text">
+                                            <i class="fas fa-lock text-muted" title="Email cannot be changed"></i>
+                                        </span>
+                                    </div>
+                                    <div class="form-text">This is your login email address and cannot be changed</div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label asp-for="PhoneNumber" class="form-label">
+                                        <i class="fas fa-phone text-primary me-2"></i>Phone Number
+                                    </label>
+                                    <input asp-for="PhoneNumber" class="form-control" placeholder="e.g. 0412 345 678" />
+                                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                                    <div class="form-text">We'll use this for order updates and support</div>
+                                </div>
+
+                                <div class="step-navigation">
+                                    <button type="button" class="btn btn-primary" onclick="nextStep()">
+                                        Next: Address Information <i class="fas fa-arrow-right ms-2"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Step 2: Address Information -->
+                            <div class="form-section" id="step2">
+                                <div class="section-header">
+                                    <h5><i class="fas fa-map-marker-alt me-2"></i>Delivery Address</h5>
+                                    <p class="text-muted">Where should we send your orders?</p>
+                                </div>
+
+                                <div class="form-group">
+                                    <label asp-for="StreetAddress" class="form-label">
+                                        <i class="fas fa-road text-primary me-2"></i>Street Address
+                                    </label>
+                                    <input asp-for="StreetAddress" class="form-control" placeholder="e.g. 377 Ring Road" />
+                                    <span asp-validation-for="StreetAddress" class="text-danger"></span>
+                                    <div class="form-text">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        Must contain both letters and numbers (Australian format)
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label asp-for="Suburb" class="form-label">
+                                                <i class="fas fa-building text-primary me-2"></i>Suburb
+                                            </label>
+                                            <input asp-for="Suburb" class="form-control" placeholder="e.g. Callaghan" />
+                                            <span asp-validation-for="Suburb" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label asp-for="PostCode" class="form-label">
+                                                <i class="fas fa-mail-bulk text-primary me-2"></i>Post Code
+                                            </label>
+                                            <input asp-for="PostCode" class="form-control" placeholder="e.g. 2308" pattern="[0-9]{4}" maxlength="4" />
+                                            <span asp-validation-for="PostCode" class="text-danger"></span>
+                                            <div class="form-text">4-digit Australian postcode</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label asp-for="State" class="form-label">
+                                        <i class="fas fa-map text-primary me-2"></i>State/Territory
+                                    </label>
+                                    <select asp-for="State" class="form-select">
+                                        <option value="">Select your state or territory</option>
+                                        <option value="NSW">NSW - New South Wales</option>
+                                        <option value="VIC">VIC - Victoria</option>
+                                        <option value="QLD">QLD - Queensland</option>
+                                        <option value="WA">WA - Western Australia</option>
+                                        <option value="SA">SA - South Australia</option>
+                                        <option value="TAS">TAS - Tasmania</option>
+                                        <option value="ACT">ACT - Australian Capital Territory</option>
+                                        <option value="NT">NT - Northern Territory</option>
+                                    </select>
+                                    <span asp-validation-for="State" class="text-danger"></span>
+                                </div>
+
+                                <div class="step-navigation">
+                                    <button type="button" class="btn btn-outline-secondary me-2" onclick="prevStep()">
+                                        <i class="fas fa-arrow-left me-2"></i>Back
+                                    </button>
+                                    <button type="button" class="btn btn-primary" onclick="nextStep()">
+                                        Next: Payment Info <i class="fas fa-arrow-right ms-2"></i>
+                                    </button>
+                                    <button type="submit" class="btn btn-success ms-2">
+                                        <i class="fas fa-save me-2"></i>Save Without Payment
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Step 3: Payment Information (Optional) -->
+                            <div class="form-section" id="step3">
+                                <div class="section-header">
+                                    <h5><i class="fas fa-credit-card me-2"></i>Payment Information</h5>
+                                    <p class="text-muted">Add a payment method for faster checkout (optional)</p>
+                                </div>
+
+                                <div class="alert alert-info modern-alert">
+                                    <i class="fas fa-shield-alt me-2"></i>
+                                    <strong>Secure:</strong> Your payment information is encrypted and stored securely.
+                                    You can skip this step and add payment details later.
+                                </div>
+
+                                <div class="form-group">
+                                    <label asp-for="CardOwner" class="form-label">
+                                        <i class="fas fa-user text-primary me-2"></i>Cardholder Name
+                                    </label>
+                                    <input asp-for="CardOwner" class="form-control" placeholder="Name as it appears on card" />
+                                    <span asp-validation-for="CardOwner" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-group">
+                                    <label asp-for="CardNumber" class="form-label">
+                                        <i class="fas fa-credit-card text-primary me-2"></i>Card Number
+                                    </label>
+                                    <input asp-for="CardNumber" class="form-control" placeholder="1234 5678 9012 3456" maxlength="19" />
+                                    <span asp-validation-for="CardNumber" class="text-danger"></span>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label asp-for="Expiry" class="form-label">
+                                                <i class="fas fa-calendar text-primary me-2"></i>Expiry Date
+                                            </label>
+                                            <input asp-for="Expiry" class="form-control" placeholder="MM/YY" pattern="[0-9]{2}/[0-9]{2}" maxlength="5" />
+                                            <span asp-validation-for="Expiry" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label asp-for="CVV" class="form-label">
+                                                <i class="fas fa-lock text-primary me-2"></i>CVV
+                                            </label>
+                                            <input asp-for="CVV" class="form-control" placeholder="123" maxlength="4" />
+                                            <span asp-validation-for="CVV" class="text-danger"></span>
+                                            <div class="form-text">3-4 digit security code on back of card</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="step-navigation">
+                                    <button type="button" class="btn btn-outline-secondary me-2" onclick="prevStep()">
+                                        <i class="fas fa-arrow-left me-2"></i>Back
+                                    </button>
+                                    <button type="submit" class="btn btn-success btn-lg">
+                                        <i class="fas fa-check me-2"></i>Complete Setup
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <!-- Existing Customer View -->
+                <div class="modern-card">
+                    <div class="card-header">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center">
+                                <div class="header-icon">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div>
+                                    <h4 class="mb-1">Account Information</h4>
+                                    <p class="text-muted mb-0">Manage your personal details and preferences</p>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-primary" onclick="enableEditMode()">
+                                <i class="fas fa-edit me-2"></i>Edit Information
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                        <!-- Read-only view -->
+                        <div id="readOnlyView">
+                            <div class="row g-4">
+                                <div class="col-lg-6">
+                                    <div class="info-card">
+                                        <div class="info-header">
+                                            <i class="fas fa-envelope text-primary"></i>
+                                            <span>Email Address</span>
+                                        </div>
+                                        <div class="info-content">@Model.Email</div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="info-card">
+                                        <div class="info-header">
+                                            <i class="fas fa-phone text-primary"></i>
+                                            <span>Phone Number</span>
+                                        </div>
+                                        <div class="info-content">@(Model.PhoneNumber ?? "Not provided")</div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="info-card">
+                                        <div class="info-header">
+                                            <i class="fas fa-map-marker-alt text-primary"></i>
+                                            <span>Delivery Address</span>
+                                        </div>
+                                        <div class="info-content">
+                                            @if (!string.IsNullOrEmpty(Model.StreetAddress))
+                                            {
+                                                <text>@Model.StreetAddress<br />@Model.Suburb, @Model.State @Model.PostCode</text>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">Not provided</span>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="info-card">
+                                        <div class="info-header">
+                                            <i class="fas fa-credit-card text-primary"></i>
+                                            <span>Payment Method</span>
+                                        </div>
+                                        <div class="info-content">
+                                            @if (!string.IsNullOrEmpty(Model.CardNumber))
+                                            {
+                                                <span>•••• •••• •••• @Model.CardNumber.Substring(Math.Max(0, Model.CardNumber.Length - 4))</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">No card on file</span>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Editable form (hidden by default) -->
+                        <div id="editableForm" style="display: none;">
+                            <form asp-action="MyAccount" method="post" class="modern-form">
+                                <div asp-validation-summary="ModelOnly" class="alert alert-danger modern-alert"></div>
+                                <input asp-for="CustomerID" type="hidden" />
+                                <input asp-for="Email" type="hidden" />
+
+                                <div class="row g-4">
+                                    <div class="col-lg-6">
+                                        <div class="form-group">
+                                            <label asp-for="PhoneNumber" class="form-label">
+                                                <i class="fas fa-phone text-primary me-2"></i>Phone Number
+                                            </label>
+                                            <input asp-for="PhoneNumber" class="form-control" />
+                                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <div class="form-group">
+                                            <label asp-for="StreetAddress" class="form-label">
+                                                <i class="fas fa-road text-primary me-2"></i>Street Address
+                                            </label>
+                                            <input asp-for="StreetAddress" class="form-control" />
+                                            <span asp-validation-for="StreetAddress" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <label asp-for="Suburb" class="form-label">
+                                                <i class="fas fa-building text-primary me-2"></i>Suburb
+                                            </label>
+                                            <input asp-for="Suburb" class="form-control" />
+                                            <span asp-validation-for="Suburb" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <label asp-for="State" class="form-label">
+                                                <i class="fas fa-map text-primary me-2"></i>State
+                                            </label>
+                                            <select asp-for="State" class="form-select">
+                                                <option value="">Select State</option>
+                                                <option value="NSW">NSW - New South Wales</option>
+                                                <option value="VIC">VIC - Victoria</option>
+                                                <option value="QLD">QLD - Queensland</option>
+                                                <option value="WA">WA - Western Australia</option>
+                                                <option value="SA">SA - South Australia</option>
+                                                <option value="TAS">TAS - Tasmania</option>
+                                                <option value="ACT">ACT - Australian Capital Territory</option>
+                                                <option value="NT">NT - Northern Territory</option>
+                                            </select>
+                                            <span asp-validation-for="State" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <label asp-for="PostCode" class="form-label">
+                                                <i class="fas fa-mail-bulk text-primary me-2"></i>Post Code
+                                            </label>
+                                            <input asp-for="PostCode" class="form-control" pattern="[0-9]{4}" maxlength="4" />
+                                            <span asp-validation-for="PostCode" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Payment Information -->
+                                <div class="section-divider"></div>
+                                <h6 class="section-title">
+                                    <i class="fas fa-credit-card me-2"></i>Payment Information
+                                </h6>
+
+                                <div class="row g-4">
+                                    <div class="col-lg-6">
+                                        <div class="form-group">
+                                            <label asp-for="CardOwner" class="form-label">
+                                                <i class="fas fa-user text-primary me-2"></i>Cardholder Name
+                                            </label>
+                                            <input asp-for="CardOwner" class="form-control" />
+                                            <span asp-validation-for="CardOwner" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <div class="form-group">
+                                            <label asp-for="CardNumber" class="form-label">
+                                                <i class="fas fa-credit-card text-primary me-2"></i>Card Number
+                                            </label>
+                                            <input asp-for="CardNumber" class="form-control" maxlength="19" />
+                                            <span asp-validation-for="CardNumber" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <div class="form-group">
+                                            <label asp-for="Expiry" class="form-label">
+                                                <i class="fas fa-calendar text-primary me-2"></i>Expiry Date
+                                            </label>
+                                            <input asp-for="Expiry" class="form-control" placeholder="MM/YY" maxlength="5" />
+                                            <span asp-validation-for="Expiry" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <div class="form-group">
+                                            <label asp-for="CVV" class="form-label">
+                                                <i class="fas fa-lock text-primary me-2"></i>CVV
+                                            </label>
+                                            <input asp-for="CVV" class="form-control" maxlength="4" />
+                                            <span asp-validation-for="CVV" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-actions">
+                                    <button type="submit" class="btn btn-success">
+                                        <i class="fas fa-save me-2"></i>Save Changes
+                                    </button>
+                                    <button type="button" class="btn btn-secondary" onclick="cancelEditMode()">
+                                        <i class="fas fa-times me-2"></i>Cancel
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- Enhanced Quick Actions -->
+            <div class="quick-actions">
+                <h5 class="mb-4">
+                    <i class="fas fa-bolt me-2 text-warning"></i>Quick Actions
+                </h5>
+                <div class="row g-3">
+                    <div class="col-lg-4">
+                        <a href="@Url.Action("OrderHistory", "Customer")" class="action-card">
+                            <div class="action-icon">
+                                <i class="fas fa-history"></i>
+                            </div>
+                            <div class="action-content">
+                                <h6>Order History</h6>
+                                <p>View your past purchases and track orders</p>
+                            </div>
+                            <div class="action-arrow">
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-lg-4">
+                        <a href="@Url.Action("Index", "Customer")" class="action-card">
+                            <div class="action-icon">
+                                <i class="fas fa-tachometer-alt"></i>
+                            </div>
+                            <div class="action-content">
+                                <h6>Dashboard</h6>
+                                <p>Return to your main customer dashboard</p>
+                            </div>
+                            <div class="action-arrow">
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-lg-4">
+                        <a href="@Url.Action("ContactSupport", "Customer")" class="action-card">
+                            <div class="action-icon">
+                                <i class="fas fa-life-ring"></i>
+                            </div>
+                            <div class="action-content">
+                                <h6>Need Help?</h6>
+                                <p>Contact our support team for assistance</p>
+                            </div>
+                            <div class="action-arrow">
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- SECURITY CONSIDERATIONS -->
-<!-- 
-1. Card number masking: Only last 4 digits are shown for security
-2. Consider adding CSRF protection for any POST operations
-3. Ensure this page requires authentication
-4. Consider adding audit trail for account access
--->
+<!-- Enhanced JavaScript -->
+<script>
+let currentStep = 1;
+const totalSteps = 3;
 
-<!-- ACCESSIBILITY CONSIDERATIONS -->
-<!--
-1. Page uses semantic HTML structure
-2. Icons are decorative and don't require alt text
-3. Consider adding sr-only labels for screen readers
-4. Ensure sufficient color contrast for text-muted elements
--->
+// Step navigation for new customer form
+function nextStep() {
+    if (currentStep < totalSteps) {
+        document.querySelector(`#step${currentStep}`).classList.remove('active');
+        document.querySelector(`.progress-steps .step:nth-child(${currentStep})`).classList.add('completed');
+        
+        currentStep++;
+        
+        document.querySelector(`#step${currentStep}`).classList.add('active');
+        document.querySelector(`.progress-steps .step:nth-child(${currentStep})`).classList.add('active');
+    }
+}
 
-<!-- RESPONSIVE DESIGN NOTES -->
-<!--
-1. Container uses Bootstrap's responsive grid system
-2. Cards will stack on mobile devices
-3. Text alignment adjusts automatically
-4. Consider testing on various screen sizes
--->
+function prevStep() {
+    if (currentStep > 1) {
+        document.querySelector(`#step${currentStep}`).classList.remove('active');
+        document.querySelector(`.progress-steps .step:nth-child(${currentStep})`).classList.remove('active');
+        
+        currentStep--;
+        
+        document.querySelector(`#step${currentStep}`).classList.add('active');
+        document.querySelector(`.progress-steps .step:nth-child(${currentStep + 1})`).classList.remove('completed');
+    }
+}
 
-<!-- FUTURE ENHANCEMENTS -->
-<!--
-1. Add profile picture upload functionality
-2. Include account creation/last login dates
-3. Add email verification status
-4. Include notification preferences
-5. Add two-factor authentication toggle
-6. Show account activity/login history
-7. Add export account data functionality (GDPR compliance)
--->
+// Edit mode toggle for existing customers
+function enableEditMode() {
+    document.getElementById('readOnlyView').style.display = 'none';
+    document.getElementById('editableForm').style.display = 'block';
+}
+
+function cancelEditMode() {
+    document.getElementById('editableForm').style.display = 'none';
+    document.getElementById('readOnlyView').style.display = 'block';
+}
+
+// Enhanced input formatting and validation
+document.addEventListener('DOMContentLoaded', function() {
+    // Format card number input
+    const cardNumberInputs = document.querySelectorAll('input[name="CardNumber"]');
+    cardNumberInputs.forEach(function(input) {
+        input.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\s/g, '').replace(/[^0-9]/gi, '');
+            let formattedValue = value.match(/.{1,4}/g)?.join(' ');
+            e.target.value = formattedValue || value;
+        });
+    });
+
+    // Format expiry date input
+    const expiryInputs = document.querySelectorAll('input[name="Expiry"]');
+    expiryInputs.forEach(function(input) {
+        input.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length >= 2) {
+                value = value.substring(0,2) + '/' + value.substring(2,4);
+            }
+            e.target.value = value;
+        });
+    });
+
+    // Postcode validation
+    const postCodeInputs = document.querySelectorAll('input[name="PostCode"]');
+    postCodeInputs.forEach(function(input) {
+        input.addEventListener('input', function(e) {
+            e.target.value = e.target.value.replace(/[^0-9]/g, '');
+        });
+    });
+
+    // Phone number formatting
+    const phoneInputs = document.querySelectorAll('input[name="PhoneNumber"]');
+    phoneInputs.forEach(function(input) {
+        input.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            // Format as Australian phone number
+            if (value.length > 0) {
+                if (value.startsWith('04')) {
+                    // Mobile format: 04XX XXX XXX
+                    if (value.length <= 10) {
+                        value = value.replace(/(\d{4})(\d{3})(\d{3})/, '$1 $2 $3');
+                    }
+                } else if (value.startsWith('0')) {
+                    // Landline format: 0X XXXX XXXX
+                    if (value.length <= 10) {
+                        value = value.replace(/(\d{2})(\d{4})(\d{4})/, '$1 $2 $3');
+                    }
+                }
+            }
+            e.target.value = value;
+        });
+    });
+});
+</script>
+
+<!-- Enhanced Styles -->
+<style>
+:root {
+    /* Match main site's black & white theme */
+    --primary-color: #ffffff;
+    --primary-dark: #e5e5e5;
+    --primary-foreground: #000000;
+    --secondary-color: #1a1a1a;
+    --success-color: #ffffff;
+    --warning-color: #fbbf24;
+    --danger-color: #ef4444;
+    --info-color: #ffffff;
+    --background-color: #000000;
+    --foreground-color: #ffffff;
+    --card-bg: #0a0a0a;
+    --muted-color: #1a1a1a;
+    --muted-foreground: #a1a1aa;
+    --border-color: #27272a;
+    --input-bg: #27272a;
+    --border-radius: 12px;
+    --box-shadow: 0 4px 20px rgba(255, 255, 255, 0.08);
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Header Styling - Match site's aesthetic */
+.account-header {
+    background: linear-gradient(135deg, var(--card-bg), var(--muted-color));
+    color: var(--foreground-color);
+    padding: 3rem 2rem;
+    border-radius: var(--border-radius);
+    margin-bottom: 2rem;
+    box-shadow: var(--box-shadow);
+    border: 1px solid var(--border-color);
+}
+
+.account-header .display-4 {
+    font-weight: 800;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    letter-spacing: -0.025em;
+}
+
+.account-header .text-primary {
+    color: var(--primary-color) !important;
+}
+
+/* Modern Card Design - Match site's cards */
+.modern-card {
+    background: var(--card-bg);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+    margin-bottom: 2rem;
+    transition: var(--transition);
+}
+
+.modern-card:hover {
+    box-shadow: 0 20px 40px rgba(255, 255, 255, 0.12);
+    transform: translateY(-2px);
+    border-color: var(--primary-color);
+}
+
+.modern-card .card-header {
+    background: linear-gradient(135deg, var(--muted-color), var(--secondary-color));
+    border-bottom: 1px solid var(--border-color);
+    padding: 1.5rem 2rem;
+}
+
+.modern-card .card-body {
+    padding: 2rem;
+    background: var(--card-bg);
+}
+
+.header-icon {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, var(--primary-color), var(--muted-foreground));
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-foreground);
+    font-size: 1.2rem;
+    margin-right: 1rem;
+    border: 1px solid var(--border-color);
+}
+
+/* Progress Steps - Updated for dark theme */
+.progress-steps {
+    display: flex;
+    justify-content: center;
+    margin: 2rem 0;
+    position: relative;
+}
+
+.progress-steps::before {
+    content: '';
+    position: absolute;
+    top: 25px;
+    left: 20%;
+    right: 20%;
+    height: 2px;
+    background: var(--border-color);
+    z-index: 1;
+}
+
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+    flex: 1;
+    max-width: 120px;
+}
+
+.step-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: var(--muted-color);
+    color: var(--muted-foreground);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.5rem;
+    transition: var(--transition);
+    font-size: 1.1rem;
+    border: 1px solid var(--border-color);
+}
+
+.step.active .step-icon {
+    background: var(--primary-color);
+    color: var(--primary-foreground);
+    transform: scale(1.1);
+    border-color: var(--primary-color);
+}
+
+.step.completed .step-icon {
+    background: var(--success-color);
+    color: var(--primary-foreground);
+    border-color: var(--success-color);
+}
+
+.step-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-align: center;
+    color: var(--muted-foreground);
+}
+
+.step.active .step-label {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+/* Form Sections */
+.form-section {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.form-section.active {
+    display: block;
+}
+
+.section-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.section-header h5 {
+    color: var(--foreground-color);
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.section-header p {
+    color: var(--muted-foreground);
+}
+
+/* Enhanced Form Styling - Match site's form styles */
+.modern-form .form-group {
+    margin-bottom: 1.5rem;
+}
+
+.modern-form .form-label {
+    font-weight: 600;
+    color: var(--foreground-color);
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+}
+
+.modern-form .form-control,
+.modern-form .form-select {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    transition: var(--transition);
+    background-color: var(--input-bg);
+    color: var(--foreground-color);
+}
+
+.modern-form .form-control:focus,
+.modern-form .form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.25);
+    background-color: var(--input-bg);
+    color: var(--foreground-color);
+}
+
+.modern-form .form-control::placeholder {
+    color: var(--muted-foreground);
+}
+
+/* Fix for email readonly field */
+.email-readonly {
+    background-color: var(--muted-color) !important;
+    color: var(--foreground-color) !important;
+    font-weight: 500;
+    cursor: not-allowed;
+    border-color: var(--border-color) !important;
+}
+
+.form-text {
+    font-size: 0.875rem;
+    color: var(--muted-foreground);
+    margin-top: 0.25rem;
+}
+
+/* Text colors */
+.text-primary {
+    color: var(--primary-color) !important;
+}
+
+/* Step Navigation */
+.step-navigation {
+    display: flex;
+    justify-content: center;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-color);
+}
+
+/* Info Cards for Read-only View */
+.info-card {
+    background: var(--muted-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1.25rem;
+    height: 100%;
+    transition: var(--transition);
+}
+
+.info-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
+    border-color: var(--primary-color);
+}
+
+.info-header {
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+    color: var(--foreground-color);
+    margin-bottom: 0.75rem;
+    font-size: 0.9rem;
+}
+
+.info-header i {
+    margin-right: 0.5rem;
+}
+
+.info-content {
+    font-size: 1rem;
+    color: var(--foreground-color);
+    line-height: 1.4;
+}
+
+/* Section Divider */
+.section-divider {
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--border-color), transparent);
+    margin: 2rem 0 1.5rem;
+}
+
+.section-title {
+    color: var(--foreground-color);
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+}
+
+/* Form Actions */
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-color);
+}
+
+/* Quick Actions - Match site's style */
+.quick-actions {
+    margin-top: 3rem;
+}
+
+.quick-actions h5 {
+    color: var(--foreground-color);
+}
+
+.action-card {
+    display: flex;
+    align-items: center;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: 1.25rem;
+    text-decoration: none;
+    color: inherit;
+    transition: var(--transition);
+    height: 100%;
+}
+
+.action-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--box-shadow);
+    text-decoration: none;
+    color: inherit;
+    border-color: var(--primary-color);
+}
+
+.action-icon {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, var(--primary-color), var(--muted-foreground));
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-foreground);
+    font-size: 1.2rem;
+    margin-right: 1rem;
+    border: 1px solid var(--border-color);
+}
+
+.action-content {
+    flex: 1;
+}
+
+.action-content h6 {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    color: var(--foreground-color);
+}
+
+.action-content p {
+    font-size: 0.875rem;
+    color: var(--muted-foreground);
+    margin: 0;
+}
+
+.action-arrow {
+    color: var(--muted-foreground);
+    transition: var(--transition);
+}
+
+.action-card:hover .action-arrow {
+    color: var(--primary-color);
+    transform: translateX(4px);
+}
+
+/* Enhanced Alert Styling - Match site's alerts */
+.modern-alert {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.5rem;
+    font-weight: 500;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    background: var(--card-bg);
+    color: var(--foreground-color);
+    border-left: 4px solid var(--primary-color);
+}
+
+.alert-success.modern-alert {
+    border-left-color: var(--success-color);
+    background: var(--card-bg);
+}
+
+.alert-danger.modern-alert {
+    border-left-color: var(--danger-color);
+    background: var(--card-bg);
+}
+
+.alert-info.modern-alert {
+    border-left-color: var(--info-color);
+    background: var(--card-bg);
+}
+
+/* Button overrides to match site */
+.btn-primary {
+    background: var(--primary-color);
+    color: var(--primary-foreground);
+    border-color: var(--primary-color);
+    font-weight: 600;
+}
+
+.btn-primary:hover {
+    background: var(--muted-foreground);
+    color: var(--background-color);
+    border-color: var(--muted-foreground);
+    transform: translateY(-2px);
+}
+
+.btn-success {
+    background: var(--primary-color);
+    color: var(--primary-foreground);
+    border-color: var(--primary-color);
+}
+
+.btn-success:hover {
+    background: var(--muted-foreground);
+    color: var(--background-color);
+    transform: translateY(-2px);
+}
+
+.btn-outline-secondary {
+    border: 1px solid var(--border-color);
+    color: var(--muted-foreground);
+    background: transparent;
+}
+
+.btn-outline-secondary:hover {
+    background: var(--secondary-color);
+    color: var(--foreground-color);
+    border-color: var(--primary-color);
+}
+
+.btn-secondary {
+    background: var(--secondary-color);
+    color: var(--foreground-color);
+    border-color: var(--border-color);
+}
+
+.btn-secondary:hover {
+    background: var(--muted-color);
+    border-color: var(--primary-color);
+    transform: translateY(-2px);
+}
+
+/* Animations */
+@@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive Design */
+@@media (max-width: 768px) {
+    .account-header {
+        padding: 2rem 1rem;
+    }
+    
+    .modern-card .card-header,
+    .modern-card .card-body {
+        padding: 1.25rem;
+    }
+    
+    .progress-steps {
+        margin: 1.5rem 0;
+    }
+    
+    .step-navigation {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .action-card {
+        text-align: center;
+        flex-direction: column;
+    }
+    
+    .action-icon {
+        margin-right: 0;
+        margin-bottom: 1rem;
+    }
+}
+</style> 
