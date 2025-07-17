@@ -1,31 +1,42 @@
 ﻿@model E_Comm.Models.User
 @{
+    // Set the page title that will appear in the browser tab
     ViewData["Title"] = "Sign Up - 3B1G";
 }
 
-<!-- Hero Section -->
+<!-- Hero Section: Eye-catching header with gradient background -->
 <div class="bg-gradient text-white py-5 mb-5" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
     <div class="container">
         <div class="row justify-content-center text-center">
             <div class="col-lg-6">
+                <!-- Main heading for the signup page -->
                 <h1 class="display-5 fw-bold mb-3">Join 3B1G</h1>
+                <!-- Subtitle to encourage user registration -->
                 <p class="lead">Create your account and start your entertainment journey</p>
             </div>
         </div>
     </div>
 </div>
 
+<!-- Main Content Container -->
 <div class="container">
     <div class="row justify-content-center">
+        <!-- Responsive column that adjusts size based on screen size -->
         <div class="col-lg-6 col-md-8">
+            <!-- Main signup card with shadow for modern look -->
             <div class="card border-0 shadow-lg">
                 <div class="card-body p-5">
+                    <!-- Card header with icon and title -->
                     <div class="text-center mb-4">
+                        <!-- FontAwesome user-plus icon -->
                         <i class="fas fa-user-plus text-primary fa-3x mb-3"></i>
                         <h3 class="fw-bold">Create Account</h3>
+                        <!-- Encouraging message for user registration -->
                         <p class="text-muted">Join the 3B1G community today</p>
                     </div>
 
+                    <!-- Error Message Display -->
+                    <!-- This block displays server-side validation errors -->
                     @if (ViewBag.Error != null)
                     {
                         <div class="alert alert-danger border-0 shadow-sm">
@@ -33,6 +44,8 @@
                         </div>
                     }
 
+                    <!-- Success Message Display -->
+                    <!-- This block displays success messages (e.g., account created successfully) -->
                     @if (TempData["Success"] != null)
                     {
                         <div class="alert alert-success border-0 shadow-sm">
@@ -40,43 +53,59 @@
                         </div>
                     }
 
+                    <!-- Main Registration Form -->
+                    <!-- Form posts to AuthController's Signup action -->
                     <form asp-controller="Auth" asp-action="Signup" method="post">
+                        <!-- First Row: Username and Full Name (side by side on larger screens) -->
                         <div class="row">
+                            <!-- Username Field -->
                             <div class="col-md-6 mb-4">
                                 <label asp-for="UserName" class="form-label fw-semibold">
                                     <i class="fas fa-user me-2 text-muted"></i>Username
                                 </label>
+                                <!-- Input field bound to UserName model property -->
                                 <input asp-for="UserName" class="form-control form-control-lg"
                                        placeholder="Choose a username" required>
+                                <!-- Client-side validation message container -->
                                 <span asp-validation-for="UserName" class="text-danger small"></span>
                             </div>
 
+                            <!-- Full Name Field -->
                             <div class="col-md-6 mb-4">
                                 <label asp-for="Name" class="form-label fw-semibold">
                                     <i class="fas fa-id-card me-2 text-muted"></i>Full Name
                                 </label>
+                                <!-- Input field bound to Name model property -->
                                 <input asp-for="Name" class="form-control form-control-lg"
                                        placeholder="Enter your full name" required>
+                                <!-- Client-side validation message container -->
                                 <span asp-validation-for="Name" class="text-danger small"></span>
                             </div>
                         </div>
 
+                        <!-- Email Address Field (full width) -->
                         <div class="mb-4">
                             <label asp-for="Email" class="form-label fw-semibold">
                                 <i class="fas fa-envelope me-2 text-muted"></i>Email Address
                             </label>
+                            <!-- Email input with built-in browser validation -->
                             <input asp-for="Email" type="email" class="form-control form-control-lg"
                                    placeholder="Enter your email address" required>
+                            <!-- Client-side validation message container -->
                             <span asp-validation-for="Email" class="text-danger small"></span>
                         </div>
 
+                        <!-- Password Row: Password and Confirm Password (side by side) -->
                         <div class="row">
+                            <!-- Password Field -->
                             <div class="col-md-6 mb-4">
                                 <label for="password" class="form-label fw-semibold">
                                     <i class="fas fa-lock me-2 text-muted"></i>Password
                                 </label>
+                                <!-- Password input field -->
                                 <input type="password" class="form-control form-control-lg" id="password" name="password"
                                        placeholder="Create a password" required>
+                                <!-- Password requirements help text -->
                                 <div class="form-text">
                                     <small class="text-muted">
                                         <i class="fas fa-info-circle me-1"></i>
@@ -85,17 +114,21 @@
                                 </div>
                             </div>
 
+                            <!-- Confirm Password Field -->
                             <div class="col-md-6 mb-4">
                                 <label for="confirmPassword" class="form-label fw-semibold">
                                     <i class="fas fa-lock me-2 text-muted"></i>Confirm Password
                                 </label>
+                                <!-- Confirm password input field -->
                                 <input type="password" class="form-control form-control-lg" id="confirmPassword" name="confirmPassword"
                                        placeholder="Confirm your password" required>
                             </div>
                         </div>
 
+                        <!-- Terms and Conditions Checkbox -->
                         <div class="mb-4">
                             <div class="form-check">
+                                <!-- Required checkbox for terms acceptance -->
                                 <input class="form-check-input" type="checkbox" id="termsCheck" required>
                                 <label class="form-check-label" for="termsCheck">
                                     I agree to the <a href="#" class="text-primary">Terms of Service</a> and
@@ -104,6 +137,7 @@
                             </div>
                         </div>
 
+                        <!-- Submit Button -->
                         <div class="d-grid mb-4">
                             <button type="submit" class="btn btn-primary btn-lg">
                                 <i class="fas fa-user-plus me-2"></i>Create Account
@@ -111,6 +145,8 @@
                         </div>
                     </form>
 
+                    <!-- Login Link Section -->
+                    <!-- For users who already have an account -->
                     <div class="text-center">
                         <p class="text-muted">
                             Already have an account?
@@ -122,15 +158,18 @@
                 </div>
             </div>
 
-            <!-- Benefits Card -->
+            <!-- Benefits Card: Shows why users should join -->
             <div class="card border-10 shadow-sm mt-4">
+                <!-- Card header with benefits title -->
                 <div class="card-header bg-light border-0 d-flex justify-content-center align-items-center" style="height: 100px;">
                     <h5 class="mb-0 text-center text-dark fs-1">
                         <i class="fas fa-star me-2 text-primary"></i>Why Join 3B1G?
                     </h5>
                 </div>
+                <!-- Benefits content -->
                 <div class="card-body">
                     <div class="row g-3 text-center">
+                        <!-- Benefit 1: Easy Shopping -->
                         <div class="col-md-4">
                             <div class="p-3">
                                 <i class="fas fa-shopping-cart text-primary fa-2x mb-2"></i>
@@ -138,6 +177,7 @@
                                 <small class="text-muted">Browse and purchase with ease</small>
                             </div>
                         </div>
+                        <!-- Benefit 2: Order Tracking -->
                         <div class="col-md-4">
                             <div class="p-3">
                                 <i class="fas fa-history text-success fa-2x mb-2"></i>
@@ -145,6 +185,7 @@
                                 <small class="text-muted">Track your orders in real-time</small>
                             </div>
                         </div>
+                        <!-- Benefit 3: Personalized Experience -->
                         <div class="col-md-4">
                             <div class="p-3">
                                 <i class="fas fa-heart text-danger fa-2x mb-2"></i>
@@ -161,53 +202,67 @@
 
 @section Scripts {
     <script>
-        // Password confirmation validation
+        // Client-side JavaScript for enhanced user experience
+        
+        // Password Confirmation Validation
+        // Validates that both password fields match in real-time
         document.getElementById('confirmPassword').addEventListener('input', function() {
             const password = document.getElementById('password').value;
             const confirmPassword = this.value;
 
+            // Check if passwords match
             if (confirmPassword && password !== confirmPassword) {
+                // Set custom validation message if passwords don't match
                 this.setCustomValidity('Passwords do not match');
                 this.classList.add('is-invalid');
             } else {
+                // Clear validation message if passwords match
                 this.setCustomValidity('');
                 this.classList.remove('is-invalid');
+                // Add valid styling if confirm password has content
                 if (confirmPassword) {
                     this.classList.add('is-valid');
                 }
             }
         });
 
-        // Password strength indicator
+        // Password Field Event Listener
+        // Triggers re-validation of confirm password when password changes
         document.getElementById('password').addEventListener('input', function() {
             const password = this.value;
             const confirmPassword = document.getElementById('confirmPassword');
 
             // Reset confirm password validation when password changes
             if (confirmPassword.value) {
+                // Trigger input event to re-validate confirm password
                 confirmPassword.dispatchEvent(new Event('input'));
             }
         });
 
-        // Auto-focus username field
+        // Auto-focus Username Field
+        // Automatically focuses the username field when page loads for better UX
         document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('UserName').focus();
         });
 
-        // Form validation feedback
+        // Form Submission Validation
+        // Final validation check before form submission
         document.querySelector('form').addEventListener('submit', function(e) {
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
 
+            // Prevent form submission if passwords don't match
             if (password !== confirmPassword) {
-                e.preventDefault();
+                e.preventDefault(); // Stop form submission
                 document.getElementById('confirmPassword').classList.add('is-invalid');
-                document.getElementById('confirmPassword').focus();
+                document.getElementById('confirmPassword').focus(); // Focus the problematic field
             }
         });
     </script>
 
     @{
+        // Include ASP.NET Core client-side validation scripts
+        // This partial view includes jQuery validation and unobtrusive validation
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 }

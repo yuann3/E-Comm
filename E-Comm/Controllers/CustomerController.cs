@@ -23,7 +23,7 @@ namespace E_Comm.Controllers
             // Load customer and their recent orders (optional for Home view)
             var customerEmail = User.Claims.FirstOrDefault(c => c.Type == "Email")?.Value;
             var customer = await _context.Customers
-                .Include(c => c.Orders)
+              //  .Include(c => c.Orders)
                 .FirstOrDefaultAsync(c => c.Email == customerEmail);
 
             ViewBag.RecentOrders = customer?.Orders?.Take(5).ToList() ?? new List<Order>();

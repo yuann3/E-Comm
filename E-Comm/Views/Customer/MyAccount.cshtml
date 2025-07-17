@@ -1,0 +1,151 @@
+﻿@model E_Comm.Models.Customer
+@{
+    // Set the page title that appears in the browser tab and for SEO
+    ViewData["Title"] = "My Account - 3B1G";
+}
+
+<!-- Main Container: Centered account information display -->
+<div class="container py-5">
+    <!-- Bootstrap row with centered content -->
+    <div class="row justify-content-center">
+        <!-- Responsive column: medium screens and up use 8/12 width for better readability -->
+        <div class="col-md-8">
+            
+            <!-- Page Header: Main title with user icon -->
+            <h2 class="mb-4 text-center">
+                <i class="fas fa-user me-2"></i>My Account
+            </h2>
+
+            <!-- CONTACT INFORMATION SECTION -->
+            <!-- Card container for contact details with subtle shadow and no border -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body">
+                    <!-- Section title -->
+                    <h5 class="card-title mb-3">Contact Information</h5>
+                    
+                    <!-- Display customer's email address -->
+                    <!-- @Model.Email accesses the Email property from the Customer model -->
+                    <p><strong>Email:</strong> @Model.Email</p>
+                    
+                    <!-- Display phone number with null check -->
+                    <!-- Uses conditional operator to show "Not Provided" if phone is null/empty -->
+                    <p><strong>Phone:</strong> @(string.IsNullOrEmpty(Model.PhoneNumber) ? "Not Provided" : Model.PhoneNumber)</p>
+                </div>
+            </div>
+
+            <!-- SHIPPING ADDRESS SECTION -->
+            <!-- Card container for shipping address information -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body">
+                    <!-- Section title -->
+                    <h5 class="card-title mb-3">Shipping Address</h5>
+                    
+                    <!-- Conditional rendering: Only show address if street address exists -->
+                    @if (!string.IsNullOrEmpty(Model.StreetAddress))
+                    {
+                        <!-- Display street address on first line -->
+                        <p>@Model.StreetAddress</p>
+                        <!-- Display suburb, state, and postcode on second line -->
+                        <p>@Model.Suburb, @Model.State @Model.PostCode</p>
+                    }
+                    else
+                    {
+                        <!-- Show placeholder message if no address is provided -->
+                        <!-- Uses Bootstrap's text-muted class for subtle gray text -->
+                        <p class="text-muted">Address not provided.</p>
+                    }
+                </div>
+            </div>
+
+            <!-- PAYMENT INFORMATION SECTION -->
+            <!-- Card container for payment method details -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body">
+                    <!-- Section title -->
+                    <h5 class="card-title mb-3">Payment Information</h5>
+                    
+                    <!-- Conditional rendering: Only show payment info if card number exists -->
+                    @if (!string.IsNullOrEmpty(Model.CardNumber))
+                    {
+                        <!-- Display masked card number for security -->
+                        <!-- Uses C# 8.0 range operator [^4..] to get last 4 digits -->
+                        <!-- Shows: **** **** **** 1234 instead of full card number -->
+                        <p><strong>Card:</strong> **** **** **** @Model.CardNumber[^4..]</p>
+                        
+                        <!-- Display the name as it appears on the card -->
+                        <p><strong>Name on Card:</strong> @Model.CardOwner</p>
+                        
+                        <!-- Display card expiry date -->
+                        <!-- Note: Consider formatting this date for better presentation -->
+                        <p><strong>Expiry:</strong> @Model.Expiry</p>
+                    }
+                    else
+                    {
+                        <!-- Show placeholder message if no payment method is saved -->
+                        <!-- Uses Bootstrap's text-muted class for subtle gray text -->
+                        <p class="text-muted">No payment method saved.</p>
+                    }
+                </div>
+            </div>
+
+            <!-- ACTION BUTTONS SECTION -->
+            <!-- Right-aligned container for account actions -->
+            <div class="text-end">
+                <!-- Edit Account Link -->
+                <!-- Uses ASP.NET Core tag helper to generate link to EditAccount action -->
+                <!-- Assumes EditAccount action exists in the same controller -->
+                <a asp-action="EditAccount" class="btn btn-primary">
+                    <i class="fas fa-edit me-1"></i>Edit Account
+                </a>
+                
+                <!-- POTENTIAL IMPROVEMENTS: Consider adding more action buttons -->
+                <!-- Examples:
+                <a asp-action="ChangePassword" class="btn btn-outline-secondary ms-2">
+                    <i class="fas fa-key me-1"></i>Change Password
+                </a>
+                <a asp-action="OrderHistory" class="btn btn-outline-info ms-2">
+                    <i class="fas fa-history me-1"></i>Order History
+                </a>
+                <button type="button" class="btn btn-outline-danger ms-2" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
+                    <i class="fas fa-trash me-1"></i>Delete Account
+                </button>
+                -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SECURITY CONSIDERATIONS -->
+<!-- 
+1. Card number masking: Only last 4 digits are shown for security
+2. Consider adding CSRF protection for any POST operations
+3. Ensure this page requires authentication
+4. Consider adding audit trail for account access
+-->
+
+<!-- ACCESSIBILITY CONSIDERATIONS -->
+<!--
+1. Page uses semantic HTML structure
+2. Icons are decorative and don't require alt text
+3. Consider adding sr-only labels for screen readers
+4. Ensure sufficient color contrast for text-muted elements
+-->
+
+<!-- RESPONSIVE DESIGN NOTES -->
+<!--
+1. Container uses Bootstrap's responsive grid system
+2. Cards will stack on mobile devices
+3. Text alignment adjusts automatically
+4. Consider testing on various screen sizes
+-->
+
+<!-- FUTURE ENHANCEMENTS -->
+<!--
+1. Add profile picture upload functionality
+2. Include account creation/last login dates
+3. Add email verification status
+4. Include notification preferences
+5. Add two-factor authentication toggle
+6. Show account activity/login history
+7. Add export account data functionality (GDPR compliance)
+-->
