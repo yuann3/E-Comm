@@ -4,6 +4,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace E_Comm.Models
 {
+    /// <summary>
+    /// Handles user authentication and registration services.
+    /// Supports both test credentials and database-backed users.
+    /// </summary>
     public class AuthService
     {
         private readonly EntertainmentGuildContext _context;
@@ -13,7 +17,9 @@ namespace E_Comm.Models
             _context = context;
         }
 
-        // Test credentials from requirements document
+        /// <summary>
+        /// Predefined test credentials for development and testing.
+        /// </summary>
         private readonly Dictionary<string, UserCredentials> _testCredentials = new()
         {
             {
@@ -30,9 +36,16 @@ namespace E_Comm.Models
             }
         };
 
+        /// <summary>
+        /// Attempts to authenticate a user by email and password.
+        /// First checks test credentials, then queries the database.
+        /// </summary>
+        /// <param name="email">User's email address</param>
+        /// <param name="password">User's plain-text password</param>
+        /// <returns>Authentication result with user details and status</returns>
         public async Task<AuthResult> AuthenticateAsync(string email, string password)
         {
-            // First try test credentials for development
+            // Check hardcoded test credentials
             if (_testCredentials.ContainsKey(email))
             {
                 var testUser = _testCredentials[email];
@@ -51,10 +64,11 @@ namespace E_Comm.Models
                 }
             }
 
-            // Then try database authentication
+            // Query the database for the user
             var user = await _context.Users
                 .FirstOrDefaultAsync(u => u.Email == email);
 
+            // Verify password and return result
             if (user != null && VerifyPassword(password, user.Salt, user.HashPW))
             {
                 return new AuthResult
@@ -69,51 +83,56 @@ namespace E_Comm.Models
                 };
             }
 
+            // Default failure response
             return new AuthResult { IsSuccess = false };
         }
-        // NEW: Registration method
+
+        /// <summary>
+        /// Registers a new user after checking for existing emails and usernames.
+        /// </summary>
+        /// <param name="user">User details</param>
+        /// <param name="password">User's password (plain text)</param>
+        /// <returns>Registration result indicating success or error</returns>
         public async Task<RegistrationResult> RegisterUserAsync(User user, string password)
         {
             try
             {
-                // Check if email already exists in database
+                // Check if email already exists
                 var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == user.Email);
-                if (existingUser != null)
+                if (existingUser != null || _testCredentials.ContainsKey(user.Email ?? ""))
                 {
                     return new RegistrationResult { IsSuccess = false, ErrorMessage = "Email is already registered." };
                 }
 
-                // Check if email exists in test credentials
-                if (_testCredentials.ContainsKey(user.Email ?? ""))
-                {
-                    return new RegistrationResult { IsSuccess = false, ErrorMessage = "Email is already registered." };
-                }
-
-                // Check if username already exists
+                // Check if username is taken
                 var existingUsername = await _context.Users.FirstOrDefaultAsync(u => u.UserName == user.UserName);
                 if (existingUsername != null)
                 {
                     return new RegistrationResult { IsSuccess = false, ErrorMessage = "Username is already taken." };
                 }
 
-                // Generate salt and hash password
+                // Generate salt and hashed password
                 user.Salt = GenerateSalt();
                 user.HashPW = HashPassword(password, user.Salt);
 
-                // Set default values for new users
-                user.IsAdmin = false; // New users are customers by default
+                // Set default role for new users
+                user.IsAdmin = false;
 
-                // Add user to database
+                // Save new user
                 _context.Users.Add(user);
                 await _context.SaveChangesAsync();
 
                 return new RegistrationResult { IsSuccess = true };
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return new RegistrationResult { IsSuccess = false, ErrorMessage = "Registration failed. Please try again." };
             }
         }
+
+        /// <summary>
+        /// Verifies a password against stored salt and hash.
+        /// </summary>
         private bool VerifyPassword(string password, string? salt, string? hashedPassword)
         {
             if (string.IsNullOrEmpty(salt) || string.IsNullOrEmpty(hashedPassword))
@@ -123,6 +142,9 @@ namespace E_Comm.Models
             return hash == hashedPassword;
         }
 
+        /// <summary>
+        /// Hashes a password using SHA256 and salt.
+        /// </summary>
         private string HashPassword(string password, string salt)
         {
             using (var sha256 = SHA256.Create())
@@ -133,7 +155,9 @@ namespace E_Comm.Models
             }
         }
 
-        // NEW: Generate salt for new users
+        /// <summary>
+        /// Generates a secure random salt for password hashing.
+        /// </summary>
         private string GenerateSalt()
         {
             var saltBytes = new byte[24];
@@ -145,6 +169,9 @@ namespace E_Comm.Models
         }
     }
 
+    /// <summary>
+    /// Structure for hardcoded user credentials used in development/testing.
+    /// </summary>
     public class UserCredentials
     {
         public string Email { get; set; } = "";
@@ -153,6 +180,10 @@ namespace E_Comm.Models
         public string Name { get; set; } = "";
     }
 
+    /// <summary>
+    /// Result returned from an authentication attempt.
+    /// Includes role and flags used in business logic.
+    /// </summary>
     public class AuthResult
     {
         public bool IsSuccess { get; set; }
@@ -164,7 +195,10 @@ namespace E_Comm.Models
         public bool IsCustomer { get; set; }
     }
 
-    // NEW: Registration result class
+    /// <summary>
+    /// Result returned from a registration attempt.
+    /// Contains status and an optional error message.
+    /// </summary>
     public class RegistrationResult
     {
         public bool IsSuccess { get; set; }

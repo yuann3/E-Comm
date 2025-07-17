@@ -118,7 +118,7 @@ namespace E_Comm.Controllers
                             new Claim(ClaimTypes.Name, authResult.Name),
                             new Claim(ClaimTypes.Role, authResult.Role),
                             new Claim("IsAdmin", authResult.IsAdmin.ToString()),
-                            new Claim("IsEmployee", authResult.IsEmployee.ToString()),
+                            //new Claim("IsEmployee", authResult.IsEmployee.ToString()),
                             new Claim("IsCustomer", authResult.IsCustomer.ToString())
                         };
 

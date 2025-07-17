@@ -41,10 +41,18 @@ namespace E_Comm.Controllers
             {
                 var email = User.FindFirst(ClaimTypes.Email)?.Value;
 
+<<<<<<< HEAD
+            // Load customer and their recent orders (optional for Home view)
+            var customerEmail = User.Claims.FirstOrDefault(c => c.Type == "Email")?.Value;
+            var customer = await _context.Customers
+              //  .Include(c => c.Orders)
+                .FirstOrDefaultAsync(c => c.Email == customerEmail);
+=======
                 // Fetch latest 5 orders
                 var customer = await _context.Customers
                     .Include(c => c.Orders.OrderByDescending(o => o.OrderDate).Take(5))
                     .FirstOrDefaultAsync(c => c.Email == email);
+>>>>>>> upstream/main
 
                 ViewBag.RecentOrders = customer?.Orders.ToList() ?? new List<Order>();
 
