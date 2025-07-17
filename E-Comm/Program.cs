@@ -7,6 +7,17 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+// Add Session support for shopping cart
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
+// Add IHttpContextAccessor for session access
+builder.Services.AddHttpContextAccessor();
+
 // Add Entity Framework with SQL Server
 builder.Services.AddDbContext<EntertainmentGuildContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -26,12 +37,12 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
-    options.AddPolicy("EmployeeOnly", policy => policy.RequireRole("Employee"));
     options.AddPolicy("CustomerOnly", policy => policy.RequireRole("Customer"));
 });
 
 // Register services
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<CartService>();
 
 var app = builder.Build();
 
@@ -59,6 +70,9 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseRouting();
 
+// Add Session middleware (must come before authentication)
+app.UseSession();
+
 // Add Authentication & Authorization middleware
 app.UseAuthentication();
 app.UseAuthorization();
@@ -70,11 +84,6 @@ app.MapControllerRoute(
     name: "admin",
     pattern: "admin/{action=Index}/{id?}",
     defaults: new { controller = "Admin" });
-
-app.MapControllerRoute(
-    name: "employee", 
-    pattern: "employee/{action=Index}/{id?}",
-    defaults: new { controller = "Employee" });
 
 app.MapControllerRoute(
     name: "customer",

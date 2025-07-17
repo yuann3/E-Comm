@@ -1,195 +1,77 @@
 @{
-    // 🎯 Set the browser tab title for better UX and SEO
     ViewData["Title"] = "Login - 3B1G";
 }
 
-<!-- 🌈 HERO SECTION: Eye-catching header banner with gradient background -->
-<!-- Creates visual hierarchy and establishes brand identity -->
-<div class="bg-gradient text-white py-5 mb-5" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+<!-- Hero Section -->
+<div class="login-hero-section">
     <div class="container">
-        <!-- Center content horizontally using Bootstrap's grid system -->
         <div class="row justify-content-center text-center">
             <div class="col-lg-6">
-                <!-- Large, bold heading to grab user attention -->
-                <h1 class="display-5 fw-bold mb-3">Welcome Back</h1>
-                <!-- Subtitle that clarifies the page purpose -->
-                <p class="lead">Sign in to access your 3B1G account</p>
+                <h1 class="hero-title">Welcome Back</h1>
+                <p class="hero-subtitle">Sign in to access your 3B1G account</p>
             </div>
         </div>
     </div>
 </div>
 
-<!-- 🔐 MAIN LOGIN SECTION: Contains the login form and test credentials -->
 <div class="container">
-    <!-- Center the login form on the page -->
     <div class="row justify-content-center">
         <div class="col-lg-5 col-md-7">
-            
-            <!-- 📋 LOGIN FORM CARD: Main login interface -->
-            <!-- Shadow-lg provides depth, border-0 removes default Bootstrap border -->
-            <div class="card border-0 shadow-lg">
-                <div class="card-body p-5">
-                    
-                    <!-- 🏷️ BRANDING SECTION: Logo and page identification -->
-                    <div class="text-center mb-4">
-                        <!-- Crown icon represents authority/premium feel -->
-                        <i class="fas fa-crown text-primary fa-3x mb-3"></i>
-                        <!-- Brand name in bold -->
-                        <h3 class="fw-bold">3B1G</h3>
-                        <!-- Instruction text in muted color for hierarchy -->
-                        <p class="text-muted">Please sign in to your account</p>
+            <!-- Main Login Card -->
+            <div class="login-card">
+                <div class="card-body">
+                    <div class="login-header">
+                        <div class="login-icon">
+                            <i class="fas fa-crown"></i>
+                        </div>
+                        <h3 class="login-title brand-font">3B1G</h3>
+                        <p class="login-subtitle">Please sign in to your account</p>
                     </div>
 
-                    <!-- 🚨 ERROR HANDLING: Display login failure messages -->
-                    <!-- Only shows if ViewBag.Error contains a message from the controller -->
                     @if (ViewBag.Error != null)
                     {
-                        <div class="alert alert-danger border-0 shadow-sm">
-                            <!-- Warning icon provides visual context for errors -->
+                        <div class="alert alert-danger">
                             <i class="fas fa-exclamation-circle me-2"></i>@ViewBag.Error
                         </div>
                     }
 
-                    <!-- 📝 LOGIN FORM: User authentication inputs -->
-                    <!-- Form posts to Auth controller's Login action -->
-                    <form asp-controller="Auth" asp-action="Login" method="post">
-                        
-                        <!-- 📧 EMAIL INPUT FIELD -->
-                        <div class="mb-4">
-                            <!-- Label with icon for better visual hierarchy -->
-                            <label for="email" class="form-label fw-semibold">
-                                <i class="fas fa-envelope me-2 text-muted"></i>Email Address
+                    <form asp-controller="Auth" asp-action="Login" method="post" class="login-form">
+                        <div class="form-group">
+                            <label for="email" class="form-label">
+                                <i class="fas fa-envelope me-2"></i>Email Address
                             </label>
-                            <!-- Large input for mobile-friendly interaction -->
-                            <!-- Required attribute provides client-side validation -->
-                            <input type="email" class="form-control form-control-lg" id="email" name="email" 
-                                   placeholder="Enter your email address" 
-                                   autocomplete="email"
-                                   required>
+                            <input type="email" class="form-control" id="email" name="email" 
+                                   placeholder="Enter your email address" required>
                         </div>
                         
-                        <!-- 🔒 PASSWORD INPUT FIELD -->
-                        <div class="mb-4">
-                            <!-- Label with lock icon for security context -->
-                            <label for="password" class="form-label fw-semibold">
-                                <i class="fas fa-lock me-2 text-muted"></i>Password
+                        <div class="form-group">
+                            <label for="password" class="form-label">
+                                <i class="fas fa-lock me-2"></i>Password
                             </label>
-                            <!-- Password input with autocomplete for better UX -->
-                            <input type="password" class="form-control form-control-lg" id="password" name="password" 
-                                   placeholder="Enter your password" 
-                                   autocomplete="current-password"
-                                   required>
+                            <input type="password" class="form-control" id="password" name="password" 
+                                   placeholder="Enter your password" required>
                         </div>
                         
-                        <!-- 🔄 REMEMBER ME CHECKBOX -->
-                        <!-- Added for better user experience -->
-                        <div class="mb-4 form-check">
-                            <input type="checkbox" class="form-check-input" id="rememberMe" name="rememberMe">
-                            <label class="form-check-label" for="rememberMe">
-                                Remember me on this device
-                            </label>
-                        </div>
-                        
-                        <!-- 🚀 SUBMIT BUTTON -->
-                        <!-- d-grid makes button full-width on mobile -->
-                        <div class="d-grid mb-4">
-                            <button type="submit" class="btn btn-primary btn-lg">
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary btn-lg w-100">
                                 <i class="fas fa-sign-in-alt me-2"></i>Sign In
                             </button>
                         </div>
                     </form>
 
-                    <!-- 🔗 ADDITIONAL LINKS SECTION -->
-                    <div class="text-center">
-                        <!-- Forgot password link -->
-                        <div class="mb-3">
-                            <a href="#" class="text-muted text-decoration-none">
-                                <i class="fas fa-question-circle me-1"></i>Forgot your password?
-                            </a>
-                        </div>
-                        
-                        <!-- 👶 SIGNUP LINK: Direct users to registration -->
-                        <p class="text-muted">
+                    <div class="login-footer">
+                        <p class="signup-link">
                             Don't have an account?
-                            <a asp-controller="Auth" asp-action="Signup" class="text-primary text-decoration-none fw-semibold">
+                            <a asp-controller="Auth" asp-action="Signup" class="link-primary">
                                 Create one here
                             </a>
                         </p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 🧪 TEST CREDENTIALS SECTION: For development/testing purposes -->
-            <!-- Helps developers and testers quickly access different user roles -->
-            <div class="card border-0 shadow-sm mt-4">
-                
-                <!-- Card header with background styling -->
-                <div class="card-header bg-light border-0">
-                    <h5 class="mb-0 text-center">
-                        <i class="fas fa-key me-2 text-primary"></i>Test Credentials
-                    </h5>
-                </div>
-                
-                <div class="card-body">
-                    <!-- Instructions for test users -->
-                    <p class="text-muted text-center mb-3">Use these credentials to test different user roles:</p>
-                    
-                    <!-- 🎭 THREE ROLE CARDS: Customer, Employee, Admin -->
-                    <!-- Each card represents a different user permission level -->
-                    <div class="row g-3">
                         
-                        <!-- 👤 CUSTOMER ROLE CARD -->
-                        <div class="col-md-4">
-                            <div class="card bg-primary bg-gradient text-white border-0 h-100">
-                                <div class="card-body text-center p-3">
-                                    <!-- User icon represents standard customer -->
-                                    <i class="fas fa-user fa-2x mb-2"></i>
-                                    <h6 class="card-title">Customer</h6>
-                                    <!-- Email credentials displayed -->
-                                    <small class="d-block">customer@example.com</small>
-                                    <small class="d-block">Password1</small>
-                                    <!-- Button to auto-fill form with these credentials -->
-                                    <button class="btn btn-light btn-sm mt-2" onclick="fillCredentials('customer@example.com', 'Password1')">
-                                        <i class="fas fa-copy me-1"></i>Use
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 👔 EMPLOYEE ROLE CARD -->
-                        <div class="col-md-4">
-                            <div class="card bg-success bg-gradient text-white border-0 h-100">
-                                <div class="card-body text-center p-3">
-                                    <!-- ID badge icon represents employee status -->
-                                    <i class="fas fa-id-badge fa-2x mb-2"></i>
-                                    <h6 class="card-title">Employee</h6>
-                                    <!-- Employee credentials -->
-                                    <small class="d-block">employee@example.com</small>
-                                    <small class="d-block">Passw0rd</small>
-                                    <!-- Auto-fill button for employee login -->
-                                    <button class="btn btn-light btn-sm mt-2" onclick="fillCredentials('employee@example.com', 'Passw0rd')">
-                                        <i class="fas fa-copy me-1"></i>Use
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 👑 ADMIN ROLE CARD -->
-                        <div class="col-md-4">
-                            <div class="card bg-warning bg-gradient text-white border-0 h-100">
-                                <div class="card-body text-center p-3">
-                                    <!-- Crown icon represents highest authority -->
-                                    <i class="fas fa-crown fa-2x mb-2"></i>
-                                    <h6 class="card-title">Admin</h6>
-                                    <!-- Administrator credentials -->
-                                    <small class="d-block">administrator@example.com</small>
-                                    <small class="d-block">Pa$$w0rd</small>
-                                    <!-- Auto-fill button for admin login -->
-                                    <button class="btn btn-light btn-sm mt-2" onclick="fillCredentials('administrator@example.com', 'Pa$$w0rd')">
-                                        <i class="fas fa-copy me-1"></i>Use
-                                    </button>
-                                </div>
-                            </div>
+                        <!-- Test Credentials Button -->
+                        <div class="test-credentials-trigger">
+                            <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#testCredentialsModal">
+                                <i class="fas fa-key me-1"></i>Test Credentials
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -198,76 +80,383 @@
     </div>
 </div>
 
-<!-- 💻 JAVASCRIPT FUNCTIONALITY SECTION -->
+<!-- Test Credentials Modal -->
+<div class="modal fade" id="testCredentialsModal" tabindex="-1" aria-labelledby="testCredentialsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="testCredentialsModalLabel">
+                    <i class="fas fa-key me-2"></i>Test Credentials
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-center mb-4">Use these credentials to test different user roles:</p>
+                
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="credential-group">
+                            <h6 class="credential-title-modal">Admin</h6>
+                            <p class="credential-details-modal">
+                                <small class="credential-email-modal">administrator@example.com</small>
+                                <small class="credential-password-modal">Pa$$w0rd</small>
+                            </p>
+                            <button class="btn btn-primary btn-sm" onclick="fillCredentialsFromModal('administrator@example.com', 'Pa$$w0rd')">
+                                <i class="fas fa-copy me-1"></i>Use Admin Credentials
+                            </button>
+                        </div>
+                        
+                        <div class="credential-group">
+                            <h6 class="credential-title-modal">Customer</h6>
+                            <p class="credential-details-modal">
+                                <small class="credential-email-modal">customer@example.com</small>
+                                <small class="credential-password-modal">Password1</small>
+                            </p>
+                            <button class="btn btn-primary btn-sm" onclick="fillCredentialsFromModal('customer@example.com', 'Password1')">
+                                <i class="fas fa-copy me-1"></i>Use Customer Credentials
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        /* Login Hero Section */
+        .login-hero-section {
+            background: var(--background);
+            padding: 4rem 0 2rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .login-hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            height: 1px;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(255, 255, 255, 0.2) 20%, 
+                rgba(255, 255, 255, 0.4) 50%, 
+                rgba(255, 255, 255, 0.2) 80%, 
+                transparent 100%);
+        }
+
+        .hero-title {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--foreground);
+            margin-bottom: 1rem;
+            letter-spacing: -0.025em;
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            color: var(--muted-foreground);
+            margin: 0;
+        }
+
+        /* Main Login Card */
+        .login-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-xl);
+            margin-bottom: 2rem;
+            transition: var(--transition);
+        }
+
+        .login-card:hover {
+            box-shadow: var(--shadow-xl);
+            border-color: var(--muted-foreground);
+        }
+
+        .login-card .card-body {
+            padding: 3rem;
+        }
+
+        /* Login Header */
+        .login-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .login-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--muted);
+            border: 2px solid var(--border);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2rem;
+            color: var(--primary);
+            transition: var(--transition);
+        }
+
+        .login-card:hover .login-icon {
+            transform: scale(1.1);
+            border-color: var(--primary);
+            background: var(--secondary);
+        }
+
+        .login-title {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--foreground);
+            margin-bottom: 0.5rem;
+        }
+
+        .login-subtitle {
+            color: var(--muted-foreground);
+            margin: 0;
+        }
+
+        /* Login Form */
+        .login-form {
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            color: var(--foreground);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .form-label i {
+            color: var(--primary);
+        }
+
+        .form-control {
+            padding: 0.875rem 1.25rem;
+            font-size: 1rem;
+            border-radius: var(--border-radius-sm);
+            border: 1px solid var(--border);
+            background: var(--input);
+            color: var(--foreground);
+            transition: var(--transition-fast);
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.25);
+            background: var(--input);
+            color: var(--foreground);
+        }
+
+        .form-control::placeholder {
+            color: var(--muted-foreground);
+        }
+
+        /* Login Footer */
+        .login-footer {
+            text-align: center;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .signup-link {
+            color: var(--muted-foreground);
+            margin-bottom: 1rem;
+        }
+
+        .link-primary {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition-fast);
+        }
+
+        .link-primary:hover {
+            color: var(--foreground);
+            text-decoration: underline;
+        }
+
+        /* Test Credentials Trigger */
+        .test-credentials-trigger {
+            margin-top: 1rem;
+        }
+
+        .test-credentials-trigger .btn {
+            border-radius: var(--border-radius-sm);
+            transition: var(--transition);
+        }
+
+        .test-credentials-trigger .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* Modal Styles */
+        .modal-content {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--border-radius);
+        }
+
+        .modal-header {
+            border-bottom: 1px solid var(--border);
+            background: var(--secondary);
+        }
+
+        .modal-title {
+            color: var(--foreground);
+            font-weight: 600;
+        }
+
+        .modal-title i {
+            color: var(--primary);
+        }
+
+        .modal-body {
+            background: var(--card);
+            color: var(--foreground);
+        }
+
+        .modal-footer {
+            border-top: 1px solid var(--border);
+            background: var(--secondary);
+        }
+
+        .btn-close {
+            filter: invert(1);
+        }
+
+        /* Modal Credential Cards */
+        .credential-group {
+            text-align: left;
+            margin-bottom: 1rem;
+        }
+
+        .credential-title-modal {
+            color: var(--foreground);
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        .credential-details-modal {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .credential-email-modal,
+        .credential-password-modal {
+            color: var(--muted-foreground);
+            font-size: 0.8rem;
+            font-family: 'Consolas', 'Monaco', monospace;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--border-radius-sm);
+            padding: 0.25rem 0.5rem;
+            display: block;
+        }
+
+        /* Responsive Design */
+        @@media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+
+            .login-card .card-body {
+                padding: 2rem;
+            }
+
+            .modal-dialog {
+                margin: 1rem;
+            }
+
+            .credential-group {
+                padding: 0.75rem;
+            }
+        }
+
+        @@media (max-width: 576px) {
+            .hero-title {
+                font-size: 2rem;
+            }
+
+            .login-card .card-body {
+                padding: 1.5rem;
+            }
+
+            .modal-dialog {
+                margin: 0.5rem;
+            }
+
+            .credential-group {
+                padding: 0.75rem;
+            }
+        }
+    </style>
+}
+
 @section Scripts {
     <script>
-        /**
-         * 🔄 AUTO-FILL CREDENTIALS FUNCTION
-         * Automatically fills the login form with selected test credentials
-         * @param {string} email - The email address to fill
-         * @param {string} password - The password to fill
-         */
-        function fillCredentials(email, password) {
-            // Get form elements and populate with provided credentials
+        function fillCredentialsFromModal(email, password) {
+            // Fill the credentials
             document.getElementById('email').value = email;
             document.getElementById('password').value = password;
             
-            // 🎨 VISUAL FEEDBACK: Show user that action was successful
+            // Add visual feedback
             const button = event.target;
             const originalText = button.innerHTML;
+            const originalClass = button.className;
             
-            // Change button appearance to indicate success
             button.innerHTML = '<i class="fas fa-check me-1"></i>Filled!';
-            button.classList.add('btn-success');
-            button.classList.remove('btn-light');
+            button.className = 'btn btn-success btn-sm';
             
-            // 🕐 RESET BUTTON: Return to original state after 1.5 seconds
             setTimeout(() => {
                 button.innerHTML = originalText;
-                button.classList.remove('btn-success');
-                button.classList.add('btn-light');
-            }, 1500);
+                button.className = originalClass;
+            }, 1000);
+            
+            // Close modal after a brief delay
+            setTimeout(() => {
+                const modal = bootstrap.Modal.getInstance(document.getElementById('testCredentialsModal'));
+                if (modal) {
+                    modal.hide();
+                }
+            }, 1200);
         }
 
-        /**
-         * 🎯 AUTO-FOCUS FUNCTIONALITY
-         * Automatically focuses on email input when page loads for better UX
-         * This improves accessibility and user experience
-         */
+        // Auto-focus email field
         document.addEventListener('DOMContentLoaded', function() {
-            // Focus on email field so user can start typing immediately
             document.getElementById('email').focus();
         });
 
-        /**
-         * 📱 FORM VALIDATION ENHANCEMENT
-         * Add additional client-side validation for better user experience
-         */
+        // Add smooth entrance animation
         document.addEventListener('DOMContentLoaded', function() {
-            const form = document.querySelector('form');
-            const emailInput = document.getElementById('email');
-            const passwordInput = document.getElementById('password');
-            
-            // Add real-time validation feedback
-            emailInput.addEventListener('blur', function() {
-                if (!this.value.includes('@')) {
-                    this.classList.add('is-invalid');
-                } else {
-                    this.classList.remove('is-invalid');
-                    this.classList.add('is-valid');
-                }
-            });
-            
-            // Password strength indicator (basic)
-            passwordInput.addEventListener('input', function() {
-                if (this.value.length < 6) {
-                    this.classList.add('is-invalid');
-                    this.classList.remove('is-valid');
-                } else {
-                    this.classList.remove('is-invalid');
-                    this.classList.add('is-valid');
-                }
-            });
+            const loginCard = document.querySelector('.login-card');
+            if (loginCard) {
+                loginCard.style.opacity = '0';
+                loginCard.style.transform = 'translateY(20px)';
+                loginCard.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                
+                setTimeout(() => {
+                    loginCard.style.opacity = '1';
+                    loginCard.style.transform = 'translateY(0)';
+                }, 200);
+            }
         });
     </script>
-}
+} 

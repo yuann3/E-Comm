@@ -15,6 +15,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Nabla&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true"/>
     <link rel="stylesheet" href="~/E_Comm.styles.css" asp-append-version="true"/>
+    @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
 <header>
@@ -54,6 +55,18 @@
                 <ul class="navbar-nav">
                     @if (User.Identity?.IsAuthenticated == true)
                     {
+                        @if (User.IsInRole("Customer") || User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item me-3">
+                                <a class="nav-link position-relative" asp-controller="Customer" asp-action="ViewCart">
+                                    <i class="fas fa-shopping-cart"></i>
+                                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary cart-count" 
+                                          style="font-size: 0.6rem; display: none;">
+                                        0
+                                    </span>
+                                </a>
+                            </li>
+                        }
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" 
                                role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -65,25 +78,24 @@
                                 {
                                     <li><h6 class="dropdown-header"><i class="fas fa-crown me-2"></i>Administrator</h6></li>
                                     <li><a class="dropdown-item" asp-controller="Admin" asp-action="Index">
-                                        <i class="fas fa-tachometer-alt me-2"></i>Dashboard</a></li>
+                                        <i class="fas fa-tachometer-alt me-2"></i>Admin Dashboard</a></li>
                                     <li><a class="dropdown-item" asp-controller="Admin" asp-action="ManageItems">
                                         <i class="fas fa-boxes me-2"></i>Manage Items</a></li>
                                     <li><a class="dropdown-item" asp-controller="Admin" asp-action="ManageUsers">
                                         <i class="fas fa-users-cog me-2"></i>Manage Users</a></li>
                                     <li><hr class="dropdown-divider"></li>
-                                }
-                                @if (User.IsInRole("Employee"))
-                                {
-                                    <li><h6 class="dropdown-header"><i class="fas fa-id-badge me-2"></i>Employee</h6></li>
-                                    <li><a class="dropdown-item" asp-controller="Employee" asp-action="Index">
-                                        <i class="fas fa-tachometer-alt me-2"></i>Dashboard</a></li>
-                                    <li><a class="dropdown-item" asp-controller="Employee" asp-action="ViewItems">
-                                        <i class="fas fa-boxes me-2"></i>View Items</a></li>
-                                    <li><a class="dropdown-item" asp-controller="Employee" asp-action="ViewAccounts">
-                                        <i class="fas fa-users me-2"></i>View Accounts</a></li>
+                                    <li><h6 class="dropdown-header"><i class="fas fa-user me-2"></i>Customer Functions</h6></li>
+                                    <li><a class="dropdown-item" asp-controller="Customer" asp-action="Index">
+                                        <i class="fas fa-tachometer-alt me-2"></i>Customer Dashboard</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Customer" asp-action="MyAccount">
+                                        <i class="fas fa-user-edit me-2"></i>My Account</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Customer" asp-action="OrderHistory">
+                                        <i class="fas fa-history me-2"></i>Order History</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Customer" asp-action="Browse">
+                                        <i class="fas fa-search me-2"></i>Browse Products</a></li>
                                     <li><hr class="dropdown-divider"></li>
                                 }
-                                @if (User.IsInRole("Customer"))
+                                @if (User.IsInRole("Customer") && !User.IsInRole("Admin"))
                                 {
                                     <li><h6 class="dropdown-header"><i class="fas fa-user me-2"></i>Customer</h6></li>
                                     <li><a class="dropdown-item" asp-controller="Customer" asp-action="Index">
@@ -239,6 +251,39 @@
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 <script src="~/js/site.js" asp-append-version="true"></script>
+
+@if (User.Identity?.IsAuthenticated == true && (User.IsInRole("Customer") || User.IsInRole("Admin")))
+{
+    <script>
+        // Update cart count on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCartCount();
+        });
+
+        function updateCartCount() {
+            fetch('@Url.Action("GetCartCount", "Customer")')
+                .then(response => response.json())
+                .then(data => {
+                    const cartBadge = document.querySelector('.cart-count');
+                    if (cartBadge) {
+                        if (data.count > 0) {
+                            cartBadge.textContent = data.count;
+                            cartBadge.style.display = 'inline-block';
+                        } else {
+                            cartBadge.style.display = 'none';
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error updating cart count:', error);
+                });
+        }
+
+        // Update cart count when items are added (call this function from other pages)
+        window.updateCartCount = updateCartCount;
+    </script>
+}
+
 @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

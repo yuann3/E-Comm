@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace E_Comm.Migrations
 {
     [DbContext(typeof(EntertainmentGuildContext))]
-    [Migration("20250606081222_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20250710114601_FinalInitialCreate")]
+    partial class FinalInitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -396,7 +396,10 @@ namespace E_Comm.Migrations
                         .HasColumnType("nvarchar(32)");
 
                     b.Property<int>("UserID")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserID"));
 
                     b.HasKey("UserName");
 

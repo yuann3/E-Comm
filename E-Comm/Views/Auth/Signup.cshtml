@@ -1,156 +1,123 @@
 ﻿@model E_Comm.Models.User
 @{
-    // Set the page title that will appear in the browser tab
     ViewData["Title"] = "Sign Up - 3B1G";
 }
 
-<!-- Hero Section: Eye-catching header with gradient background -->
-<div class="bg-gradient text-white py-5 mb-5" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+<!-- Hero Section -->
+<div class="signup-hero-section">
     <div class="container">
         <div class="row justify-content-center text-center">
             <div class="col-lg-6">
-                <!-- Main heading for the signup page -->
-                <h1 class="display-5 fw-bold mb-3">Join 3B1G</h1>
-                <!-- Subtitle to encourage user registration -->
-                <p class="lead">Create your account and start your entertainment journey</p>
+                <h1 class="hero-title">Join 3B1G</h1>
+                <p class="hero-subtitle">Create your account and start your entertainment journey</p>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Main Content Container -->
 <div class="container">
     <div class="row justify-content-center">
-        <!-- Responsive column that adjusts size based on screen size -->
         <div class="col-lg-6 col-md-8">
-            <!-- Main signup card with shadow for modern look -->
-            <div class="card border-0 shadow-lg">
-                <div class="card-body p-5">
-                    <!-- Card header with icon and title -->
-                    <div class="text-center mb-4">
-                        <!-- FontAwesome user-plus icon -->
-                        <i class="fas fa-user-plus text-primary fa-3x mb-3"></i>
-                        <h3 class="fw-bold">Create Account</h3>
-                        <!-- Encouraging message for user registration -->
-                        <p class="text-muted">Join the 3B1G community today</p>
+            <!-- Main Signup Card -->
+            <div class="signup-card">
+                <div class="card-body">
+                    <div class="signup-header">
+                        <div class="signup-icon">
+                            <i class="fas fa-user-plus"></i>
+                        </div>
+                        <h3 class="signup-title">Create Account</h3>
+                        <p class="signup-subtitle">Join the 3B1G community today</p>
                     </div>
 
-                    <!-- Error Message Display -->
-                    <!-- This block displays server-side validation errors -->
                     @if (ViewBag.Error != null)
                     {
-                        <div class="alert alert-danger border-0 shadow-sm">
+                        <div class="alert alert-danger">
                             <i class="fas fa-exclamation-circle me-2"></i>@ViewBag.Error
                         </div>
                     }
 
-                    <!-- Success Message Display -->
-                    <!-- This block displays success messages (e.g., account created successfully) -->
                     @if (TempData["Success"] != null)
                     {
-                        <div class="alert alert-success border-0 shadow-sm">
+                        <div class="alert alert-success">
                             <i class="fas fa-check-circle me-2"></i>@TempData["Success"]
                         </div>
                     }
 
-                    <!-- Main Registration Form -->
-                    <!-- Form posts to AuthController's Signup action -->
-                    <form asp-controller="Auth" asp-action="Signup" method="post">
-                        <!-- First Row: Username and Full Name (side by side on larger screens) -->
-                        <div class="row">
-                            <!-- Username Field -->
-                            <div class="col-md-6 mb-4">
-                                <label asp-for="UserName" class="form-label fw-semibold">
-                                    <i class="fas fa-user me-2 text-muted"></i>Username
+                    <form asp-controller="Auth" asp-action="Signup" method="post" class="signup-form">
+                        <div class="form-row">
+                            <div class="form-group form-group-half">
+                                <label asp-for="UserName" class="form-label">
+                                    <i class="fas fa-user me-2"></i>Username
                                 </label>
-                                <!-- Input field bound to UserName model property -->
-                                <input asp-for="UserName" class="form-control form-control-lg"
+                                <input asp-for="UserName" class="form-control"
                                        placeholder="Choose a username" required>
-                                <!-- Client-side validation message container -->
                                 <span asp-validation-for="UserName" class="text-danger small"></span>
                             </div>
 
-                            <!-- Full Name Field -->
-                            <div class="col-md-6 mb-4">
-                                <label asp-for="Name" class="form-label fw-semibold">
-                                    <i class="fas fa-id-card me-2 text-muted"></i>Full Name
+                            <div class="form-group form-group-half">
+                                <label asp-for="Name" class="form-label">
+                                    <i class="fas fa-id-card me-2"></i>Full Name
                                 </label>
-                                <!-- Input field bound to Name model property -->
-                                <input asp-for="Name" class="form-control form-control-lg"
+                                <input asp-for="Name" class="form-control"
                                        placeholder="Enter your full name" required>
-                                <!-- Client-side validation message container -->
                                 <span asp-validation-for="Name" class="text-danger small"></span>
                             </div>
                         </div>
 
-                        <!-- Email Address Field (full width) -->
-                        <div class="mb-4">
-                            <label asp-for="Email" class="form-label fw-semibold">
-                                <i class="fas fa-envelope me-2 text-muted"></i>Email Address
+                        <div class="form-group">
+                            <label asp-for="Email" class="form-label">
+                                <i class="fas fa-envelope me-2"></i>Email Address
                             </label>
-                            <!-- Email input with built-in browser validation -->
-                            <input asp-for="Email" type="email" class="form-control form-control-lg"
+                            <input asp-for="Email" type="email" class="form-control"
                                    placeholder="Enter your email address" required>
-                            <!-- Client-side validation message container -->
                             <span asp-validation-for="Email" class="text-danger small"></span>
                         </div>
 
-                        <!-- Password Row: Password and Confirm Password (side by side) -->
-                        <div class="row">
-                            <!-- Password Field -->
-                            <div class="col-md-6 mb-4">
-                                <label for="password" class="form-label fw-semibold">
-                                    <i class="fas fa-lock me-2 text-muted"></i>Password
+                        <div class="form-row">
+                            <div class="form-group form-group-half">
+                                <label for="password" class="form-label">
+                                    <i class="fas fa-lock me-2"></i>Password
                                 </label>
-                                <!-- Password input field -->
-                                <input type="password" class="form-control form-control-lg" id="password" name="password"
+                                <input type="password" class="form-control" id="password" name="password"
                                        placeholder="Create a password" required>
-                                <!-- Password requirements help text -->
-                                <div class="form-text">
-                                    <small class="text-muted">
+                                <div class="form-hint">
+                                    <small>
                                         <i class="fas fa-info-circle me-1"></i>
                                         Password should be at least 6 characters long
                                     </small>
                                 </div>
                             </div>
 
-                            <!-- Confirm Password Field -->
-                            <div class="col-md-6 mb-4">
-                                <label for="confirmPassword" class="form-label fw-semibold">
-                                    <i class="fas fa-lock me-2 text-muted"></i>Confirm Password
+                            <div class="form-group form-group-half">
+                                <label for="confirmPassword" class="form-label">
+                                    <i class="fas fa-lock me-2"></i>Confirm Password
                                 </label>
-                                <!-- Confirm password input field -->
-                                <input type="password" class="form-control form-control-lg" id="confirmPassword" name="confirmPassword"
+                                <input type="password" class="form-control" id="confirmPassword" name="confirmPassword"
                                        placeholder="Confirm your password" required>
                             </div>
                         </div>
 
-                        <!-- Terms and Conditions Checkbox -->
-                        <div class="mb-4">
+                        <div class="form-group">
                             <div class="form-check">
-                                <!-- Required checkbox for terms acceptance -->
                                 <input class="form-check-input" type="checkbox" id="termsCheck" required>
                                 <label class="form-check-label" for="termsCheck">
-                                    I agree to the <a href="#" class="text-primary">Terms of Service</a> and
-                                    <a href="#" class="text-primary">Privacy Policy</a>
+                                    I agree to the <a href="#" class="link-primary">Terms of Service</a> and
+                                    <a href="#" class="link-primary">Privacy Policy</a>
                                 </label>
                             </div>
                         </div>
 
-                        <!-- Submit Button -->
-                        <div class="d-grid mb-4">
-                            <button type="submit" class="btn btn-primary btn-lg">
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary btn-lg w-100">
                                 <i class="fas fa-user-plus me-2"></i>Create Account
                             </button>
                         </div>
                     </form>
 
-                    <!-- Login Link Section -->
-                    <!-- For users who already have an account -->
-                    <div class="text-center">
-                        <p class="text-muted">
+                    <div class="signup-footer">
+                        <p class="signin-link">
                             Already have an account?
-                            <a asp-controller="Auth" asp-action="Login" class="text-primary text-decoration-none fw-semibold">
+                            <a asp-controller="Auth" asp-action="Login" class="link-primary">
                                 Sign in here
                             </a>
                         </p>
@@ -158,111 +125,453 @@
                 </div>
             </div>
 
-            <!-- Benefits Card: Shows why users should join -->
-            <div class="card border-10 shadow-sm mt-4">
-                <!-- Card header with benefits title -->
-                <div class="card-header bg-light border-0 d-flex justify-content-center align-items-center" style="height: 100px;">
-                    <h5 class="mb-0 text-center text-dark fs-1">
-                        <i class="fas fa-star me-2 text-primary"></i>Why Join 3B1G?
-                    </h5>
-                </div>
-                <!-- Benefits content -->
-                <div class="card-body">
-                    <div class="row g-3 text-center">
-                        <!-- Benefit 1: Easy Shopping -->
-                        <div class="col-md-4">
-                            <div class="p-3">
-                                <i class="fas fa-shopping-cart text-primary fa-2x mb-2"></i>
-                                <h6 class="fw-bold">Easy Shopping</h6>
-                                <small class="text-muted">Browse and purchase with ease</small>
-                            </div>
-                        </div>
-                        <!-- Benefit 2: Order Tracking -->
-                        <div class="col-md-4">
-                            <div class="p-3">
-                                <i class="fas fa-history text-success fa-2x mb-2"></i>
-                                <h6 class="fw-bold">Order Tracking</h6>
-                                <small class="text-muted">Track your orders in real-time</small>
-                            </div>
-                        </div>
-                        <!-- Benefit 3: Personalized Experience -->
-                        <div class="col-md-4">
-                            <div class="p-3">
-                                <i class="fas fa-heart text-danger fa-2x mb-2"></i>
-                                <h6 class="fw-bold">Personalized</h6>
-                                <small class="text-muted">Get recommendations just for you</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            
         </div>
     </div>
 </div>
 
+@section Styles {
+    <style>
+        /* Signup Hero Section */
+        .signup-hero-section {
+            background: var(--background);
+            padding: 4rem 0 2rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .signup-hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            height: 1px;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(255, 255, 255, 0.2) 20%, 
+                rgba(255, 255, 255, 0.4) 50%, 
+                rgba(255, 255, 255, 0.2) 80%, 
+                transparent 100%);
+        }
+
+        .hero-title {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--foreground);
+            margin-bottom: 1rem;
+            letter-spacing: -0.025em;
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            color: var(--muted-foreground);
+            margin: 0;
+        }
+
+        /* Main Signup Card */
+        .signup-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-xl);
+            margin-bottom: 2rem;
+            transition: var(--transition);
+        }
+
+        .signup-card:hover {
+            box-shadow: var(--shadow-xl);
+            border-color: var(--muted-foreground);
+        }
+
+        .signup-card .card-body {
+            padding: 3rem;
+        }
+
+        /* Signup Header */
+        .signup-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .signup-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--muted);
+            border: 2px solid var(--border);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2rem;
+            color: var(--primary);
+            transition: var(--transition);
+        }
+
+        .signup-card:hover .signup-icon {
+            transform: scale(1.1);
+            border-color: var(--primary);
+            background: var(--secondary);
+        }
+
+        .signup-title {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--foreground);
+            margin-bottom: 0.5rem;
+        }
+
+        .signup-subtitle {
+            color: var(--muted-foreground);
+            margin: 0;
+        }
+
+        /* Signup Form */
+        .signup-form {
+            margin-bottom: 2rem;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group-half {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        .form-label {
+            color: var(--foreground);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .form-label i {
+            color: var(--primary);
+        }
+
+        .form-control {
+            padding: 0.875rem 1.25rem;
+            font-size: 1rem;
+            border-radius: var(--border-radius-sm);
+            border: 1px solid var(--border);
+            background: var(--input);
+            color: var(--foreground);
+            transition: var(--transition-fast);
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.25);
+            background: var(--input);
+            color: var(--foreground);
+        }
+
+        .form-control::placeholder {
+            color: var(--muted-foreground);
+        }
+
+        .form-control.is-valid {
+            border-color: var(--primary);
+        }
+
+        .form-control.is-invalid {
+            border-color: var(--destructive);
+        }
+
+        .form-hint {
+            margin-top: 0.5rem;
+        }
+
+        .form-hint small {
+            color: var(--muted-foreground);
+            font-size: 0.825rem;
+        }
+
+        .form-hint i {
+            color: var(--primary);
+        }
+
+        .form-check {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .form-check-input {
+            width: 1.25rem;
+            height: 1.25rem;
+            border: 2px solid var(--border);
+            border-radius: var(--border-radius-sm);
+            background: var(--input);
+            margin: 0;
+            flex-shrink: 0;
+        }
+
+        .form-check-input:checked {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .form-check-input:focus {
+            box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.25);
+        }
+
+        .form-check-label {
+            color: var(--muted-foreground);
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .link-primary {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition-fast);
+        }
+
+        .link-primary:hover {
+            color: var(--foreground);
+            text-decoration: underline;
+        }
+
+        /* Signup Footer */
+        .signup-footer {
+            text-align: center;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .signin-link {
+            color: var(--muted-foreground);
+            margin: 0;
+        }
+
+        /* Benefits Card */
+        .benefits-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .benefits-card:hover {
+            box-shadow: var(--shadow-lg);
+            border-color: var(--muted-foreground);
+        }
+
+        .benefits-header {
+            padding: 2rem;
+            border-bottom: 1px solid var(--border);
+            background: var(--secondary);
+            text-align: center;
+        }
+
+        .benefits-title {
+            color: var(--foreground);
+            font-weight: 600;
+            margin: 0;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .benefits-title i {
+            color: var(--primary);
+        }
+
+        .benefits-body {
+            padding: 2rem;
+        }
+
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+        }
+
+        .benefit-item {
+            text-align: center;
+        }
+
+        .benefit-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--muted);
+            border: 2px solid var(--border);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 1.5rem;
+            color: var(--primary);
+            transition: var(--transition);
+        }
+
+        .benefit-item:hover .benefit-icon {
+            transform: scale(1.1);
+            border-color: var(--primary);
+            background: var(--secondary);
+        }
+
+        .benefit-content {
+            text-align: center;
+        }
+
+        .benefit-title {
+            color: var(--foreground);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .benefit-description {
+            color: var(--muted-foreground);
+            line-height: 1.4;
+        }
+
+        /* Responsive Design */
+        @@media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+
+            .signup-card .card-body {
+                padding: 2rem;
+            }
+
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+
+            .form-group-half {
+                margin-bottom: 1.5rem;
+            }
+
+            .benefits-body {
+                padding: 1.5rem;
+            }
+
+            .benefits-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+        }
+
+        @@media (max-width: 576px) {
+            .hero-title {
+                font-size: 2rem;
+            }
+
+            .signup-card .card-body {
+                padding: 1.5rem;
+            }
+
+            .benefits-header {
+                padding: 1.5rem;
+            }
+
+            .benefits-body {
+                padding: 1rem;
+            }
+
+            .benefits-grid {
+                gap: 1rem;
+            }
+        }
+    </style>
+}
+
 @section Scripts {
     <script>
-        // Client-side JavaScript for enhanced user experience
-        
-        // Password Confirmation Validation
-        // Validates that both password fields match in real-time
+        // Password confirmation validation
         document.getElementById('confirmPassword').addEventListener('input', function() {
             const password = document.getElementById('password').value;
             const confirmPassword = this.value;
 
-            // Check if passwords match
             if (confirmPassword && password !== confirmPassword) {
-                // Set custom validation message if passwords don't match
                 this.setCustomValidity('Passwords do not match');
                 this.classList.add('is-invalid');
+                this.classList.remove('is-valid');
             } else {
-                // Clear validation message if passwords match
                 this.setCustomValidity('');
                 this.classList.remove('is-invalid');
-                // Add valid styling if confirm password has content
                 if (confirmPassword) {
                     this.classList.add('is-valid');
                 }
             }
         });
 
-        // Password Field Event Listener
-        // Triggers re-validation of confirm password when password changes
+        // Password strength indicator
         document.getElementById('password').addEventListener('input', function() {
             const password = this.value;
             const confirmPassword = document.getElementById('confirmPassword');
 
+            // Add visual feedback for password strength
+            if (password.length >= 6) {
+                this.classList.add('is-valid');
+                this.classList.remove('is-invalid');
+            } else if (password.length > 0) {
+                this.classList.add('is-invalid');
+                this.classList.remove('is-valid');
+            }
+
             // Reset confirm password validation when password changes
             if (confirmPassword.value) {
-                // Trigger input event to re-validate confirm password
                 confirmPassword.dispatchEvent(new Event('input'));
             }
         });
 
-        // Auto-focus Username Field
-        // Automatically focuses the username field when page loads for better UX
+        // Auto-focus username field
         document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('UserName').focus();
+            const usernameField = document.getElementById('UserName');
+            if (usernameField) {
+                usernameField.focus();
+            }
         });
 
-        // Form Submission Validation
-        // Final validation check before form submission
+        // Form validation feedback
         document.querySelector('form').addEventListener('submit', function(e) {
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
 
-            // Prevent form submission if passwords don't match
             if (password !== confirmPassword) {
-                e.preventDefault(); // Stop form submission
+                e.preventDefault();
                 document.getElementById('confirmPassword').classList.add('is-invalid');
-                document.getElementById('confirmPassword').focus(); // Focus the problematic field
+                document.getElementById('confirmPassword').focus();
             }
+        });
+
+        // Add smooth entrance animation
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.signup-card, .benefits-card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                
+                setTimeout(() => {
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 200);
+            });
         });
     </script>
 
     @{
-        // Include ASP.NET Core client-side validation scripts
-        // This partial view includes jQuery validation and unobtrusive validation
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 }

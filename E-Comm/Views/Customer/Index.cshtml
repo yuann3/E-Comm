@@ -52,11 +52,16 @@
                         <p class="card-text">Track your orders and view your complete purchase history.</p>
                     </div>
                     
-                    @if (ViewBag.RecentOrders != null && ((List<E_Comm.Models.Order>)ViewBag.RecentOrders).Count > 0)
+                    @{
+                        var recentOrders = ViewBag.RecentOrders as List<E_Comm.Models.Order>;
+                        var orderCount = recentOrders?.Count ?? 0;
+                    }
+                    
+                    @if (orderCount > 0)
                     {
                         <div class="alert alert-info text-center mb-3">
                             <i class="fas fa-info-circle me-2"></i>
-                            You have @((List<E_Comm.Models.Order>)ViewBag.RecentOrders).Count recent orders
+                            You have @orderCount recent orders
                         </div>
                     }
                     else

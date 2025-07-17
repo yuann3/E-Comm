@@ -4,7 +4,6 @@ namespace E_Comm.Models
 {
     public class User
     {
-        [Key]
         public int UserID { get; set; }
         
         [Required]
@@ -26,8 +25,6 @@ namespace E_Comm.Models
         [StringLength(64)]
         public string? HashPW { get; set; }
         
-
-        public bool IsEmployee => !IsAdmin && !string.IsNullOrEmpty(UserName);
-        public bool IsCustomer => !IsAdmin && !IsEmployee;
+        public bool IsCustomer => !IsAdmin;
     }
 } 

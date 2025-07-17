@@ -1,0 +1,879 @@
+@model E_Comm.Models.Cart
+@{
+    ViewData["Title"] = "Shopping Cart";
+}
+
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <!-- Cart Header -->
+            <div class="cart-header">
+                <div class="cart-title-section">
+                    <h1 class="cart-title">
+                        <i class="fas fa-shopping-cart me-2"></i>Your Cart
+                    </h1>
+                </div>
+                @if (Model.Items.Any())
+                {
+                    <div class="cart-actions">
+                        <a asp-controller="Customer" asp-action="Browse" class="btn btn-outline-primary">
+                            <i class="fas fa-plus me-2"></i>Add More Items
+                        </a>
+                    </div>
+                }
+            </div>
+
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle me-2"></i>@TempData["Success"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i>@TempData["Error"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            @if (Model.Items.Any())
+            {
+                <div class="row">
+                    <!-- Cart Items -->
+                    <div class="col-lg-8">
+                        <div class="cart-items-section">
+                            <div class="section-header">
+                                <h4 class="section-title">
+                                    <i class="fas fa-list me-2"></i>Cart Items (@Model.TotalItems)
+                                </h4>
+                            </div>
+                            <div class="cart-items-container">
+                                @foreach (var item in Model.Items)
+                                {
+                                    <div class="cart-item-card">
+                                        <div class="cart-item-content">
+                                            <!-- Product Icon & Info -->
+                                            <div class="product-section">
+                                                <div class="product-icon-wrapper">
+                                                    <div class="product-icon">
+                                                        @if (item.GenreName.ToLower().Contains("book"))
+                                                        {
+                                                            <i class="fas fa-book text-info"></i>
+                                                        }
+                                                        else if (item.GenreName.ToLower().Contains("movie"))
+                                                        {
+                                                            <i class="fas fa-film text-danger"></i>
+                                                        }
+                                                        else if (item.GenreName.ToLower().Contains("game"))
+                                                        {
+                                                            <i class="fas fa-gamepad text-success"></i>
+                                                        }
+                                                        else
+                                                        {
+                                                            <i class="fas fa-cube text-warning"></i>
+                                                        }
+                                                    </div>
+                                                </div>
+                                                <div class="product-details">
+                                                    <h5 class="product-name">@item.ProductName</h5>
+                                                    <div class="product-meta">
+                                                        <span class="meta-item">
+                                                            <i class="fas fa-user"></i>@item.ProductAuthor
+                                                        </span>
+                                                        <span class="meta-item">
+                                                            <i class="fas fa-tag"></i>@item.GenreName
+                                                        </span>
+                                                        <span class="meta-item">
+                                                            <i class="fas fa-store"></i>@item.SourceName
+                                                        </span>
+                                                    </div>
+                                                    <div class="unit-price">
+                                                        <span class="price-label">Unit Price:</span>
+                                                        <span class="price-value">$@item.Price.ToString("F2")</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Quantity Controls -->
+                                            <div class="quantity-section">
+                                                <label class="quantity-label">Quantity</label>
+                                                <div class="quantity-controls-modern">
+                                                    <button class="quantity-btn-modern minus" 
+                                                            type="button" 
+                                                            onclick="updateQuantity(@item.StocktakeId, @item.Quantity - 1)"
+                                                            @(item.Quantity <= 1 ? "disabled" : "")>
+                                                        <i class="fas fa-minus"></i>
+                                                    </button>
+                                                    <input type="number" 
+                                                           class="quantity-input-modern" 
+                                                           value="@item.Quantity" 
+                                                           min="1" 
+                                                           max="@item.MaxQuantity"
+                                                           id="quantity-@item.StocktakeId"
+                                                           onchange="updateQuantity(@item.StocktakeId, this.value)">
+                                                    <button class="quantity-btn-modern plus" 
+                                                            type="button" 
+                                                            onclick="updateQuantity(@item.StocktakeId, @item.Quantity + 1)"
+                                                            @(item.Quantity >= item.MaxQuantity ? "disabled" : "")>
+                                                        <i class="fas fa-plus"></i>
+                                                    </button>
+                                                </div>
+                                                <div class="stock-info">
+                                                    <small class="text-muted">@item.MaxQuantity available</small>
+                                                </div>
+                                            </div>
+
+                                            <!-- Total Price & Actions -->
+                                            <div class="price-actions-section">
+                                                <div class="total-price-display">
+                                                    <span class="total-label">Total</span>
+                                                    <span class="total-amount">$@item.TotalPrice.ToString("F2")</span>
+                                                </div>
+                                                <form method="post" action="@Url.Action("RemoveFromCart", "Customer")" class="remove-form">
+                                                    <input type="hidden" name="stocktakeId" value="@item.StocktakeId" />
+                                                    <button type="submit" class="remove-btn" 
+                                                            onclick="return confirm('Remove @item.ProductName from cart?')"
+                                                            title="Remove item">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+
+                        <!-- Cart Actions -->
+                        <div class="cart-bottom-actions">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <form method="post" action="@Url.Action("ClearCart", "Customer")" class="d-inline">
+                                    <button type="submit" class="btn btn-outline-danger" 
+                                            onclick="return confirm('Are you sure you want to clear your cart?')">
+                                        <i class="fas fa-trash-alt me-2"></i>Clear Cart
+                                    </button>
+                                </form>
+                                <div class="text-muted small">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Free shipping on all orders
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Cart Summary -->
+                    <div class="col-lg-4">
+                        <div class="order-summary-section">
+                            <div class="section-header">
+                                <h4 class="section-title">
+                                    <i class="fas fa-calculator me-2"></i>Order Summary
+                                </h4>
+                            </div>
+                            <div class="summary-content">
+                                <div class="summary-row">
+                                    <span class="summary-label">Items (@Model.TotalItems):</span>
+                                    <span class="summary-value">$@Model.TotalPrice.ToString("F2")</span>
+                                </div>
+                                <div class="summary-row">
+                                    <span class="summary-label">Shipping:</span>
+                                    <span class="summary-value shipping-free">Free</span>
+                                </div>
+                                <div class="summary-divider"></div>
+                                <div class="summary-row total-row">
+                                    <span class="summary-label-total">Total:</span>
+                                    <span class="summary-value-total">$@Model.TotalPrice.ToString("F2")</span>
+                                </div>
+                                
+                                <div class="checkout-section">
+                                    <a asp-controller="Customer" asp-action="Checkout" class="checkout-btn">
+                                        <i class="fas fa-credit-card me-2"></i>Proceed to Checkout
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Security Notice -->
+                        <div class="security-notice">
+                            <div class="security-content">
+                                <i class="fas fa-shield-alt security-icon"></i>
+                                <p class="security-text">Your information is secure and encrypted</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <!-- Empty Cart -->
+                <div class="empty-cart-container">
+                    <div class="empty-cart-content">
+                        <div class="empty-cart-icon">
+                            <i class="fas fa-shopping-cart"></i>
+                        </div>
+                        <h2 class="empty-cart-title">Your cart is empty</h2>
+                        <p class="empty-cart-description">Looks like you haven't added any items to your cart yet.</p>
+                        <a asp-controller="Customer" asp-action="Browse" class="btn btn-primary btn-lg empty-cart-btn">
+                            <i class="fas fa-shopping-bag me-2"></i>Start Shopping
+                        </a>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function updateQuantity(stocktakeId, newQuantity) {
+            // Ensure quantity is within valid range
+            newQuantity = Math.max(1, parseInt(newQuantity));
+            
+            // Update the input field
+            document.getElementById(`quantity-${stocktakeId}`).value = newQuantity;
+            
+            // Send AJAX request to update quantity
+            fetch('@Url.Action("UpdateCartQuantity", "Customer")', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `stocktakeId=${stocktakeId}&quantity=${newQuantity}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Reload the page to update totals
+                    location.reload();
+                } else {
+                    showToast('error', 'Failed to update quantity. Please try again.', 'fas fa-exclamation-circle');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('error', 'An error occurred. Please try again.', 'fas fa-exclamation-triangle');
+            });
+        }
+
+        // Toast notification function
+        function showToast(type, message, icon) {
+            const toast = document.createElement('div');
+            toast.className = `toast align-items-center text-white bg-${type === 'success' ? 'success' : 'danger'} border-0`;
+            toast.setAttribute('role', 'alert');
+            toast.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body">
+                        <i class="${icon} me-2"></i>${message}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            `;
+            
+            document.body.appendChild(toast);
+            const bsToast = new bootstrap.Toast(toast);
+            bsToast.show();
+            
+            // Remove toast after it's hidden
+            toast.addEventListener('hidden.bs.toast', () => {
+                document.body.removeChild(toast);
+            });
+        }
+    </script>
+}
+
+@section Styles {
+    <style>
+        /* Cart Header Styles */
+        .cart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .cart-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--foreground);
+            margin: 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .cart-title i {
+            color: var(--primary);
+        }
+
+        .cart-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        /* Empty Cart Styles */
+        .empty-cart-container {
+            min-height: 60vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem 1rem;
+        }
+
+        .empty-cart-content {
+            text-align: center;
+            max-width: 500px;
+            padding: 3rem 2rem;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .empty-cart-icon {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 2rem;
+            background: var(--muted);
+            border: 2px solid var(--border);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .empty-cart-icon i {
+            font-size: 3rem;
+            color: var(--muted-foreground);
+            transition: var(--transition);
+        }
+
+        .empty-cart-content:hover .empty-cart-icon {
+            border-color: var(--primary);
+            background: var(--secondary);
+            transform: scale(1.05);
+        }
+
+        .empty-cart-content:hover .empty-cart-icon i {
+            color: var(--primary);
+        }
+
+        .empty-cart-title {
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: var(--foreground);
+            margin-bottom: 1rem;
+        }
+
+        .empty-cart-description {
+            color: var(--muted-foreground);
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+        .empty-cart-btn {
+            padding: 0.875rem 2rem;
+            font-size: 1rem;
+            font-weight: 600;
+            min-width: 200px;
+            transition: var(--transition);
+        }
+
+        .empty-cart-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* Section Headers */
+        .section-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            color: var(--foreground);
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin: 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-title i {
+            color: var(--primary);
+        }
+
+        /* Cart Items Section */
+        .cart-items-section {
+            margin-bottom: 2rem;
+        }
+
+        .cart-items-container {
+            margin-top: 1rem;
+        }
+
+        /* Modern Cart Item Styles */
+        .cart-item-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--border-radius);
+            margin-bottom: 1rem;
+            transition: var(--transition);
+            overflow: hidden;
+        }
+
+        .cart-item-card:hover {
+            border-color: var(--primary);
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+        }
+
+        .cart-item-content {
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            gap: 2rem;
+            padding: 1.5rem;
+            align-items: center;
+        }
+
+        /* Product Section */
+        .product-section {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            min-width: 0; /* Allow flex shrinking */
+        }
+
+        .product-icon-wrapper {
+            flex-shrink: 0;
+        }
+
+        .product-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--muted);
+            border: 1px solid var(--border);
+            border-radius: var(--border-radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            transition: var(--transition);
+        }
+
+        .cart-item-card:hover .product-icon {
+            border-color: var(--primary);
+            background: var(--secondary);
+            transform: scale(1.05);
+        }
+
+        .product-details {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .product-name {
+            color: var(--foreground);
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            line-height: 1.3;
+        }
+
+        .product-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .meta-item {
+            color: var(--muted-foreground);
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .meta-item i {
+            width: 12px;
+            color: var(--primary);
+        }
+
+        .unit-price {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .price-label {
+            color: var(--muted-foreground);
+            font-size: 0.875rem;
+        }
+
+        .price-value {
+            color: var(--foreground);
+            font-weight: 600;
+        }
+
+        /* Quantity Section */
+        .quantity-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .quantity-label {
+            color: var(--foreground);
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin: 0;
+        }
+
+        .quantity-controls-modern {
+            display: flex;
+            align-items: center;
+            background: var(--input);
+            border: 1px solid var(--border);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+        }
+
+        .quantity-btn-modern {
+            width: 36px;
+            height: 36px;
+            background: var(--muted);
+            border: none;
+            color: var(--foreground);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .quantity-btn-modern:hover:not(:disabled) {
+            background: var(--primary);
+            color: var(--primary-foreground);
+        }
+
+        .quantity-btn-modern:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .quantity-input-modern {
+            width: 60px;
+            height: 36px;
+            border: none;
+            background: var(--input);
+            color: var(--foreground);
+            text-align: center;
+            font-weight: 600;
+            outline: none;
+        }
+
+        .stock-info {
+            text-align: center;
+        }
+
+        /* Price & Actions Section */
+        .price-actions-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .total-price-display {
+            text-align: center;
+        }
+
+        .total-label {
+            display: block;
+            color: var(--muted-foreground);
+            font-size: 0.875rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .total-amount {
+            display: block;
+            color: var(--primary);
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .remove-form {
+            margin: 0;
+        }
+
+        .remove-btn {
+            width: 40px;
+            height: 40px;
+            background: var(--muted);
+            border: 1px solid var(--border);
+            border-radius: var(--border-radius);
+            color: var(--muted-foreground);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .remove-btn:hover {
+            background: var(--destructive);
+            border-color: var(--destructive);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .cart-bottom-actions {
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border);
+        }
+
+        /* Order Summary Section */
+        .order-summary-section {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .summary-content {
+            margin-top: 1rem;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .summary-label {
+            color: var(--foreground);
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .summary-value {
+            color: var(--foreground);
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .shipping-free {
+            color: #34d399 !important;
+        }
+
+        .summary-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 1.5rem 0;
+        }
+
+        .total-row {
+            margin-bottom: 2rem;
+        }
+
+        .summary-label-total {
+            color: var(--foreground);
+            font-size: 1.125rem;
+            font-weight: 700;
+        }
+
+        .summary-value-total {
+            color: var(--primary);
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .checkout-section {
+            margin-top: 1.5rem;
+        }
+
+        .checkout-btn {
+            display: block;
+            width: 100%;
+            background: var(--primary);
+            color: var(--primary-foreground);
+            padding: 1rem 1.5rem;
+            border-radius: var(--border-radius);
+            text-decoration: none;
+            text-align: center;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: var(--transition);
+            border: none;
+        }
+
+        .checkout-btn:hover {
+            background: var(--muted-foreground);
+            color: var(--background);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* Security Notice */
+        .security-notice {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            margin-top: 1rem;
+            text-align: center;
+        }
+
+        .security-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .security-icon {
+            color: #34d399;
+            font-size: 1.5rem;
+        }
+
+        .security-text {
+            color: var(--muted-foreground);
+            font-size: 0.875rem;
+            margin: 0;
+        }
+
+
+
+        /* Responsive Design */
+        @@media (max-width: 768px) {
+            .cart-header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .cart-title {
+                font-size: 1.75rem;
+            }
+
+            .empty-cart-content {
+                padding: 2rem 1rem;
+                margin: 0 1rem;
+            }
+
+            .empty-cart-icon {
+                width: 100px;
+                height: 100px;
+            }
+
+            .empty-cart-icon i {
+                font-size: 2.5rem;
+            }
+
+            .empty-cart-title {
+                font-size: 1.5rem;
+            }
+
+            .empty-cart-btn {
+                min-width: auto;
+                width: 100%;
+            }
+
+            /* Cart Items Mobile */
+            .cart-item-content {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+                padding: 1rem;
+            }
+
+            .product-section {
+                flex-direction: column;
+                text-align: center;
+                gap: 1rem;
+            }
+
+            .product-meta {
+                align-items: center;
+            }
+
+            .quantity-section {
+                align-self: center;
+            }
+
+            .price-actions-section {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .total-price-display {
+                text-align: left;
+            }
+        }
+
+        @@media (max-width: 576px) {
+            .empty-cart-container {
+                min-height: 50vh;
+                padding: 2rem 0.5rem;
+            }
+
+            .empty-cart-icon {
+                width: 80px;
+                height: 80px;
+            }
+
+            .empty-cart-icon i {
+                font-size: 2rem;
+            }
+
+            .empty-cart-title {
+                font-size: 1.25rem;
+            }
+
+            .empty-cart-description {
+                font-size: 0.875rem;
+            }
+
+            /* Cart Items Small Mobile */
+            .cart-item-content {
+                padding: 0.75rem;
+                gap: 1rem;
+            }
+
+            .product-icon {
+                width: 50px;
+                height: 50px;
+                font-size: 1.25rem;
+            }
+
+            .product-name {
+                font-size: 1rem;
+            }
+
+            .meta-item {
+                font-size: 0.8rem;
+            }
+
+            .price-actions-section {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+
+            .quantity-controls-modern {
+                scale: 0.9;
+            }
+
+            .total-price-display {
+                text-align: center;
+            }
+        }
+    </style>
+} 

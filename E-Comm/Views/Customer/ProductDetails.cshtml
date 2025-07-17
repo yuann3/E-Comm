@@ -1,6 +1,7 @@
 @model E_Comm.Models.Product
+
 @{
-    ViewData["Title"] = $"{Model.Name} - Product Details - 3B1G";
+    ViewData["Title"] = Model.Name + " - Product Details";
 }
 
 <div class="container mt-4">
@@ -10,20 +11,20 @@
             <nav aria-label="breadcrumb" class="mb-4">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item">
-                        <a href="@Url.Action("Index", "Home")">
-                            <i class="fas fa-home me-1"></i>Home
+                        <a href="@Url.Action("Index", "Customer")">
+                            <i class="fas fa-home me-1"></i>Dashboard
                         </a>
                     </li>
                     <li class="breadcrumb-item">
-                        <a href="@Url.Action("Catalog", "Home")">
-                            <i class="fas fa-search me-1"></i>Catalog
+                        <a href="@Url.Action("Browse", "Customer")">
+                            <i class="fas fa-search me-1"></i>Browse Products
                         </a>
                     </li>
                     <li class="breadcrumb-item active" aria-current="page">
                         Product Details
                     </li>
                 </ol>
-            </nav> 
+            </nav>
 
             <!-- Success Message -->
             @if (TempData["Success"] != null)
@@ -113,7 +114,7 @@
                         <!-- Product Description -->
                         <div class="product-description mb-4">
                             <h5 class="section-title">Description</h5>
-                            <p class="text-muted">@Model.Description</p>
+                            <p class="description-text">@Model.Description</p>
                         </div>
 
                         <!-- Pricing & Stock Section -->
@@ -170,56 +171,40 @@
 
                         <!-- Action Buttons -->
                         <div class="action-buttons">
-                            @if (User.Identity?.IsAuthenticated == true && (User.IsInRole("Customer") || User.IsInRole("Admin")))
+                            @if (Model.Stocktakes?.Any(s => s.Quantity > 0) == true)
                             {
-                                <!-- Customer or Admin is logged in -->
-                                @if (Model.Stocktakes?.Any(s => s.Quantity > 0) == true)
-                                {
-                                    <div class="add-to-cart-form">
-                                        <div class="quantity-section mb-3">
-                                            <label for="quantity" class="form-label">Quantity:</label>
-                                            <div class="quantity-controls">
-                                                <button type="button" class="quantity-btn minus-btn">
-                                                    <i class="fas fa-minus"></i>
-                                                </button>
-                                                <input type="number" id="quantity" name="quantity" value="1" min="1" max="@Model.Stocktakes.First().Quantity" class="quantity-input">
-                                                <button type="button" class="quantity-btn plus-btn">
-                                                    <i class="fas fa-plus"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <div class="button-group">
-                                            <button type="button" class="btn btn-primary btn-add-cart" onclick="addToCartWithQuantity(@Model.ID)">
-                                                <i class="fas fa-shopping-cart me-2"></i>Add to Cart
+                                <div class="add-to-cart-form">
+                                    <div class="quantity-section mb-3">
+                                        <label for="quantity" class="form-label">Quantity:</label>
+                                        <div class="quantity-controls">
+                                            <button type="button" class="quantity-btn minus-btn">
+                                                <i class="fas fa-minus"></i>
                                             </button>
-                                            <button type="button" class="btn btn-outline-primary btn-wishlist">
-                                                <i class="fas fa-heart me-2"></i>Add to Wishlist
+                                            <input type="number" id="quantity" name="quantity" value="1" min="1" max="@Model.Stocktakes.First().Quantity" class="quantity-input">
+                                            <button type="button" class="quantity-btn plus-btn">
+                                                <i class="fas fa-plus"></i>
                                             </button>
                                         </div>
                                     </div>
-                                }
-                                else
-                                {
                                     <div class="button-group">
-                                        <button type="button" class="btn btn-secondary" disabled>
-                                            <i class="fas fa-times me-2"></i>Currently Unavailable
+                                        <button type="button" class="btn btn-primary btn-add-cart" onclick="addToCartWithQuantity(@Model.ID)">
+                                            <i class="fas fa-shopping-cart me-2"></i>Add to Cart
                                         </button>
-                                        <button type="button" class="btn btn-outline-primary btn-notify">
-                                            <i class="fas fa-bell me-2"></i>Notify When Available
+                                        <button type="button" class="btn btn-outline-primary btn-wishlist">
+                                            <i class="fas fa-heart me-2"></i>Add to Wishlist
                                         </button>
                                     </div>
-                                }
+                                </div>
                             }
                             else
                             {
-                                <!-- User is not logged in or not a customer/admin -->
                                 <div class="button-group">
-                                    <a href="@Url.Action("Login", "Auth")" class="btn btn-primary">
-                                        <i class="fas fa-sign-in-alt me-2"></i>Login to Purchase
-                                    </a>
-                                    <a href="@Url.Action("Signup", "Auth")" class="btn btn-outline-primary">
-                                        <i class="fas fa-user-plus me-2"></i>Create Account
-                                    </a>
+                                    <button type="button" class="btn btn-secondary" disabled>
+                                        <i class="fas fa-times me-2"></i>Currently Unavailable
+                                    </button>
+                                    <button type="button" class="btn btn-outline-primary btn-notify">
+                                        <i class="fas fa-bell me-2"></i>Notify When Available
+                                    </button>
                                 </div>
                             }
                         </div>
@@ -331,125 +316,17 @@
                 </div>
             </div>
 
-            <!-- Back to Catalog -->
+            <!-- Back to Browse -->
             <div class="row mt-5">
                 <div class="col-12 text-center">
-                    <a href="@Url.Action("Catalog", "Home")" class="btn btn-outline-secondary btn-lg">
-                        <i class="fas fa-arrow-left me-2"></i>Back to Catalog
+                    <a href="@Url.Action("Browse", "Customer")" class="btn btn-outline-secondary btn-lg">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Products
                     </a>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-@section Scripts {
-    <script>
-        // Quantity controls
-        document.addEventListener('DOMContentLoaded', function() {
-            const minusBtn = document.querySelector('.minus-btn');
-            const plusBtn = document.querySelector('.plus-btn');
-            const quantityInput = document.querySelector('.quantity-input');
-            
-            if (minusBtn && plusBtn && quantityInput) {
-                minusBtn.addEventListener('click', function() {
-                    let currentValue = parseInt(quantityInput.value);
-                    if (currentValue > 1) {
-                        quantityInput.value = currentValue - 1;
-                    }
-                });
-                
-                plusBtn.addEventListener('click', function() {
-                    let currentValue = parseInt(quantityInput.value);
-                    let maxValue = parseInt(quantityInput.max);
-                    if (currentValue < maxValue) {
-                        quantityInput.value = currentValue + 1;
-                    }
-                });
-            }
-        });
-
-        // Add to cart with quantity
-        function addToCartWithQuantity(productId) {
-            const quantityInput = document.querySelector('.quantity-input');
-            const quantity = quantityInput ? parseInt(quantityInput.value) : 1;
-            const button = event.target.closest('button');
-            const originalContent = button.innerHTML;
-            
-            // Show loading state
-            button.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Adding...';
-            button.disabled = true;
-
-            fetch('/Customer/AddToCart', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                body: `productId=${productId}&quantity=${quantity}`
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showToast('success', data.message, 'fas fa-check-circle');
-                    // Update cart count
-                    if (typeof window.updateCartCount === 'function') {
-                        window.updateCartCount();
-                    }
-                    
-                    // Update button to show success temporarily
-                    button.innerHTML = '<i class="fas fa-check me-2"></i>Added!';
-                    button.classList.remove('btn-primary');
-                    button.classList.add('btn-success');
-                    
-                    // Restore button after 2 seconds
-                    setTimeout(() => {
-                        button.innerHTML = originalContent;
-                        button.classList.remove('btn-success');
-                        button.classList.add('btn-primary');
-                        button.disabled = false;
-                    }, 2000);
-                } else {
-                    showToast('error', data.message, 'fas fa-exclamation-circle');
-                    // Restore button
-                    button.innerHTML = originalContent;
-                    button.disabled = false;
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showToast('error', 'An error occurred. Please try again.', 'fas fa-exclamation-triangle');
-                // Restore button
-                button.innerHTML = originalContent;
-                button.disabled = false;
-            });
-        }
-
-        // Toast notification function
-        function showToast(type, message, icon) {
-            const toast = document.createElement('div');
-            toast.className = `toast align-items-center text-white bg-${type === 'success' ? 'success' : 'danger'} border-0`;
-            toast.setAttribute('role', 'alert');
-            toast.innerHTML = `
-                <div class="d-flex">
-                    <div class="toast-body">
-                        <i class="${icon} me-2"></i>${message}
-                    </div>
-                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-                </div>
-            `;
-            
-            document.body.appendChild(toast);
-            const bsToast = new bootstrap.Toast(toast);
-            bsToast.show();
-            
-            // Remove toast after it's hidden
-            toast.addEventListener('hidden.bs.toast', () => {
-                document.body.removeChild(toast);
-            });
-        }
-    </script>
-}
 
 <style>
 /* ProductDetails specific styles using site.css variables */
@@ -814,4 +691,113 @@
         font-size: 2.5rem;
     }
 }
-</style> 
+</style>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Quantity controls
+            const minusBtn = document.querySelector('.minus-btn');
+            const plusBtn = document.querySelector('.plus-btn');
+            const quantityInput = document.querySelector('.quantity-input');
+            
+            if (minusBtn && plusBtn && quantityInput) {
+                minusBtn.addEventListener('click', function() {
+                    const currentValue = parseInt(quantityInput.value);
+                    const minValue = parseInt(quantityInput.getAttribute('min'));
+                    if (currentValue > minValue) {
+                        quantityInput.value = currentValue - 1;
+                    }
+                });
+                
+                plusBtn.addEventListener('click', function() {
+                    const currentValue = parseInt(quantityInput.value);
+                    const maxValue = parseInt(quantityInput.getAttribute('max'));
+                    if (currentValue < maxValue) {
+                        quantityInput.value = currentValue + 1;
+                    }
+                });
+            }
+        });
+
+        // Add to cart with quantity
+        function addToCartWithQuantity(productId) {
+            const quantityInput = document.querySelector('.quantity-input');
+            const quantity = quantityInput ? parseInt(quantityInput.value) : 1;
+            const button = event.target.closest('button');
+            const originalContent = button.innerHTML;
+            
+            // Show loading state
+            button.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Adding...';
+            button.disabled = true;
+
+            fetch('/Customer/AddToCart', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: `productId=${productId}&quantity=${quantity}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast('success', data.message, 'fas fa-check-circle');
+                    // Update cart count
+                    if (typeof window.updateCartCount === 'function') {
+                        window.updateCartCount();
+                    }
+                    
+                    // Update button to show success temporarily
+                    button.innerHTML = '<i class="fas fa-check me-2"></i>Added!';
+                    button.classList.remove('btn-primary');
+                    button.classList.add('btn-success');
+                    
+                    // Restore button after 2 seconds
+                    setTimeout(() => {
+                        button.innerHTML = originalContent;
+                        button.classList.remove('btn-success');
+                        button.classList.add('btn-primary');
+                        button.disabled = false;
+                    }, 2000);
+                } else {
+                    showToast('error', data.message, 'fas fa-exclamation-circle');
+                    // Restore button
+                    button.innerHTML = originalContent;
+                    button.disabled = false;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('error', 'An error occurred. Please try again.', 'fas fa-exclamation-triangle');
+                // Restore button
+                button.innerHTML = originalContent;
+                button.disabled = false;
+            });
+        }
+
+        // Toast notification function
+        function showToast(type, message, icon) {
+            const toast = document.createElement('div');
+            toast.className = `toast align-items-center text-white bg-${type === 'success' ? 'success' : 'danger'} border-0`;
+            toast.setAttribute('role', 'alert');
+            toast.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body">
+                        <i class="${icon} me-2"></i>${message}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            `;
+            
+            document.body.appendChild(toast);
+            const bsToast = new bootstrap.Toast(toast);
+            bsToast.show();
+            
+            // Remove toast after it's hidden
+            toast.addEventListener('hidden.bs.toast', () => {
+                document.body.removeChild(toast);
+            });
+        }
+    </script>
+} 

@@ -4,15 +4,59 @@
     ViewData["Title"] = "Order History";
 }
 
+@functions {
+    public static (string iconClass, string iconColor) GetProductIcon(string genreName)
+    {
+        var genre = (genreName ?? "").ToLower();
+        
+        if (genre.Contains("book") || genre.Contains("novel") || genre.Contains("literature") || genre.Contains("fiction") || genre.Contains("non-fiction"))
+        {
+            return ("fas fa-book", "text-info");
+        }
+        else if (genre.Contains("movie") || genre.Contains("film") || genre.Contains("cinema") || genre.Contains("dvd") || genre.Contains("blu-ray"))
+        {
+            return ("fas fa-film", "text-danger");
+        }
+        else if (genre.Contains("game") || genre.Contains("gaming") || genre.Contains("video") || genre.Contains("console") || genre.Contains("pc"))
+        {
+            return ("fas fa-gamepad", "text-success");
+        }
+        else if (genre.Contains("music") || genre.Contains("audio") || genre.Contains("sound") || genre.Contains("cd") || genre.Contains("vinyl"))
+        {
+            return ("fas fa-music", "text-purple");
+        }
+        else if (genre.Contains("software") || genre.Contains("app") || genre.Contains("program"))
+        {
+            return ("fas fa-laptop-code", "text-primary");
+        }
+        else if (genre.Contains("comic") || genre.Contains("manga") || genre.Contains("graphic"))
+        {
+            return ("fas fa-book-open", "text-warning");
+        }
+        else if (genre.Contains("toy") || genre.Contains("collectible") || genre.Contains("figure"))
+        {
+            return ("fas fa-puzzle-piece", "text-info");
+        }
+        else if (genre.Contains("electronics") || genre.Contains("gadget") || genre.Contains("device"))
+        {
+            return ("fas fa-microchip", "text-secondary");
+        }
+        else
+        {
+            return ("fas fa-cube", "text-warning");
+        }
+    }
+}
+
 <div class="container mt-4">
     <div class="row">
         <div class="col-12">
             <!-- Header -->
-            <div class="text-center mb-5">
-                <h1 class="display-5 mb-3">
-                    <i class="fas fa-history me-3 text-primary"></i>Order History
+            <div class="order-history-header">
+                <h1 class="page-title">
+                    <i class="fas fa-history me-3"></i>Order History
                 </h1>
-                <p class="lead text-muted">Track your orders and view your complete purchase history</p>
+                <p class="page-subtitle">Track your orders and view your complete purchase history</p>
             </div>
 
             <!-- Success/Info Messages -->
@@ -35,176 +79,206 @@
             @if (Model != null && Model.Count > 0)
             {
                 <!-- Orders List -->
-                <div class="row g-4">
-                    @foreach (var order in Model)
-                    {
-                        <div class="col-12">
-                            <div class="card feature-card">
-                                <div class="card-body p-4">
-                                    <div class="row align-items-center">
-                                        <div class="col-auto">
-                                            <div class="feature-icon">
-                                                <i class="fas fa-shopping-bag text-white fa-2x"></i>
-                                            </div>
+                <div class="orders-section">
+                    <div class="section-header">
+                        <h4 class="section-title">
+                            <i class="fas fa-list me-2"></i>Your Orders (@Model.Count)
+                        </h4>
+                    </div>
+                    <div class="orders-container">
+                        @foreach (var order in Model)
+                        {
+                            <div class="order-card">
+                                <div class="order-card-header">
+                                    <div class="order-info-section">
+                                        <div class="order-id">
+                                            <span class="order-label">Order</span>
+                                            <span class="order-value">#@order.OrderID</span>
                                         </div>
-                                        <div class="col">
-                                            <div class="row g-3">
-                                                <div class="col-md-2">
-                                                    <h6 class="text-muted mb-1">Order ID</h6>
-                                                    <p class="mb-0 fw-semibold">#@order.OrderID</p>
-                                                </div>
-                                                <div class="col-md-2">
-                                                    <h6 class="text-muted mb-1">Customer ID</h6>
-                                                    <p class="mb-0 fw-semibold">@(order.CustomerId?.ToString() ?? "0")</p>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <h6 class="text-muted mb-1">Items</h6>
-                                                    <p class="mb-0 fw-semibold">
-                                                        @(order.ProductsInOrders?.Sum(p => p.Quantity) ?? 0) items
-                                                        @if (order.ProductsInOrders?.Any() == true)
-                                                        {
-                                                            <br><small class="text-muted">@(order.ProductsInOrders.Count()) products</small>
-                                                        }
-                                                    </p>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <h6 class="text-muted mb-1">Delivery Address</h6>
-                                                    <p class="mb-0 fw-semibold">
-                                                        @if (!string.IsNullOrEmpty(order.StreetAddress))
-                                                        {
-                                                            <text>@order.StreetAddress<br />
-                                                            @order.Suburb, @order.State @order.PostCode</text>
-                                                        }
-                                                        else
-                                                        {
-                                                            <span class="text-muted">No address specified</span>
-                                                        }
-                                                    </p>
-                                                </div>
-                                                <div class="col-md-2 text-md-end">
-                                                    <span class="badge bg-success fs-6 px-3 py-2 mb-2">
-                                                        <i class="fas fa-check-circle me-2"></i>Completed
-                                                    </span>
-                                                    <br>
-                                                    <a href="@Url.Action("OrderDetails", "Customer", new { id = order.OrderID })" 
-                                                       class="btn btn-outline-primary btn-sm">
-                                                        <i class="fas fa-eye me-2"></i>View Details
-                                                    </a>
-                                                </div>
-                                            </div>
-
-                                            <!-- Order Summary (expandable) -->
-                                            @if (order.ProductsInOrders?.Any() == true)
-                                            {
-                                                <div class="mt-3 pt-3 border-top">
-                                                    <div class="row align-items-center">
-                                                        <div class="col">
-                                                            <h6 class="text-muted mb-1">Order Total</h6>
-                                                            @{
-                                                                var orderTotal = order.ProductsInOrders.Sum(p => (decimal)(p.Stocktake?.Price ?? 0) * p.Quantity);
-                                                            }
-                                                            <p class="mb-0 fw-bold fs-5 text-success">$@String.Format("{0:F2}", orderTotal)</p>
-                                                        </div>
-                                                        <div class="col-auto">
-                                                            <button class="btn btn-outline-secondary btn-sm" type="button" 
-                                                                    data-bs-toggle="collapse" data-bs-target="#orderItems@(order.OrderID)" 
-                                                                    aria-expanded="false">
-                                                                <i class="fas fa-chevron-down me-2"></i>Show Items
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                    
-                                                    <!-- Collapsible Order Items -->
-                                                    <div class="collapse mt-3" id="orderItems@(order.OrderID)">
-                                                        <div class="card bg-light">
-                                                            <div class="card-body p-3">
-                                                                <h6 class="mb-3">Items in this order:</h6>
-                                                                <div class="row g-2">
-                                                                    @foreach (var item in order.ProductsInOrders.Take(3))
-                                                                    {
-                                                                        <div class="col-md-4">
-                                                                            <div class="d-flex align-items-center">
-                                                                                <div class="product-mini-icon me-2">
-                                                                                    <i class="fas fa-book text-primary"></i>
-                                                                                </div>
-                                                                                <div class="flex-grow-1">
-                                                                                    <small class="fw-semibold d-block">@(item.Stocktake?.Product?.Name ?? "Unknown")</small>
-                                                                                    <small class="text-muted">Qty: @item.Quantity × $@String.Format("{0:F2}", item.Stocktake?.Price ?? 0.0)</small>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    }
-                                                                    @if (order.ProductsInOrders.Count() > 3)
-                                                                    {
-                                                                        <div class="col-md-4">
-                                                                            <small class="text-muted">
-                                                                                +@(order.ProductsInOrders.Count() - 3) more items...
-                                                                            </small>
-                                                                        </div>
-                                                                    }
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            }
+                                        <div class="order-status">
+                                            <span class="status-badge completed">
+                                                <i class="fas fa-check-circle me-1"></i>Completed
+                                            </span>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                        </div>
-                    }
-                </div>
-
-                <!-- Summary Card -->
-                <div class="row mt-5">
-                    <div class="col-lg-8 mx-auto">
-                        <div class="card feature-card text-center">
-                            <div class="card-body p-4">
-                                <div class="row align-items-center">
-                                    <div class="col-auto">
-                                        <div class="feature-icon">
-                                            <i class="fas fa-chart-bar text-white fa-2x"></i>
-                                        </div>
-                                    </div>
-                                    <div class="col">
-                                        <h4 class="card-title mb-1">Order Summary</h4>
-                                        <p class="text-muted mb-0">Your purchase history at a glance</p>
+                                    <div class="order-actions">
+                                        <a href="@Url.Action("OrderDetails", "Customer", new { id = order.OrderID })" 
+                                           class="btn-view-details">
+                                            <i class="fas fa-eye me-2"></i>View Details
+                                        </a>
                                     </div>
                                 </div>
                                 
-                                <div class="row g-3 mt-3">
-                                    <div class="col-md-3">
-                                        <div class="border border-secondary rounded p-3">
-                                            <h3 class="text-primary mb-1">@Model.Count</h3>
-                                            <p class="text-muted mb-0 small">Total Orders</p>
+                                <div class="order-card-body">
+                                    <div class="order-summary-grid">
+                                        <div class="summary-item">
+                                            <div class="summary-icon">
+                                                <i class="fas fa-shopping-bag"></i>
+                                            </div>
+                                            <div class="summary-content">
+                                                <span class="summary-label">Items</span>
+                                                <span class="summary-value">@(order.ProductsInOrders?.Sum(p => p.Quantity) ?? 0)</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="summary-item">
+                                            <div class="summary-icon">
+                                                <i class="fas fa-dollar-sign"></i>
+                                            </div>
+                                            <div class="summary-content">
+                                                <span class="summary-label">Total</span>
+                                                @{
+                                                    var orderTotal = order.ProductsInOrders?.Sum(p => (decimal)(p.Stocktake?.Price ?? 0) * p.Quantity) ?? 0;
+                                                }
+                                                <span class="summary-value total-amount">$@String.Format("{0:F2}", orderTotal)</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="summary-item">
+                                            <div class="summary-icon">
+                                                <i class="fas fa-map-marker-alt"></i>
+                                            </div>
+                                            <div class="summary-content">
+                                                <span class="summary-label">Delivery</span>
+                                                <span class="summary-value">
+                                                    @if (!string.IsNullOrEmpty(order.StreetAddress))
+                                                    {
+                                                        <text>@order.Suburb, @order.State</text>
+                                                    }
+                                                    else
+                                                    {
+                                                        <text>No address</text>
+                                                    }
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-3">
-                                        <div class="border border-secondary rounded p-3">
-                                            <h3 class="text-success mb-1">@Model.Count</h3>
-                                            <p class="text-muted mb-0 small">Completed</p>
+                                    
+                                    @if (order.ProductsInOrders?.Any() == true)
+                                    {
+                                        <div class="order-items-preview">
+                                            <div class="preview-header">
+                                                <span class="preview-label">Order Items</span>
+                                                <button class="btn-toggle-items" type="button" 
+                                                        data-bs-toggle="collapse" data-bs-target="#orderItems@(order.OrderID)" 
+                                                        aria-expanded="false">
+                                                    <i class="fas fa-chevron-down"></i>
+                                                </button>
+                                            </div>
+                                            <div class="items-quick-view">
+                                                @foreach (var item in order.ProductsInOrders.Take(3))
+                                                {
+                                                    <div class="item-preview">
+                                                        <div class="item-icon">
+                                                            @{
+                                                                var iconInfo = GetProductIcon(item.Stocktake?.Product?.Genre?.Name);
+                                                            }
+                                                            <i class="@iconInfo.iconClass @iconInfo.iconColor"></i>
+                                                        </div>
+                                                        <div class="item-details">
+                                                            <span class="item-name">@(item.Stocktake?.Product?.Name ?? "Unknown")</span>
+                                                            <span class="item-quantity">×@item.Quantity</span>
+                                                        </div>
+                                                    </div>
+                                                }
+                                                @if (order.ProductsInOrders.Count() > 3)
+                                                {
+                                                    <div class="item-preview more-items">
+                                                        <div class="more-items-indicator">
+                                                            <span>+@(order.ProductsInOrders.Count() - 3) more</span>
+                                                        </div>
+                                                    </div>
+                                                }
+                                            </div>
+                                            
+                                            <!-- Detailed Items (Collapsible) -->
+                                            <div class="collapse" id="orderItems@(order.OrderID)">
+                                                <div class="detailed-items">
+                                                    @foreach (var item in order.ProductsInOrders)
+                                                    {
+                                                        <div class="detailed-item">
+                                                            <div class="detailed-item-icon">
+                                                                @{
+                                                                    var iconInfo = GetProductIcon(item.Stocktake?.Product?.Genre?.Name);
+                                                                }
+                                                                <i class="@iconInfo.iconClass @iconInfo.iconColor"></i>
+                                                            </div>
+                                                            <div class="detailed-item-info">
+                                                                <h6 class="item-title">@(item.Stocktake?.Product?.Name ?? "Unknown")</h6>
+                                                                <div class="item-meta">
+                                                                    <span class="meta-item">
+                                                                        <i class="fas fa-user"></i>@(item.Stocktake?.Product?.Author ?? "Unknown")
+                                                                    </span>
+                                                                    <span class="meta-item">
+                                                                        <i class="fas fa-tag"></i>@(item.Stocktake?.Product?.Genre?.Name ?? "Unknown")
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                            <div class="detailed-item-pricing">
+                                                                <div class="quantity-badge">×@item.Quantity</div>
+                                                                <div class="unit-price">$@String.Format("{0:F2}", item.Stocktake?.Price ?? 0.0)</div>
+                                                                <div class="total-price">$@String.Format("{0:F2}", (item.Stocktake?.Price ?? 0.0) * item.Quantity)</div>
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="border border-secondary rounded p-3">
-                                            @{
-                                                var totalItems = Model.Sum(o => o.ProductsInOrders?.Sum(p => p.Quantity) ?? 0);
-                                            }
-                                            <h3 class="text-info mb-1">@totalItems</h3>
-                                            <p class="text-muted mb-0 small">Items Purchased</p>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="border border-secondary rounded p-3">
-                                            @{
-                                                var totalSpent = Model.Sum(o => o.ProductsInOrders?.Sum(p => (decimal)(p.Stocktake?.Price ?? 0) * p.Quantity) ?? 0);
-                                            }
-                                            <h3 class="text-warning mb-1">$@String.Format("{0:F0}", totalSpent)</h3>
-                                            <p class="text-muted mb-0 small">Total Spent</p>
-                                        </div>
-                                    </div>
+                                    }
                                 </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Summary Statistics -->
+                <div class="statistics-section">
+                    <div class="section-header">
+                        <h4 class="section-title">
+                            <i class="fas fa-chart-bar me-2"></i>Order Summary
+                        </h4>
+                    </div>
+                    <div class="statistics-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-shopping-cart"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-number">@Model.Count</div>
+                                <div class="stat-label">Total Orders</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-number">@Model.Count</div>
+                                <div class="stat-label">Completed</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-boxes"></i>
+                            </div>
+                            <div class="stat-content">
+                                @{
+                                    var totalItems = Model.Sum(o => o.ProductsInOrders?.Sum(p => p.Quantity) ?? 0);
+                                }
+                                <div class="stat-number">@totalItems</div>
+                                <div class="stat-label">Items Purchased</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-dollar-sign"></i>
+                            </div>
+                            <div class="stat-content">
+                                @{
+                                    var totalSpent = Model.Sum(o => o.ProductsInOrders?.Sum(p => (decimal)(p.Stocktake?.Price ?? 0) * p.Quantity) ?? 0);
+                                }
+                                <div class="stat-number">$@String.Format("{0:F0}", totalSpent)</div>
+                                <div class="stat-label">Total Spent</div>
                             </div>
                         </div>
                     </div>
@@ -213,69 +287,71 @@
             else
             {
                 <!-- No Orders State -->
-                <div class="row">
-                    <div class="col-lg-6 mx-auto">
-                        <div class="card feature-card text-center">
-                            <div class="card-body p-5">
-                                <i class="fas fa-shopping-cart fa-4x text-muted mb-4"></i>
-                                <h3 class="card-title">No Orders Yet</h3>
-                                <p class="card-text mb-4">
-                                    @if (ViewBag.Message != null)
-                                    {
-                                        <text>@ViewBag.Message</text>
-                                    }
-                                    else
-                                    {
-                                        <text>You haven't placed any orders yet. Start exploring our amazing collection!</text>
-                                    }
-                                </p>
-                                
-                                <div class="d-grid gap-3">
-                                    <a href="@Url.Action("Browse", "Customer")" class="btn btn-primary btn-lg">
-                                        <i class="fas fa-search me-2"></i> Browse Products
-                                    </a>
-                                    @if (ViewBag.Message != null)
-                                    {
-                                        <a href="@Url.Action("MyAccount", "Customer")" class="btn btn-outline-primary">
-                                            <i class="fas fa-user-edit me-2"></i> Complete Account Setup
-                                        </a>
-                                    }
-                                    <a href="@Url.Action("Index", "Customer")" class="btn btn-outline-secondary">
-                                        <i class="fas fa-arrow-left me-2"></i> Back to Dashboard
-                                    </a>
-                                </div>
-                            </div>
+                <div class="empty-state">
+                    <div class="empty-state-content">
+                        <div class="empty-state-icon">
+                            <i class="fas fa-shopping-cart"></i>
+                        </div>
+                        <h3 class="empty-state-title">No Orders Yet</h3>
+                        <p class="empty-state-description">
+                            @if (ViewBag.Message != null)
+                            {
+                                <text>@ViewBag.Message</text>
+                            }
+                            else
+                            {
+                                <text>You haven't placed any orders yet. Start exploring our amazing collection!</text>
+                            }
+                        </p>
+                        
+                        <div class="empty-state-actions">
+                            <a href="@Url.Action("Browse", "Customer")" class="btn btn-primary btn-lg">
+                                <i class="fas fa-search me-2"></i>Browse Products
+                            </a>
+                            @if (ViewBag.Message != null)
+                            {
+                                <a href="@Url.Action("MyAccount", "Customer")" class="btn btn-outline-primary">
+                                    <i class="fas fa-user-edit me-2"></i>Complete Account Setup
+                                </a>
+                            }
                         </div>
                     </div>
                 </div>
             }
 
             <!-- Quick Actions -->
-            <div class="row g-3 mt-5">
-                <div class="col-md-4">
-                    <a href="@Url.Action("Index", "Customer")" class="card feature-card text-decoration-none h-100">
-                        <div class="card-body text-center p-4">
-                            <i class="fas fa-tachometer-alt fa-2x text-primary mb-3"></i>
-                            <h6 class="card-title">Dashboard</h6>
-                            <p class="card-text small text-muted">Return to main dashboard</p>
+            <div class="quick-actions-section">
+                <div class="section-header">
+                    <h4 class="section-title">
+                        <i class="fas fa-bolt me-2"></i>Quick Actions
+                    </h4>
+                </div>
+                <div class="quick-actions-grid">
+                    <a href="@Url.Action("Index", "Customer")" class="quick-action-card">
+                        <div class="action-icon">
+                            <i class="fas fa-tachometer-alt"></i>
+                        </div>
+                        <div class="action-content">
+                            <h6 class="action-title">Dashboard</h6>
+                            <p class="action-description">Return to main dashboard</p>
                         </div>
                     </a>
-                </div>
-                <div class="col-md-4">
-                    <a href="@Url.Action("Browse", "Customer")" class="card feature-card text-decoration-none h-100">
-                        <div class="card-body text-center p-4">
-                            <i class="fas fa-shopping-cart fa-2x text-primary mb-3"></i>
-                            <h6 class="card-title">Continue Shopping</h6>
-                            <p class="card-text small text-muted">Browse our product catalog</p>
+                    <a href="@Url.Action("Browse", "Customer")" class="quick-action-card">
+                        <div class="action-icon">
+                            <i class="fas fa-shopping-cart"></i>
+                        </div>
+                        <div class="action-content">
+                            <h6 class="action-title">Continue Shopping</h6>
+                            <p class="action-description">Browse our product catalog</p>
                         </div>
                     </a>
-                </div>
-                <div class="col-md-4">
-                    <a href="@Url.Action("ContactSupport", "Customer")" class="card feature-card text-decoration-none h-100">
-                        <div class="card-body text-center p-4">
-                            <i class="fas fa-life-ring fa-2x text-primary mb-3"></i>
-                            <h6 class="card-title">Need Help?</h6>
-                            <p class="card-text small text-muted">Contact our support team</p>
+                    <a href="@Url.Action("ContactSupport", "Customer")" class="quick-action-card">
+                        <div class="action-icon">
+                            <i class="fas fa-life-ring"></i>
+                        </div>
+                        <div class="action-content">
+                            <h6 class="action-title">Need Help?</h6>
+                            <p class="action-description">Contact our support team</p>
                         </div>
                     </a>
                 </div>
@@ -284,39 +360,695 @@
     </div>
 </div>
 
-<style>
-.product-mini-icon {
-    width: 24px;
-    height: 24px;
-    background: var(--bs-primary-bg-subtle);
-    border-radius: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.75rem;
-}
+@section Styles {
+    <style>
+        /* Page Header */
+        .order-history-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+        }
 
-.feature-card {
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--foreground);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-.feature-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-}
+        .page-title i {
+            color: var(--primary);
+        }
 
-.collapse {
-    transition: all 0.3s ease;
-}
+        .page-subtitle {
+            font-size: 1.1rem;
+            color: var(--muted-foreground);
+            margin: 0;
+        }
 
-@@media (max-width: 768px) {
-    .col-md-2, .col-md-3 {
-        margin-bottom: 1rem;
-    }
-    
-    .text-md-end {
-        text-align: left !important;
-        margin-top: 1rem;
-    }
-}
-</style> 
+        /* Section Headers */
+        .section-header {
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            color: var(--foreground);
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-title i {
+            color: var(--primary);
+        }
+
+        /* Orders Section */
+        .orders-section {
+            margin-bottom: 4rem;
+        }
+
+        .orders-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        /* Order Cards */
+        .order-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            overflow: hidden;
+        }
+
+        .order-card:hover {
+            border-color: var(--primary);
+            box-shadow: var(--shadow-xl);
+            transform: translateY(-2px);
+        }
+
+        .order-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            background: var(--secondary);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .order-info-section {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .order-id {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .order-label {
+            color: var(--muted-foreground);
+            font-size: 0.875rem;
+        }
+
+        .order-value {
+            color: var(--foreground);
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: var(--border-radius);
+            font-size: 0.875rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+
+        .status-badge.completed {
+            background: var(--primary);
+            color: var(--primary-foreground);
+        }
+
+        .btn-view-details {
+            background: var(--primary);
+            color: var(--primary-foreground);
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--border-radius);
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+        }
+
+        .btn-view-details:hover {
+            background: var(--muted-foreground);
+            color: var(--background);
+            transform: translateY(-2px);
+        }
+
+        .order-card-body {
+            padding: 1.5rem;
+        }
+
+        /* Order Summary Grid */
+        .order-summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .summary-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--muted);
+            border-radius: var(--border-radius);
+            border: 1px solid var(--border);
+        }
+
+        .summary-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--primary);
+            color: var(--primary-foreground);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        .summary-content {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .summary-label {
+            color: var(--muted-foreground);
+            font-size: 0.875rem;
+        }
+
+        .summary-value {
+            color: var(--foreground);
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .total-amount {
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        /* Order Items Preview */
+        .order-items-preview {
+            background: var(--secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--border-radius);
+            padding: 1rem;
+        }
+
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .preview-label {
+            color: var(--foreground);
+            font-weight: 600;
+        }
+
+        .btn-toggle-items {
+            background: var(--muted);
+            border: 1px solid var(--border);
+            border-radius: var(--border-radius);
+            padding: 0.5rem;
+            color: var(--foreground);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-toggle-items:hover {
+            background: var(--primary);
+            color: var(--primary-foreground);
+        }
+
+        .items-quick-view {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .item-preview {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--border-radius);
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .item-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--muted);
+            border-radius: var(--border-radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        .item-details {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            flex: 1;
+        }
+
+        .item-name {
+            color: var(--foreground);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .item-quantity {
+            color: var(--muted-foreground);
+            font-size: 0.8rem;
+        }
+
+        .more-items {
+            justify-content: center;
+            min-width: 120px;
+        }
+
+        .more-items-indicator {
+            color: var(--muted-foreground);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* Detailed Items */
+        .detailed-items {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .detailed-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .detailed-item:last-child {
+            border-bottom: none;
+        }
+
+        .detailed-item-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--muted);
+            border-radius: var(--border-radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .detailed-item-info {
+            flex: 1;
+        }
+
+        .item-title {
+            color: var(--foreground);
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .item-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .meta-item {
+            color: var(--muted-foreground);
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .meta-item i {
+            width: 12px;
+            color: var(--primary);
+        }
+
+        .detailed-item-pricing {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .quantity-badge {
+            background: var(--primary);
+            color: var(--primary-foreground);
+            padding: 0.25rem 0.75rem;
+            border-radius: var(--border-radius);
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .unit-price {
+            color: var(--muted-foreground);
+            font-size: 0.875rem;
+        }
+
+        .total-price {
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        /* Statistics Section */
+        .statistics-section {
+            margin-bottom: 4rem;
+        }
+
+        .statistics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .stat-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        .stat-card:hover {
+            border-color: var(--primary);
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-4px);
+        }
+
+        .stat-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--muted);
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: var(--primary);
+            margin: 0 auto 1rem;
+            transition: var(--transition);
+        }
+
+        .stat-card:hover .stat-icon {
+            background: var(--primary);
+            color: var(--primary-foreground);
+            transform: scale(1.1);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--muted-foreground);
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        /* Empty State */
+        .empty-state {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 60vh;
+            margin: 2rem 0;
+        }
+
+        .empty-state-content {
+            text-align: center;
+            max-width: 500px;
+            padding: 3rem 2rem;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .empty-state-icon {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 2rem;
+            background: var(--muted);
+            border: 2px solid var(--border);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: var(--muted-foreground);
+            transition: var(--transition);
+        }
+
+        .empty-state-content:hover .empty-state-icon {
+            border-color: var(--primary);
+            background: var(--secondary);
+            color: var(--primary);
+            transform: scale(1.05);
+        }
+
+        .empty-state-title {
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: var(--foreground);
+            margin-bottom: 1rem;
+        }
+
+        .empty-state-description {
+            color: var(--muted-foreground);
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+        .empty-state-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        /* Quick Actions */
+        .quick-actions-section {
+            margin-bottom: 2rem;
+        }
+
+        .quick-actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .quick-action-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            text-decoration: none;
+            color: inherit;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .quick-action-card:hover {
+            border-color: var(--primary);
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-4px);
+            color: inherit;
+        }
+
+        .action-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--muted);
+            border: 1px solid var(--border);
+            border-radius: var(--border-radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: var(--primary);
+            flex-shrink: 0;
+            transition: var(--transition);
+        }
+
+        .quick-action-card:hover .action-icon {
+            background: var(--primary);
+            color: var(--primary-foreground);
+            transform: scale(1.1);
+        }
+
+        .action-content {
+            flex: 1;
+        }
+
+        .action-title {
+            color: var(--foreground);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .action-description {
+            color: var(--muted-foreground);
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        /* Custom color for purple */
+        .text-purple {
+            color: #8b5cf6;
+        }
+
+        /* Responsive Design */
+        @@media (max-width: 768px) {
+            .page-title {
+                font-size: 2rem;
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .order-card-header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .order-info-section {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .order-summary-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .items-quick-view {
+                flex-direction: column;
+            }
+
+            .item-preview {
+                min-width: auto;
+            }
+
+            .detailed-item {
+                flex-direction: column;
+                text-align: center;
+                gap: 1rem;
+            }
+
+            .detailed-item-pricing {
+                flex-direction: row;
+                justify-content: center;
+                gap: 1rem;
+            }
+
+            .statistics-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .quick-actions-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .quick-action-card {
+                flex-direction: column;
+                text-align: center;
+                gap: 1rem;
+            }
+        }
+
+        @@media (max-width: 576px) {
+            .page-title {
+                font-size: 1.75rem;
+            }
+
+            .order-card-body {
+                padding: 1rem;
+            }
+
+            .order-summary-grid {
+                gap: 1rem;
+            }
+
+            .summary-item {
+                padding: 0.75rem;
+            }
+
+            .summary-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
+            }
+
+            .statistics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stat-card {
+                padding: 1.5rem;
+            }
+
+            .stat-icon {
+                width: 60px;
+                height: 60px;
+                font-size: 1.5rem;
+            }
+
+            .stat-number {
+                font-size: 2rem;
+            }
+
+            .empty-state-content {
+                padding: 2rem 1rem;
+                margin: 0 1rem;
+            }
+
+            .empty-state-icon {
+                width: 100px;
+                height: 100px;
+                font-size: 2.5rem;
+            }
+
+            .empty-state-title {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+} 

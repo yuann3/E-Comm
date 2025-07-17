@@ -5,15 +5,15 @@ namespace E_Comm.Models
 {
     public class ProductsInOrder
     {
-        [Key]
-        public int Id { get; set; }
-        
         [ForeignKey("Order")]
-        public int? OrderId { get; set; }
+        [Column("OrderId")]
+        public int OrderId { get; set; }
         
         [ForeignKey("Stocktake")]
-        public int? ProduktId { get; set; } // Note: keeping original typo from database
+        [Column("produktId")]
+        public int ProduktId { get; set; } // Note: keeping original typo from database
         
+        [Column("Quantity")]
         public int? Quantity { get; set; }
         
         // Navigation properties
