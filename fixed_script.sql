@@ -196,6 +196,8 @@ CREATE TABLE [dbo].[Product](
 	[Published] [date] NULL,
 	[LastUpdatedBy] [nvarchar](50) NULL,
 	[LastUpdated] [datetime] NULL,
+	[ProductImage] [varbinary](max) NULL,
+	[ImageContentType] [nvarchar](100) NULL,
  CONSTRAINT [PK_Product] PRIMARY KEY CLUSTERED 
 (
 	[ID] ASC
