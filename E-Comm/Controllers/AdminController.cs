@@ -301,10 +301,41 @@ namespace E_Comm.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateItem(Product product, int sourceId, int quantity, double price)
+        public async Task<IActionResult> CreateItem(Product product, int sourceId, int quantity, double price, IFormFile? productImage)
         {
             if (ModelState.IsValid)
             {
+                // Handle image upload
+                if (productImage != null && productImage.Length > 0)
+                {
+                    // Validate file type
+                    var allowedTypes = new[] { "image/jpeg", "image/jpg", "image/png", "image/gif" };
+                    if (!allowedTypes.Contains(productImage.ContentType.ToLower()))
+                    {
+                        ModelState.AddModelError("productImage", "Only JPEG, PNG, and GIF images are allowed.");
+                        ViewBag.Genres = await _context.Genres.ToListAsync();
+                        ViewBag.Sources = await _context.Sources.ToListAsync();
+                        return View(product);
+                    }
+
+                    // Validate file size (max 5MB)
+                    if (productImage.Length > 5 * 1024 * 1024)
+                    {
+                        ModelState.AddModelError("productImage", "Image size must be less than 5MB.");
+                        ViewBag.Genres = await _context.Genres.ToListAsync();
+                        ViewBag.Sources = await _context.Sources.ToListAsync();
+                        return View(product);
+                    }
+
+                    // Convert image to byte array
+                    using (var memoryStream = new MemoryStream())
+                    {
+                        await productImage.CopyToAsync(memoryStream);
+                        product.ProductImage = memoryStream.ToArray();
+                        product.ImageContentType = productImage.ContentType;
+                    }
+                }
+
                 // Use email instead of name for better reliability with test credentials
                 var userEmail = User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Email)?.Value;
                 
@@ -351,10 +382,52 @@ namespace E_Comm.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> EditItem(Product product)
+        public async Task<IActionResult> EditItem(Product product, IFormFile? productImage)
         {
             if (ModelState.IsValid)
             {
+                // Get the existing product to preserve current image if no new one is uploaded
+                var existingProduct = await _context.Products.AsNoTracking().FirstOrDefaultAsync(p => p.ID == product.ID);
+                if (existingProduct == null)
+                    return NotFound();
+
+                // Handle image upload
+                if (productImage != null && productImage.Length > 0)
+                {
+                    // Validate file type
+                    var allowedTypes = new[] { "image/jpeg", "image/jpg", "image/png", "image/gif" };
+                    if (!allowedTypes.Contains(productImage.ContentType.ToLower()))
+                    {
+                        ModelState.AddModelError("productImage", "Only JPEG, PNG, and GIF images are allowed.");
+                        ViewBag.Genres = await _context.Genres.ToListAsync();
+                        ViewBag.Sources = await _context.Sources.ToListAsync();
+                        return View(product);
+                    }
+
+                    // Validate file size (max 5MB)
+                    if (productImage.Length > 5 * 1024 * 1024)
+                    {
+                        ModelState.AddModelError("productImage", "Image size must be less than 5MB.");
+                        ViewBag.Genres = await _context.Genres.ToListAsync();
+                        ViewBag.Sources = await _context.Sources.ToListAsync();
+                        return View(product);
+                    }
+
+                    // Convert image to byte array
+                    using (var memoryStream = new MemoryStream())
+                    {
+                        await productImage.CopyToAsync(memoryStream);
+                        product.ProductImage = memoryStream.ToArray();
+                        product.ImageContentType = productImage.ContentType;
+                    }
+                }
+                else
+                {
+                    // Preserve existing image if no new one is uploaded
+                    product.ProductImage = existingProduct.ProductImage;
+                    product.ImageContentType = existingProduct.ImageContentType;
+                }
+
                 // Use email instead of name for better reliability with test credentials
                 var userEmail = User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Email)?.Value;
                 
@@ -974,6 +1047,20 @@ namespace E_Comm.Controllers
 
             // Use the same view as Customer ProductDetails for consistency
             return View("~/Views/Customer/ProductDetails.cshtml", product);
+        }
+
+        // Serve product images from database
+        [HttpGet]
+        public async Task<IActionResult> GetProductImage(int id)
+        {
+            var product = await _context.Products.FindAsync(id);
+            
+            if (product?.ProductImage == null || product.ImageContentType == null)
+            {
+                return NotFound();
+            }
+
+            return File(product.ProductImage, product.ImageContentType);
         }
 
         // Stock Management Actions

@@ -95,6 +95,20 @@ public class HomeController : Controller
         return View(product);
     }
 
+    // Serve product images from database (public access for customers)
+    [HttpGet]
+    public async Task<IActionResult> GetProductImage(int id)
+    {
+        var product = await _context.Products.FindAsync(id);
+        
+        if (product?.ProductImage == null || product.ImageContentType == null)
+        {
+            return NotFound();
+        }
+
+        return File(product.ProductImage, product.ImageContentType);
+    }
+
     // About 3B1G
     public IActionResult About()
     {

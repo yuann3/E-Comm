@@ -1,734 +1,779 @@
 @model E_Comm.Models.Product
-
 @{
     ViewData["Title"] = Model.Name + " - Product Details";
 }
 
-<div class="container mt-4">
-    <div class="row">
-        <div class="col-12">
-            <!-- Breadcrumb Navigation -->
-            <nav aria-label="breadcrumb" class="mb-4">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item">
-                        <a href="@Url.Action("Index", "Customer")">
-                            <i class="fas fa-home me-1"></i>Dashboard
-                        </a>
-                    </li>
-                    <li class="breadcrumb-item">
-                        <a href="@Url.Action("Browse", "Customer")">
-                            <i class="fas fa-search me-1"></i>Browse Products
-                        </a>
-                    </li>
-                    <li class="breadcrumb-item active" aria-current="page">
-                        Product Details
-                    </li>
-                </ol>
-            </nav>
+<div class="product-details-page">
+    <div class="container-fluid px-4 py-4">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb-modern">
+                <li class="breadcrumb-item">
+                    <a href="@Url.Action("Index", "Customer")">
+                        <i class="fas fa-home"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a href="@Url.Action("Browse", "Customer")">
+                        <i class="fas fa-search"></i>
+                        <span>Browse Products</span>
+                    </a>
+                </li>
+                <li class="breadcrumb-item active">
+                    <span>Product Details</span>
+                </li>
+            </ol>
+        </nav>
 
-            <!-- Success Message -->
-            @if (TempData["Success"] != null)
-            {
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    <i class="fas fa-check-circle me-2"></i>
-                    <strong>Success!</strong> @TempData["Success"]
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
-                </div>
-            }
+        <!-- Success Message -->
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success">
+                <i class="fas fa-check-circle"></i>
+                <strong>Success!</strong> @TempData["Success"]
+            </div>
+        }
 
-            <!-- Main Product Details -->
-            <div class="row g-4">
-                <!-- Product Image & Icon -->
-                <div class="col-lg-5">
-                    <div class="product-showcase">
-                        <div class="product-icon-large">
+        <!-- Main Product Layout -->
+        <div class="product-layout">
+            <!-- Left Column - Product Image -->
+            <div class="product-image-section">
+                <div class="image-container">
+                    @if (Model.ProductImage != null)
+                    {
+                        <div class="product-image-wrapper">
+                            <img src="@Url.Action("GetProductImage", "Home", new { id = Model.ID })" 
+                                 alt="@Model.Name" 
+                                 class="product-image" />
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="product-placeholder">
                             @{
                                 var genreName = Model.Genre?.Name?.ToLower() ?? "";
                                 string iconClass = "fas fa-book";
-                                string iconColor = "text-info";
+                                string iconColor = "text-blue-400";
                                 
                                 if (genreName.Contains("movie") || genreName.Contains("film"))
                                 {
                                     iconClass = "fas fa-film";
-                                    iconColor = "text-danger";
+                                    iconColor = "text-red-400";
                                 }
                                 else if (genreName.Contains("game") || genreName.Contains("gaming"))
                                 {
                                     iconClass = "fas fa-gamepad";
-                                    iconColor = "text-success";
-                                }
-                                else if (genreName.Contains("book") || genreName.Contains("literature"))
-                                {
-                                    iconClass = "fas fa-book";
-                                    iconColor = "text-info";
+                                    iconColor = "text-green-400";
                                 }
                                 else if (genreName.Contains("music") || genreName.Contains("audio"))
                                 {
                                     iconClass = "fas fa-music";
-                                    iconColor = "text-warning";
+                                    iconColor = "text-yellow-400";
                                 }
                             }
-                            <div class="icon-showcase">
-                                <i class="@iconClass @iconColor"></i>
+                            <i class="@iconClass @iconColor placeholder-icon"></i>
+                        </div>
+                    }
+                </div>
+
+                <!-- Product Features -->
+                <div class="product-features">
+                    <div class="feature-item">
+                        <i class="fas fa-star text-yellow-400"></i>
+                        <span>Premium Quality</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-shield-alt text-green-400"></i>
+                        <span>Authentic Product</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-shipping-fast text-blue-400"></i>
+                        <span>Fast Delivery</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-award text-purple-400"></i>
+                        <span>Best Seller</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column - Product Information -->
+            <div class="product-info-section">
+                <!-- Genre Badge -->
+                <div class="genre-badge">
+                    <i class="fas fa-tag"></i>
+                    @(Model.Genre?.Name ?? "Unknown Genre")
+                </div>
+
+                <!-- Product Title -->
+                <h1 class="product-title">@Model.Name</h1>
+
+                <!-- Author -->
+                @if (!string.IsNullOrEmpty(Model.Author))
+                {
+                    <div class="product-author">
+                        <i class="fas fa-user"></i>
+                        by <strong>@Model.Author</strong>
+                    </div>
+                }
+
+                <!-- Description -->
+                <div class="product-description">
+                    <h3>Description</h3>
+                    <p>@(Model.Description ?? "No description available for this product.")</p>
+                </div>
+
+                <!-- Price and Stock -->
+                <div class="price-stock-section">
+                    @if (Model.Stocktakes?.Any() == true)
+                    {
+                        var stocktake = Model.Stocktakes.First();
+                        <div class="price-info">
+                            <div class="current-price">
+                                $@String.Format("{0:F2}", stocktake.Price ?? 0)
+                            </div>
+                            <div class="stock-status @(stocktake.Quantity > 0 ? "in-stock" : "out-of-stock")">
+                                <i class="fas @(stocktake.Quantity > 0 ? "fa-check-circle" : "fa-times-circle")"></i>
+                                @(stocktake.Quantity > 0 ? $"{stocktake.Quantity} in stock" : "Out of stock")
+                            </div>
+                        </div>
+
+                        @if (stocktake.Source != null)
+                        {
+                            <div class="source-info">
+                                <i class="fas fa-store"></i>
+                                Available from: <strong>@stocktake.Source.Source_name</strong>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="price-info">
+                            <div class="current-price unavailable">Price unavailable</div>
+                            <div class="stock-status out-of-stock">
+                                <i class="fas fa-times-circle"></i>
+                                Currently unavailable
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-section">
+                    @if (Model.Stocktakes?.Any(s => s.Quantity > 0) == true)
+                    {
+                        <div class="quantity-selector">
+                            <label>Quantity:</label>
+                            <div class="quantity-controls">
+                                <button type="button" class="qty-btn minus" onclick="decreaseQuantity()">-</button>
+                                <input type="number" id="quantity" value="1" min="1" max="@Model.Stocktakes.First().Quantity" readonly>
+                                <button type="button" class="qty-btn plus" onclick="increaseQuantity()">+</button>
                             </div>
                         </div>
                         
-                        <!-- Quick Actions -->
-                        <div class="quick-actions-grid mt-4">
-                            <div class="action-item">
-                                <i class="fas fa-star text-warning"></i>
-                                <span>Premium Quality</span>
-                            </div>
-                            <div class="action-item">
-                                <i class="fas fa-shield-alt text-success"></i>
-                                <span>Authentic Product</span>
-                            </div>
-                            <div class="action-item">
-                                <i class="fas fa-shipping-fast text-info"></i>
-                                <span>Fast Delivery</span>
-                            </div>
-                            <div class="action-item">
-                                <i class="fas fa-award text-primary"></i>
-                                <span>Best Seller</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Product Information -->
-                <div class="col-lg-7">
-                    <div class="product-info">
-                        <!-- Product Header -->
-                        <div class="product-header mb-4">
-                            <div class="genre-badge mb-2">
-                                <i class="fas fa-tag me-2"></i>
-                                @(Model.Genre?.Name ?? "Unknown Genre")
-                            </div>
-                            <h1 class="product-title">@Model.Name</h1>
-                            <div class="product-author">
-                                <i class="fas fa-user me-2"></i>
-                                by <strong>@Model.Author</strong>
-                            </div>
-                        </div>
-
-                        <!-- Product Description -->
-                        <div class="product-description mb-4">
-                            <h5 class="section-title">Description</h5>
-                            <p class="description-text">@Model.Description</p>
-                        </div>
-
-                        <!-- Pricing & Stock Section -->
-                        <div class="pricing-section mb-4">
-                            @if (Model.Stocktakes?.Any() == true)
-                            {
-                                var stocktake = Model.Stocktakes.First();
-                                <div class="price-container">
-                                    <div class="current-price">
-                                        $@String.Format("{0:F2}", stocktake.Price ?? 0)
-                                    </div>
-                                    <div class="stock-info">
-                                        @if (stocktake.Quantity > 0)
-                                        {
-                                            <span class="stock-available">
-                                                <i class="fas fa-check-circle me-1"></i>
-                                                @stocktake.Quantity in stock
-                                            </span>
-                                        }
-                                        else
-                                        {
-                                            <span class="stock-out">
-                                                <i class="fas fa-times-circle me-1"></i>
-                                                Out of stock
-                                            </span>
-                                        }
-                                    </div>
-                                </div>
-
-                                <!-- Source Information -->
-                                @if (stocktake.Source != null)
-                                {
-                                    <div class="source-info mt-3">
-                                        <small class="text-muted">
-                                            <i class="fas fa-store me-1"></i>
-                                            Available from: <strong>@stocktake.Source.Source_name</strong>
-                                        </small>
-                                    </div>
-                                }
-                            }
-                            else
-                            {
-                                <div class="price-container">
-                                    <div class="current-price text-muted">Price unavailable</div>
-                                    <div class="stock-info">
-                                        <span class="stock-out">
-                                            <i class="fas fa-times-circle me-1"></i>
-                                            Currently unavailable
-                                        </span>
-                                    </div>
-                                </div>
-                            }
-                        </div>
-
-                        <!-- Action Buttons -->
                         <div class="action-buttons">
-                            @if (Model.Stocktakes?.Any(s => s.Quantity > 0) == true)
-                            {
-                                <div class="add-to-cart-form">
-                                    <div class="quantity-section mb-3">
-                                        <label for="quantity" class="form-label">Quantity:</label>
-                                        <div class="quantity-controls">
-                                            <button type="button" class="quantity-btn minus-btn">
-                                                <i class="fas fa-minus"></i>
-                                            </button>
-                                            <input type="number" id="quantity" name="quantity" value="1" min="1" max="@Model.Stocktakes.First().Quantity" class="quantity-input">
-                                            <button type="button" class="quantity-btn plus-btn">
-                                                <i class="fas fa-plus"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <div class="button-group">
-                                        <button type="button" class="btn btn-primary btn-add-cart" onclick="addToCartWithQuantity(@Model.ID)">
-                                            <i class="fas fa-shopping-cart me-2"></i>Add to Cart
-                                        </button>
-                                        <button type="button" class="btn btn-outline-primary btn-wishlist">
-                                            <i class="fas fa-heart me-2"></i>Add to Wishlist
-                                        </button>
-                                    </div>
-                                </div>
-                            }
-                            else
-                            {
-                                <div class="button-group">
-                                    <button type="button" class="btn btn-secondary" disabled>
-                                        <i class="fas fa-times me-2"></i>Currently Unavailable
-                                    </button>
-                                    <button type="button" class="btn btn-outline-primary btn-notify">
-                                        <i class="fas fa-bell me-2"></i>Notify When Available
-                                    </button>
-                                </div>
-                            }
+                            <button class="btn-primary-action" onclick="addToCartWithQuantity(@Model.ID)">
+                                <i class="fas fa-shopping-cart"></i>
+                                Add to Cart
+                            </button>
                         </div>
+                    }
+                    else
+                    {
+                        <div class="action-buttons">
+                            <button class="btn-disabled" disabled>
+                                <i class="fas fa-times"></i>
+                                Currently Unavailable
+                            </button>
+                        </div>
+                    }
+                </div>
+
+                <!-- Product Details -->
+                <div class="product-details-info">
+                    <h3>Product Details</h3>
+                    <div class="details-grid">
+                        <div class="detail-row">
+                            <span class="detail-label">Product ID:</span>
+                            <span class="detail-value">#@Model.ID</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Genre:</span>
+                            <span class="detail-value">@(Model.Genre?.Name ?? "Unknown")</span>
+                        </div>
+                        @if (Model.Published.HasValue)
+                        {
+                            <div class="detail-row">
+                                <span class="detail-label">Published:</span>
+                                <span class="detail-value">@Model.Published.Value.ToString("MMMM yyyy")</span>
+                            </div>
+                        }
+                        @if (Model.LastUpdated.HasValue)
+                        {
+                            <div class="detail-row">
+                                <span class="detail-label">Last Updated:</span>
+                                <span class="detail-value">@Model.LastUpdated.Value.ToString("MMM dd, yyyy")</span>
+                            </div>
+                        }
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Additional Information Tabs -->
-            <div class="row mt-5">
-                <div class="col-12">
-                    <div class="info-tabs">
-                        <ul class="nav nav-tabs" id="productTabs" role="tablist">
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link active" id="details-tab" data-bs-toggle="tab" data-bs-target="#details" type="button" role="tab">
-                                    <i class="fas fa-info-circle me-2"></i>Details
-                                </button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="specifications-tab" data-bs-toggle="tab" data-bs-target="#specifications" type="button" role="tab">
-                                    <i class="fas fa-list me-2"></i>Specifications
-                                </button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews" type="button" role="tab">
-                                    <i class="fas fa-star me-2"></i>Reviews
-                                </button>
-                            </li>
-                        </ul>
-                        <div class="tab-content" id="productTabsContent">
-                            <div class="tab-pane fade show active" id="details" role="tabpanel">
-                                <div class="tab-content-inner">
-                                    <h6>Product Details</h6>
-                                    <div class="details-grid">
-                                        <div class="detail-item">
-                                            <span class="detail-label">Product ID:</span>
-                                            <span class="detail-value">#@Model.ID</span>
-                                        </div>
-                                        <div class="detail-item">
-                                            <span class="detail-label">Genre:</span>
-                                            <span class="detail-value">@(Model.Genre?.Name ?? "Unknown")</span>
-                                        </div>
-                                        <div class="detail-item">
-                                            <span class="detail-label">Author/Creator:</span>
-                                            <span class="detail-value">@Model.Author</span>
-                                        </div>
-                                        @if (Model.Published.HasValue)
-                                        {
-                                            <div class="detail-item">
-                                                <span class="detail-label">Published:</span>
-                                                <span class="detail-value">@Model.Published.Value.ToString("MMMM yyyy")</span>
-                                            </div>
-                                        }
-                                        @if (Model.LastUpdated.HasValue)
-                                        {
-                                            <div class="detail-item">
-                                                <span class="detail-label">Last Updated:</span>
-                                                <span class="detail-value">@Model.LastUpdated.Value.ToString("MMM dd, yyyy")</span>
-                                            </div>
-                                        }
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="tab-pane fade" id="specifications" role="tabpanel">
-                                <div class="tab-content-inner">
-                                    <h6>Technical Specifications</h6>
-                                    <div class="specs-list">
-                                        <div class="spec-item">
-                                            <i class="fas fa-cube me-2 text-primary"></i>
-                                            <span>High-quality content guaranteed</span>
-                                        </div>
-                                        <div class="spec-item">
-                                            <i class="fas fa-language me-2 text-success"></i>
-                                            <span>Available in English</span>
-                                        </div>
-                                        <div class="spec-item">
-                                            <i class="fas fa-shipping-fast me-2 text-info"></i>
-                                            <span>Fast delivery available</span>
-                                        </div>
-                                        <div class="spec-item">
-                                            <i class="fas fa-undo me-2 text-warning"></i>
-                                            <span>30-day return policy</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="tab-pane fade" id="reviews" role="tabpanel">
-                                <div class="tab-content-inner">
-                                    <h6>Customer Reviews</h6>
-                                    <div class="reviews-placeholder">
-                                        <div class="rating-overview">
-                                            <div class="average-rating">
-                                                <span class="rating-number">4.8</span>
-                                                <div class="stars">
-                                                    <i class="fas fa-star text-warning"></i>
-                                                    <i class="fas fa-star text-warning"></i>
-                                                    <i class="fas fa-star text-warning"></i>
-                                                    <i class="fas fa-star text-warning"></i>
-                                                    <i class="fas fa-star text-warning"></i>
-                                                </div>
-                                                <span class="review-count">Based on 127 reviews</span>
-                                            </div>
-                                        </div>
-                                        <p class="text-muted">Customer reviews will be available soon.</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Back to Browse -->
-            <div class="row mt-5">
-                <div class="col-12 text-center">
-                    <a href="@Url.Action("Browse", "Customer")" class="btn btn-outline-secondary btn-lg">
-                        <i class="fas fa-arrow-left me-2"></i>Back to Products
-                    </a>
-                </div>
-            </div>
+        <!-- Back Button -->
+        <div class="back-section">
+            <a href="@Url.Action("Browse", "Customer")" class="btn-back">
+                <i class="fas fa-arrow-left"></i>
+                Back to Products
+            </a>
         </div>
     </div>
 </div>
 
 <style>
-/* ProductDetails specific styles using site.css variables */
-.breadcrumb {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--border-radius);
+/* Modern Product Details Page - Black & White Shadcn Style */
+.product-details-page {
+    min-height: 100vh;
+    background: #000000;
+    color: #ffffff;
+}
+
+.alert {
+    background: #0a0a0a;
+    border: 1px solid #22c55e;
+    border-left: 4px solid #22c55e;
+    border-radius: 8px;
+    padding: 1rem 1.5rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: #ffffff;
+}
+
+.breadcrumb-modern {
+    display: flex;
+    list-style: none;
     padding: 1rem;
+    margin: 0;
+    background: #0a0a0a;
+    border: 1px solid #27272a;
+    border-radius: 8px;
+    align-items: center;
+    flex-wrap: wrap;
 }
 
-.breadcrumb-item a {
-    color: var(--muted-foreground);
+.breadcrumb-modern .breadcrumb-item {
+    display: flex;
+    align-items: center;
+}
+
+.breadcrumb-modern .breadcrumb-item a {
+    color: #a1a1aa;
     text-decoration: none;
-    transition: var(--transition-fast);
+    transition: color 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-weight: 500;
 }
 
-.breadcrumb-item a:hover {
-    color: var(--primary);
+.breadcrumb-modern .breadcrumb-item a:hover {
+    color: #ffffff;
+    background: #1a1a1a;
 }
 
-.breadcrumb-item.active {
-    color: var(--primary);
+.breadcrumb-modern .breadcrumb-item.active {
+    color: #ffffff;
+    font-weight: 600;
+    padding: 0.25rem 0.5rem;
 }
 
-.product-showcase {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--border-radius);
-    padding: 2rem;
-    text-align: center;
-    box-shadow: var(--shadow);
+.breadcrumb-modern .breadcrumb-item:not(:last-child)::after {
+    content: '/';
+    color: #4a4a4a;
+    margin: 0 0.75rem;
+    font-weight: 400;
 }
 
-.icon-showcase {
-    width: 120px;
-    height: 120px;
+.breadcrumb-modern .breadcrumb-item a i {
+    font-size: 0.875rem;
+}
+
+.breadcrumb-modern .breadcrumb-item a span,
+.breadcrumb-modern .breadcrumb-item.active span {
+    font-size: 0.875rem;
+}
+
+/* Main Product Layout */
+.product-layout {
+    display: grid;
+    grid-template-columns: 400px 1fr;
+    gap: 3rem;
+    max-width: 1200px;
     margin: 0 auto;
-    background: var(--muted);
-    border: 2px solid var(--border);
-    border-radius: 20px;
+}
+
+/* Left Column - Image Section */
+.product-image-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.image-container {
+    background: #0a0a0a;
+    border: 1px solid #27272a;
+    border-radius: 12px;
+    padding: 1.5rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 3rem;
-    transition: var(--transition);
+    min-height: 400px;
 }
 
-.icon-showcase:hover {
-    transform: scale(1.05);
-    border-color: var(--primary);
+.product-image-wrapper {
+    width: 100%;
+    max-width: 350px;
+    aspect-ratio: 1;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #27272a;
 }
 
-.quick-actions-grid {
+.product-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.product-image:hover {
+    transform: scale(1.02);
+}
+
+.product-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 350px;
+    aspect-ratio: 1;
+    background: #1a1a1a;
+    border: 1px solid #27272a;
+    border-radius: 8px;
+}
+
+.placeholder-icon {
+    font-size: 4rem;
+    opacity: 0.5;
+}
+
+/* Product Features */
+.product-features {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 1rem;
+    gap: 0.75rem;
 }
 
-.action-item {
-    background: var(--muted);
-    border: 1px solid var(--border);
-    border-radius: var(--border-radius-sm);
+.feature-item {
+    background: #0a0a0a;
+    border: 1px solid #27272a;
+    border-radius: 8px;
     padding: 0.75rem;
     text-align: center;
     font-size: 0.875rem;
-    transition: var(--transition);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s ease;
 }
 
-.action-item:hover {
-    background: var(--secondary);
-    border-color: var(--primary);
+.feature-item:hover {
+    border-color: #ffffff;
+    background: #1a1a1a;
 }
 
-.action-item i {
-    display: block;
-    margin-bottom: 0.5rem;
+.feature-item i {
     font-size: 1.25rem;
 }
 
-.product-info {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--border-radius);
-    padding: 2rem;
-    box-shadow: var(--shadow);
+/* Right Column - Product Information */
+.product-info-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
 }
 
 .genre-badge {
-    display: inline-block;
-    background: var(--muted);
-    color: var(--primary);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: #1a1a1a;
+    color: #ffffff;
     padding: 0.5rem 1rem;
     border-radius: 20px;
     font-size: 0.875rem;
     font-weight: 500;
-    border: 1px solid var(--border);
+    border: 1px solid #27272a;
+    width: fit-content;
 }
 
 .product-title {
-    font-size: 2rem;
+    font-size: 2.5rem;
     font-weight: 700;
-    color: var(--foreground);
-    margin-bottom: 0.5rem;
+    color: #ffffff;
+    margin: 0;
     line-height: 1.2;
 }
 
 .product-author {
-    color: var(--muted-foreground);
-    font-size: 1.1rem;
-    margin-bottom: 1.5rem;
+    color: #a1a1aa;
+    font-size: 1.125rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
-.section-title {
-    color: var(--foreground);
+.product-description h3 {
+    color: #ffffff;
+    font-size: 1.25rem;
     font-weight: 600;
-    margin-bottom: 1rem;
-    border-bottom: 2px solid var(--border);
+    margin-bottom: 0.75rem;
+    border-bottom: 1px solid #27272a;
     padding-bottom: 0.5rem;
 }
 
-.pricing-section {
-    background: var(--secondary);
-    border: 1px solid var(--border);
-    border-radius: var(--border-radius);
+.product-description p {
+    color: #d4d4d8;
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* Price and Stock Section */
+.price-stock-section {
+    background: #0a0a0a;
+    border: 1px solid #27272a;
+    border-radius: 12px;
     padding: 1.5rem;
 }
 
-.price-container {
+.price-info {
     display: flex;
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
     gap: 1rem;
+    margin-bottom: 1rem;
 }
 
 .current-price {
     font-size: 2rem;
     font-weight: 700;
-    color: var(--primary);
+    color: #ffffff;
 }
 
-.stock-available {
-    color: var(--primary);
+.current-price.unavailable {
+    color: #71717a;
+}
+
+.stock-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
     font-weight: 500;
 }
 
-.stock-out {
-    color: var(--destructive);
+.stock-status.in-stock {
+    color: #22c55e;
+}
+
+.stock-status.out-of-stock {
+    color: #ef4444;
+}
+
+.source-info {
+    color: #a1a1aa;
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Action Section */
+.quantity-selector {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.quantity-selector label {
     font-weight: 500;
+    color: #ffffff;
 }
 
 .quantity-controls {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    margin-top: 0.5rem;
+    gap: 0;
+    width: fit-content;
 }
 
-.quantity-btn {
-    background: var(--muted);
-    border: 1px solid var(--border);
-    color: var(--foreground);
+.qty-btn {
+    background: #1a1a1a;
+    border: 1px solid #27272a;
+    color: #ffffff;
     width: 40px;
     height: 40px;
-    border-radius: var(--border-radius-sm);
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: var(--transition);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-weight: 600;
 }
 
-.quantity-btn:hover {
-    background: var(--secondary);
-    border-color: var(--primary);
+.qty-btn:hover {
+    background: #27272a;
+    border-color: #ffffff;
 }
 
-.quantity-input {
-    background: var(--input);
-    border: 1px solid var(--border);
-    color: var(--foreground);
-    width: 80px;
+.qty-btn.minus {
+    border-radius: 6px 0 0 6px;
+    border-right: none;
+}
+
+.qty-btn.plus {
+    border-radius: 0 6px 6px 0;
+    border-left: none;
+}
+
+.quantity-controls input {
+    background: #0a0a0a;
+    border: 1px solid #27272a;
+    border-left: none;
+    border-right: none;
+    color: #ffffff;
+    width: 60px;
     height: 40px;
     text-align: center;
-    border-radius: var(--border-radius-sm);
     font-weight: 500;
 }
 
-.quantity-input:focus {
-    border-color: var(--primary);
-    outline: none;
-    box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.25);
-}
-
-.button-group {
+.action-buttons {
     display: flex;
     gap: 1rem;
     flex-wrap: wrap;
 }
 
-.btn-add-cart {
-    flex: 1;
+.btn-primary-action,
+.btn-secondary-action,
+.btn-disabled,
+.btn-back {
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border: 1px solid;
+    cursor: pointer;
+    font-size: 1rem;
     min-width: 200px;
+    justify-content: center;
 }
 
-.btn-wishlist, .btn-notify {
-    flex: 1;
-    min-width: 180px;
+.btn-primary-action {
+    background: #ffffff;
+    color: #000000;
+    border-color: #ffffff;
+    width: 100%;
+    max-width: 300px;
 }
 
-.info-tabs {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--border-radius);
-    overflow: hidden;
+.btn-primary-action:hover {
+    background: #e5e5e5;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
 }
 
-.nav-tabs {
-    background: var(--secondary);
-    border-bottom: 1px solid var(--border);
-}
-
-.nav-tabs .nav-link {
-    color: var(--muted-foreground);
-    border: none;
+.btn-secondary-action {
     background: transparent;
-    padding: 1rem 1.5rem;
-    transition: var(--transition);
+    color: #ffffff;
+    border-color: #27272a;
+    flex: 1;
+    justify-content: center;
 }
 
-.nav-tabs .nav-link:hover {
-    color: var(--foreground);
-    background: var(--muted);
+.btn-secondary-action:hover {
+    background: #1a1a1a;
+    border-color: #ffffff;
 }
 
-.nav-tabs .nav-link.active {
-    color: var(--primary);
-    background: var(--card);
-    border-bottom: 2px solid var(--primary);
+.btn-disabled {
+    background: #1a1a1a;
+    color: #71717a;
+    border-color: #27272a;
+    cursor: not-allowed;
+    flex: 1;
+    justify-content: center;
 }
 
-.tab-content {
-    background: var(--card);
+.btn-back {
+    background: transparent;
+    color: #a1a1aa;
+    border-color: #27272a;
 }
 
-.tab-content-inner {
-    padding: 2rem;
+.btn-back:hover {
+    color: #ffffff;
+    border-color: #ffffff;
+}
+
+/* Product Details Info */
+.product-details-info h3 {
+    color: #ffffff;
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid #27272a;
+    padding-bottom: 0.5rem;
 }
 
 .details-grid {
-    display: grid;
-    gap: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
 }
 
-.detail-item {
+.detail-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 0.75rem;
-    background: var(--muted);
-    border: 1px solid var(--border);
-    border-radius: var(--border-radius-sm);
+    background: #0a0a0a;
+    border: 1px solid #27272a;
+    border-radius: 6px;
 }
 
 .detail-label {
-    color: var(--muted-foreground);
+    color: #a1a1aa;
     font-weight: 500;
 }
 
 .detail-value {
-    color: var(--foreground);
+    color: #ffffff;
     font-weight: 600;
 }
 
-.specs-list {
-    display: grid;
-    gap: 1rem;
-}
-
-.spec-item {
-    display: flex;
-    align-items: center;
-    padding: 1rem;
-    background: var(--muted);
-    border: 1px solid var(--border);
-    border-radius: var(--border-radius-sm);
-    color: var(--foreground);
-}
-
-.rating-overview {
+.back-section {
+    margin-top: 3rem;
     text-align: center;
-    margin-bottom: 2rem;
 }
 
-.average-rating {
-    background: var(--muted);
-    border: 1px solid var(--border);
-    border-radius: var(--border-radius);
-    padding: 2rem;
+/* Color Classes */
+.text-blue-400 { color: #60a5fa; }
+.text-red-400 { color: #f87171; }
+.text-green-400 { color: #4ade80; }
+.text-yellow-400 { color: #facc15; }
+.text-purple-400 { color: #c084fc; }
+
+/* Responsive Design */
+/* Medium screens and down */
+@@media screen and (max-width: 992px) {
+    .product-layout {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+    
+    .product-image-section {
+        order: 1;
+    }
+    
+    .product-info-section {
+        order: 2;
+    }
+    
+    .image-container {
+        min-height: 300px;
+    }
+    
+    .product-image-wrapper {
+        max-width: 280px;
+    }
+    
+    .product-placeholder {
+        width: 280px;
+    }
 }
 
-.rating-number {
-    font-size: 3rem;
-    font-weight: 700;
-    color: var(--primary);
-    display: block;
-}
-
-.stars {
-    margin: 0.5rem 0;
-    font-size: 1.5rem;
-}
-
-.review-count {
-    color: var(--muted-foreground);
-    font-size: 0.875rem;
-}
-
-/* Use existing site.css text colors */
-.text-info {
-    color: #60a5fa !important;
-}
-
-.text-danger {
-    color: #f87171 !important;
-}
-
-.text-success {
-    color: #34d399 !important;
-}
-
-.text-warning {
-    color: #fbbf24 !important;
-}
-
-/* Responsive design */
-@@media (max-width: 768px) {
+/* Small screens */
+@@media screen and (max-width: 768px) {
+    .container-fluid {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+    }
+    
     .product-title {
-        font-size: 1.5rem;
+        font-size: 2rem;
     }
     
-    .price-container {
+    .price-info {
         flex-direction: column;
-        align-items: start;
+        align-items: flex-start;
+        gap: 0.5rem;
     }
     
-    .button-group {
+    .action-buttons {
         flex-direction: column;
     }
     
-    .btn-add-cart, .btn-wishlist, .btn-notify {
-        min-width: auto;
+    .btn-primary-action,
+    .btn-secondary-action,
+    .btn-disabled {
+        flex: none;
         width: 100%;
     }
     
-    .quick-actions-grid {
+    .product-features {
         grid-template-columns: 1fr;
-    }
-    
-    .icon-showcase {
-        width: 100px;
-        height: 100px;
-        font-size: 2.5rem;
     }
 }
 </style>
 
 @section Scripts {
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Quantity controls
-            const minusBtn = document.querySelector('.minus-btn');
-            const plusBtn = document.querySelector('.plus-btn');
-            const quantityInput = document.querySelector('.quantity-input');
-            
-            if (minusBtn && plusBtn && quantityInput) {
-                minusBtn.addEventListener('click', function() {
-                    const currentValue = parseInt(quantityInput.value);
-                    const minValue = parseInt(quantityInput.getAttribute('min'));
-                    if (currentValue > minValue) {
-                        quantityInput.value = currentValue - 1;
-                    }
-                });
-                
-                plusBtn.addEventListener('click', function() {
-                    const currentValue = parseInt(quantityInput.value);
-                    const maxValue = parseInt(quantityInput.getAttribute('max'));
-                    if (currentValue < maxValue) {
-                        quantityInput.value = currentValue + 1;
-                    }
-                });
+        function increaseQuantity() {
+            const input = document.getElementById('quantity');
+            const max = parseInt(input.getAttribute('max'));
+            const current = parseInt(input.value);
+            if (current < max) {
+                input.value = current + 1;
             }
-        });
+        }
 
-        // Add to cart with quantity
+        function decreaseQuantity() {
+            const input = document.getElementById('quantity');
+            const min = parseInt(input.getAttribute('min'));
+            const current = parseInt(input.value);
+            if (current > min) {
+                input.value = current - 1;
+            }
+        }
+
         function addToCartWithQuantity(productId) {
-            const quantityInput = document.querySelector('.quantity-input');
+            const quantityInput = document.getElementById('quantity');
             const quantity = quantityInput ? parseInt(quantityInput.value) : 1;
             const button = event.target.closest('button');
             const originalContent = button.innerHTML;
             
-            // Show loading state
-            button.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Adding...';
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
             button.disabled = true;
 
             fetch('/Customer/AddToCart', {
@@ -742,61 +787,24 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    showToast('success', data.message, 'fas fa-check-circle');
-                    // Update cart count
-                    if (typeof window.updateCartCount === 'function') {
-                        window.updateCartCount();
-                    }
+                    button.innerHTML = '<i class="fas fa-check"></i> Added!';
+                    button.style.background = '#22c55e';
                     
-                    // Update button to show success temporarily
-                    button.innerHTML = '<i class="fas fa-check me-2"></i>Added!';
-                    button.classList.remove('btn-primary');
-                    button.classList.add('btn-success');
-                    
-                    // Restore button after 2 seconds
+                    // Refresh the page after 1 second to update cart indicator
                     setTimeout(() => {
-                        button.innerHTML = originalContent;
-                        button.classList.remove('btn-success');
-                        button.classList.add('btn-primary');
-                        button.disabled = false;
-                    }, 2000);
+                        window.location.reload();
+                    }, 1000);
                 } else {
-                    showToast('error', data.message, 'fas fa-exclamation-circle');
-                    // Restore button
+                    alert('Error: ' + data.message);
                     button.innerHTML = originalContent;
                     button.disabled = false;
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                showToast('error', 'An error occurred. Please try again.', 'fas fa-exclamation-triangle');
-                // Restore button
+                alert('An error occurred. Please try again.');
                 button.innerHTML = originalContent;
                 button.disabled = false;
-            });
-        }
-
-        // Toast notification function
-        function showToast(type, message, icon) {
-            const toast = document.createElement('div');
-            toast.className = `toast align-items-center text-white bg-${type === 'success' ? 'success' : 'danger'} border-0`;
-            toast.setAttribute('role', 'alert');
-            toast.innerHTML = `
-                <div class="d-flex">
-                    <div class="toast-body">
-                        <i class="${icon} me-2"></i>${message}
-                    </div>
-                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-                </div>
-            `;
-            
-            document.body.appendChild(toast);
-            const bsToast = new bootstrap.Toast(toast);
-            bsToast.show();
-            
-            // Remove toast after it's hidden
-            toast.addEventListener('hidden.bs.toast', () => {
-                document.body.removeChild(toast);
             });
         }
     </script>

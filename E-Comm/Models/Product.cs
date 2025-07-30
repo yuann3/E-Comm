@@ -30,6 +30,12 @@ namespace E_Comm.Models
         
         public DateTime? LastUpdated { get; set; }
         
+        // Image fields for storing product images in database
+        public byte[]? ProductImage { get; set; }
+        
+        [StringLength(100)]
+        public string? ImageContentType { get; set; }
+        
         // Navigation properties
         public virtual Genre? Genre { get; set; }
         public virtual User? LastUpdatedByUser { get; set; }
